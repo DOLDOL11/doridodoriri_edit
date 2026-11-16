@@ -604,6 +604,16 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
         }
 
+        .field.flash {
+            animation: field-flash 1.2s ease;
+            border-radius: 8px;
+        }
+
+        @keyframes field-flash {
+            0%, 40% { background: rgba(59, 130, 246, .10); }
+            100% { background: transparent; }
+        }
+
         .num-row {
             display: flex;
             align-items: center;
@@ -2446,8 +2456,43 @@
         });
         area0.addEventListener('focusin', e => {
             const sp = e.target.closest && e.target.closest('.fv');
-            if (sp) markPanelField(sp.dataset.k);
+            if (sp) revealPanelField(sp);
         });
+
+        // 미리보기에서 칸을 누르면 왼쪽 편집 패널에 그 칸을 바로 띄워 줌
+        let quietRowOpen = 0;
+        function revealPanelField(sp) {
+            const k = sp.dataset.k;
+            const area = document.getElementById('controls');
+            let tab = area.getAttribute('data-active');
+            if (!tab.startsWith('grp-')) {
+                let last = 'grp-blocks';
+                try { last = localStorage.getItem('makerEditTab') || last; } catch (e) {}
+                if (!isValidTab(last) || !last.startsWith('grp-')) last = 'grp-blocks';
+                switchTab(last, true);
+                tab = last;
+            }
+            let wrap = null;
+            if (tab === 'grp-blocks') {
+                const sec = sp.closest('[data-sec]');
+                let row = sec && secKeys[sec.dataset.sec] && secKeys[sec.dataset.sec].has(k) ? sec.dataset.sec : '_top';
+                let d = area.querySelector('details.blk[data-row="' + CSS.escape(row) + '"]');
+                if (!d) d = [...area.querySelectorAll('details.blk')].find(x => x.querySelector('.field[data-field="' + CSS.escape(k) + '"]'));
+                if (d) {
+                    if (!d.open) { quietRowOpen = Date.now(); openRows.add(d.dataset.row); d.open = true; }
+                    wrap = d.querySelector('.field[data-field="' + CSS.escape(k) + '"]');
+                }
+            }
+            if (!wrap) wrap = area.querySelector('.field[data-field="' + CSS.escape(k) + '"]');
+            if (wrap) {
+                const ar = area.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+                const pad = 70;
+                if (wr.top < ar.top + pad || wr.bottom > ar.bottom - 20) {
+                    area.scrollTo({ top: area.scrollTop + (wr.top - ar.top) - Math.max(pad, (area.clientHeight - wr.height) / 3), behavior: 'smooth' });
+                }
+            }
+            markPanelField(k);
+        }
 
         // ==========================================
         // 🗂️ 왼쪽 패널
@@ -2574,7 +2619,7 @@
             box.querySelectorAll('details.blk').forEach(d => d.addEventListener('toggle', () => {
                 if (d.open) {
                     openRows.add(d.dataset.row);
-                    if (d.dataset.row !== '_top') pingSection(d.dataset.row);
+                    if (d.dataset.row !== '_top' && Date.now() - quietRowOpen > 400) pingSection(d.dataset.row);
                 } else openRows.delete(d.dataset.row);
             }));
         }
@@ -2613,8 +2658,11 @@
 
         function markPanelField(k) {
             document.querySelectorAll('.field[data-field="' + CSS.escape(k) + '"]').forEach(wrap => {
+                wrap.classList.remove('flash');
+                void wrap.offsetWidth;
                 wrap.classList.add('flash');
-                setTimeout(() => wrap.classList.remove('flash'), 900);
+                clearTimeout(wrap._ft);
+                wrap._ft = setTimeout(() => wrap.classList.remove('flash'), 1300);
             });
         }
 

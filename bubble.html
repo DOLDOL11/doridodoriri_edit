@@ -75,6 +75,8 @@
   #b-preview summary{color:inherit;font-size:inherit} /* 미리보기 속 상태창 접기 제목에 에디터 스타일이 묻지 않게 */
 
   /* ---------- tool: 말풍선 ---------- */
+  .t-bubble .pv-head{position:sticky;top:0;z-index:30;background:var(--bg);padding:2px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+  .t-bubble .pv-head .pvbar{margin-bottom:0}
   .t-bubble .grid{display:grid;grid-template-columns:minmax(320px,440px) 1fr;gap:20px;align-items:start}
   @media (max-width:1100px){.t-bubble .grid{grid-template-columns:1fr}}
   .t-bubble #b-src{min-height:260px}
@@ -284,6 +286,7 @@
           </div>
         </div>
         <div>
+          <div class="pv-head">
           <div class="toolbar">
             <button class="btn primary" id="b-copyHtml">HTML 코드 복사</button>
             <button id="b-copyRich">서식 그대로 복사</button>
@@ -296,6 +299,7 @@
             <span class="pv-lb">미리보기</span>
             <div class="seg" id="b-pvDevice"><button data-v="pc">PC</button><button data-v="mobile">모바일</button></div>
             <div class="seg" id="b-pvTheme"><button data-v="light">밝은 블로그</button><button data-v="dark">어두운 블로그</button></div>
+          </div>
           </div>
           <div id="b-stage"><div id="b-preview"></div></div>
           <div class="card" style="margin-top:16px">

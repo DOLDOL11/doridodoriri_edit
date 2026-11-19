@@ -7,23 +7,23 @@
 <title>로그 백업 스튜디오</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-  :root{color-scheme:light;--bg:#f4f5f3;--panel:#fff;--ink:#2b2f2d;--sub:#6f7772;--line:#e3e6e2;--accent:#4f9a7d;--accent-d:#3f826a;--accent-soft:#e8f4ee;--ok:#2e7d4f}
+  :root{color-scheme:light;--bg:#eef5fb;--panel:#fff;--ink:#25313c;--sub:#687989;--line:#dbe7f2;--accent:#5a9fd8;--accent-d:#3f80ba;--accent-soft:#e6f1fb;--ok:#2f7fb8}
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:14px}
   textarea,select,input,button{color:var(--ink)}
-  ::placeholder{color:#a3aaa6}
+  ::placeholder{color:#a1b0be}
 
   /* ---------- shell ---------- */
   .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
   .nav{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
   .brand{font-weight:700;font-size:16px;padding:0 10px 4px;letter-spacing:-.3px}
   .brand-sub{font-size:12px;color:var(--sub);padding:0 10px 18px}
-  .nav-label{font-size:11px;color:#9aa19d;padding:12px 10px 6px;letter-spacing:.06em}
+  .nav-label{font-size:11px;color:#97a7b6;padding:12px 10px 6px;letter-spacing:.06em}
   .nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
-  .nav a:hover{background:#f2f4f2}
+  .nav a:hover{background:#eff5fa}
   .nav a.on{background:var(--accent-soft);color:var(--accent-d);font-weight:700}
   .nav a .ic{width:22px;text-align:center}
-  .nav .foot{margin-top:auto;font-size:12px;color:#9aa19d;padding:10px;line-height:1.6}
+  .nav .foot{margin-top:auto;font-size:12px;color:#97a7b6;padding:10px;line-height:1.6}
   .main{min-width:0}
   .view{display:none;padding:24px 28px 48px;max-width:1500px}
   .view.on{display:block}
@@ -46,25 +46,25 @@
   .tile h3{margin:10px 0 6px;font-size:16px}
   .tile p{margin:0;color:var(--sub);line-height:1.6;font-size:13px}
   .tile .use{margin-top:12px;font-size:12px;color:var(--accent-d);font-weight:500}
-  .tile.soon{border-style:dashed;cursor:default;color:#9aa19d}
+  .tile.soon{border-style:dashed;cursor:default;color:#97a7b6}
   .tile.soon:hover{border-color:var(--line);transform:none}
 
   /* ---------- shared components ---------- */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
   .card h2{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
   .step{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;align-items:center;justify-content:center;flex:none}
-  textarea{width:100%;border:1px solid #d9ddd8;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fcfdfc}
+  textarea{width:100%;border:1px solid #d2e0ed;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fbfdff}
   textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
   textarea.mono{font:12px/1.5 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
-  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d9ddd8;border-radius:6px;background:#fff}
-  button{font:inherit;cursor:pointer;border:1px solid #d9ddd8;background:#fff;border-radius:8px;padding:6px 12px}
-  button:hover{background:#f1f4f2}
+  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d2e0ed;border-radius:6px;background:#fff}
+  button{font:inherit;cursor:pointer;border:1px solid #d2e0ed;background:#fff;border-radius:8px;padding:6px 12px}
+  button:hover{background:#edf4fa}
   .btn{border:0;border-radius:8px;padding:9px 16px;font-weight:700}
   .btn.primary,button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover,button.primary:hover{background:var(--accent-d)}
   .btn.ghost{background:#eef0f3}
   .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .hint{color:#8a918d;font-size:12px;line-height:1.6;margin:6px 0 0}
+  .hint{color:#8596a7;font-size:12px;line-height:1.6;margin:6px 0 0}
   .status{font-size:12px;color:var(--sub)}
   .status.ok{color:var(--ok)} .status.warn{color:#b45309}
   label{font-size:13px}
@@ -78,23 +78,23 @@
   @media (max-width:1100px){.t-bubble .grid{grid-template-columns:1fr}}
   .t-bubble #b-src{min-height:260px}
   .t-bubble .field{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-  .t-bubble .field > label{color:#5d6561;min-width:72px}
+  .t-bubble .field > label{color:#566879;min-width:72px}
   .t-bubble input[type=range]{flex:1;min-width:100px;accent-color:var(--accent)}
   .t-bubble .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .t-bubble .presets button{padding:8px 6px;font-size:13px}
   .t-bubble .presets button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-d);font-weight:700}
   .t-bubble .char{display:grid;grid-template-columns:1fr 1fr 34px 82px 28px;gap:6px;align-items:center;margin-bottom:6px}
   .t-bubble .char input[type=text]{width:100%;min-width:0}
-  .t-bubble .char input[type=color]{width:34px;height:30px;border:1px solid #d9ddd8;border-radius:6px;padding:2px;background:#fff}
+  .t-bubble .char input[type=color]{width:34px;height:30px;border:1px solid #d2e0ed;border-radius:6px;padding:2px;background:#fff}
   .t-bubble .char select{padding:5px 4px}
   .t-bubble .char button{padding:4px 0}
   .t-bubble .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   .t-bubble .toolbar .sp{flex:1}
   .t-bubble #b-preview{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;min-height:300px}
   .t-bubble .blk{position:relative;border-radius:8px;outline:1px dashed transparent;outline-offset:4px}
-  .t-bubble .blk:hover{outline-color:#b9d8ca}
+  .t-bubble .blk:hover{outline-color:#b5d3ee}
   .t-bubble .blk.ovr{outline-color:#e9c98f}
-  .t-bubble .ctl{position:absolute;top:-14px;right:0;display:none;gap:4px;z-index:5;background:#fff;border:1px solid #d9ddd8;border-radius:8px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.2}
+  .t-bubble .ctl{position:absolute;top:-14px;right:0;display:none;gap:4px;z-index:5;background:#fff;border:1px solid #d2e0ed;border-radius:8px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.2}
   .t-bubble .blk:hover .ctl{display:flex}
   .t-bubble .ctl select,.t-bubble .ctl button{font-size:12px;padding:3px 6px;border-radius:5px}
   .t-bubble #b-code{min-height:140px}
@@ -145,6 +145,61 @@
   @media (max-width:900px){.topbar{padding:10px 14px}}
 </style>
 <style>.view.solo{max-width:1100px;margin:0 auto;padding-top:48px}</style>
+<style>
+  /* ---------- 하늘색 테마 ---------- */
+  html,body{background:linear-gradient(180deg,#d9ebfa 0px,#e8f3fc 280px,#f1f7fd 700px) fixed;background-color:#f1f7fd}
+  .card{background:rgba(255,255,255,.9);border-color:#d9e7f3;box-shadow:0 4px 18px rgba(90,159,216,.07)}
+  .tile{background:rgba(255,255,255,.88);box-shadow:0 4px 18px rgba(90,159,216,.08)}
+  .tile:hover{box-shadow:0 8px 26px rgba(90,159,216,.16)}
+  .topbar,.nav{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .step{background:linear-gradient(135deg,#7cc0f0,#4f8fd0)}
+  .btn.primary,button.primary{background:linear-gradient(135deg,#6db3ea,#4c8fd0);border-color:#4f93d2}
+  .btn.primary:hover,button.primary:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
+  ::selection{background:#cfe6fb}
+  #view-home header{position:relative;overflow:hidden;padding:28px 30px;border-radius:18px;background:linear-gradient(160deg,#a9d3f6 0%,#cfe6fb 45%,#eef7ff 100%);border:1px solid #cfe3f5;margin-bottom:22px}
+  #view-home header h1,#view-home header p{position:relative;z-index:1}
+  #view-home header h1{color:#1f4f7a}
+  #view-home header p{color:#3f6585}
+  #view-home header::before,#view-home header::after{content:"";position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 6%,rgba(255,255,255,.18) 22%,rgba(200,230,255,.12) 55%,rgba(255,214,245,.35) 78%,rgba(255,255,255,.75) 100%);box-shadow:inset 0 0 12px rgba(255,255,255,.6)}
+  #view-home header::before{width:120px;height:120px;right:40px;top:-30px}
+  #view-home header::after{width:64px;height:64px;right:170px;top:46px;opacity:.85}
+</style>
+<style>
+  /* ---------- 스튜디오 첫 화면: 이어서 하기 · 정렬 · 전체 백업 ---------- */
+  .home-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 14px}
+  .home-tools .grp{display:flex;align-items:center;gap:6px}
+  .home-tools .lb{font-size:12px;color:var(--sub)}
+  .home-tools .sp{flex:1}
+  .home-seg{display:inline-flex;border:1px solid #d2e0ed;border-radius:9px;overflow:hidden;background:#fff}
+  .home-seg button{border:0;border-radius:0;padding:5px 11px;font-size:12px;color:var(--sub);background:transparent}
+  .home-seg button+button{border-left:1px solid #d2e0ed}
+  .home-seg button.on{background:var(--accent-soft);color:var(--accent-d);font-weight:700}
+  .tile{position:relative}
+  .tile .resume{display:flex;align-items:center;gap:7px;margin-top:12px;padding:7px 10px;border-radius:9px;background:var(--accent-soft);font-size:12px;color:#36597a;line-height:1.45}
+  .tile .resume.empty{background:#f3f6f9;color:#97a7b6}
+  .tile .resume .dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(90,159,216,.18)}
+  .tile .resume.empty .dot{background:#c5d1dc;box-shadow:none}
+  .tile .resume .tx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tile .resume .tm{flex:none;margin-left:auto;color:#7f97ad}
+  .tile .mv{display:none;position:absolute;top:10px;right:10px;gap:4px}
+  .tile .mv button{width:28px;height:28px;padding:0;border-radius:8px;font-size:13px;line-height:1}
+  .tiles.editing .tile:not(.soon){cursor:grab;border-style:dashed;border-color:var(--accent)}
+  .tiles.editing .tile:not(.soon):hover{transform:none}
+  .tiles.editing .tile .mv{display:flex}
+  .tiles.editing .tile.drag{opacity:.45}
+  .tiles.editing .tile.over{box-shadow:0 0 0 3px rgba(90,159,216,.35)}
+  .edit-note{display:none;margin:-4px 0 12px;font-size:12px;color:var(--accent-d)}
+  .tiles.editing + .edit-note, .edit-note.on{display:block}
+  .home-backup{margin-top:22px}
+  .home-backup .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .home-backup .meter{flex:1 1 220px;min-width:180px}
+  .home-backup .bar{height:7px;border-radius:4px;background:#e4edf5;overflow:hidden;margin-top:5px}
+  .home-backup .bar span{display:block;height:100%;background:linear-gradient(90deg,#7cc0f0,#4f8fd0);border-radius:4px}
+  .home-backup .bar span.warn{background:linear-gradient(90deg,#f5b46a,#e27a4f)}
+  .home-backup .mtx{font-size:12px;color:var(--sub)}
+  .home-backup ul{margin:8px 0 0;padding-left:18px;color:var(--sub);font-size:12px;line-height:1.7}
+  .home-backup textarea{width:100%;min-height:90px;margin-top:6px}
+</style>
 </head>
 <body>
 <div class="main">
@@ -152,28 +207,34 @@
     <section class="view solo" id="view-home">
       <header>
         <h1>로그 백업 스튜디오</h1>
-        <p>쓰고 싶은 에디터를 고르세요. 에디터를 누르면 새 탭으로 열려요. 탭을 닫았다 다시 열어도 작성 중인 내용은 그대로 남아 있어요.</p>
+        <p>쓰고 싶은 에디터를 고르세요. 새 탭·같은 탭 중 원하는 방식으로 열 수 있고, 창을 닫았다 다시 열어도 작성 중인 내용은 그대로 남아 있어요.</p>
       </header>
+      <div class="home-tools">
+        <div class="grp"><span class="lb">정렬</span><div class="home-seg" id="home-sort"></div></div>
+        <button id="home-editBtn" type="button">✏️ 순서 바꾸기</button>
+        <span class="sp"></span>
+        <div class="grp"><span class="lb">열기</span><div class="home-seg" id="home-open"></div></div>
+      </div>
       <div class="tiles">
-        <a class="tile" rel="noopener" href="bubble.html" target="_blank">
+        <a class="tile" data-ed="bubble" rel="noopener" href="bubble.html" target="_blank">
           <div class="ic">💬</div>
           <h3>말풍선 만들기</h3>
           <p>텍스트로 된 AI 대화 로그를 붙여넣으면 나레이션과 대사를 나눠 말풍선으로 꾸며 줘요. 디자인 프리셋 10종.</p>
           <div class="use">텍스트 로그 → 블로그 HTML</div>
         </a>
-        <a class="tile" rel="noopener" href="excerpt.html" target="_blank">
+        <a class="tile" data-ed="excerpt" rel="noopener" href="excerpt.html" target="_blank">
           <div class="ic">🧹</div>
           <h3>발췌기 로그 정리</h3>
           <p>발췌기에서 복사한 코드를 상태창까지 통째로 붙여넣으면 블로그 본문 폭에 맞게 다시 짜 줘요.</p>
           <div class="use">발췌기 코드 → 블로그 HTML</div>
         </a>
-        <a class="tile" rel="noopener" href="status.html" target="_blank">
+        <a class="tile" data-ed="status" rel="noopener" href="status.html" target="_blank">
           <div class="ic">🛰️</div>
           <h3>상태창 메이커</h3>
           <p>프리셋으로 상태창을 꾸며 HTML 코드나 PNG 이미지로 저장해요. 슬롯에 저장해 둔 상태창도 그대로 불러와요.</p>
           <div class="use">상태창 → HTML · PNG</div>
         </a>
-        <a class="tile" rel="noopener" href="report.html" target="_blank">
+        <a class="tile" data-ed="report" rel="noopener" href="report.html" target="_blank">
           <div class="ic">📋</div>
           <h3>보고서 정리</h3>
           <p>AI가 출력한 보고서(OOC 분석 등)를 붙여넣으면 항목·수치·표를 나눠 보고서 양식으로 정리해 줘요. 양식 7종.</p>
@@ -185,7 +246,223 @@
           <p>새로 만들 에디터가 여기 들어와요.</p>
         </div>
       </div>
+      <div class="edit-note" id="home-editNote">카드를 끌어다 놓거나 ◀ ▶ 버튼으로 순서를 바꿀 수 있어요. 정한 순서는 이 브라우저에만 저장돼요.</div>
+      <div class="card home-backup">
+        <h2><span class="step">💾</span>스튜디오 전체 백업</h2>
+        <div class="row">
+          <div class="meter" id="home-meter"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="primary" id="home-save" type="button">💾 전체 백업 파일 저장</button>
+          <button id="home-load" type="button">📂 백업 불러오기</button>
+          <button id="home-undo" type="button" style="display:none">↶ 불러오기 전으로</button>
+          <input type="file" id="home-file" accept=".json,application/json" style="display:none">
+          <span class="mtx" id="home-last" style="margin-left:auto"></span>
+        </div>
+        <ul>
+          <li>말풍선·발췌기·보고서 작업 중인 내용, 상태창 메이커 슬롯, 색조합·인물 세트, 정렬 설정까지 <b>파일 하나</b>에 담겨요.</li>
+          <li>다른 컴퓨터나 브라우저에서 <b>백업 불러오기</b>로 열면 스튜디오 전체가 그대로 옮겨져요.</li>
+          <li>브라우저 기록을 지우면 저장 내용이 사라질 수 있으니, 가끔 한 번씩 받아두세요.</li>
+        </ul>
+        <details style="margin-top:8px"><summary>파일 저장이 안 될 때 · 백업 코드로 옮기기</summary>
+          <textarea id="home-code" class="mono" placeholder="여기에 백업 코드를 붙여넣고 '코드로 불러오기'를 누르세요"></textarea>
+          <div class="row" style="margin-top:6px;justify-content:flex-end"><button id="home-copy" type="button">백업 코드 복사</button><button id="home-paste" type="button">코드로 불러오기</button></div>
+        </details>
+      </div>
     </section>
 </div>
+<script>window.HOME_CFG={newTab:true};
+(function(){
+/* 스튜디오 첫 화면: 이어서 하기 · 정렬 · 열기 방식 · 전체 백업 */
+const CFG=window.HOME_CFG||{newTab:true};
+const tilesEl=document.querySelector('#view-home .tiles');
+if(!tilesEl) return;
+const PREF_KEY='studio-home';
+const STUDIO_RE=/^(logbubble-|log-editor-|report-editor-|maker|studioStatusExport$|studio-home$|studioTouch:)/;
+const $h=id=>document.getElementById('home-'+id);
+let P={sort:'default', order:[], open:'new'};
+try{ Object.assign(P, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch(e){}
+const savePref=()=>{ try{ localStorage.setItem(PREF_KEY, JSON.stringify(P)); }catch(e){} };
+const get=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const json=k=>{ try{ return JSON.parse(get(k)||'null'); }catch(e){ return null; } };
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=n=>n.toLocaleString('ko-KR');
+function ago(t){
+  if(!t) return '';
+  const d=(Date.now()-t)/1000;
+  if(d<60) return '방금'; if(d<3600) return Math.floor(d/60)+'분 전'; if(d<86400) return Math.floor(d/3600)+'시간 전';
+  if(d<86400*7) return Math.floor(d/86400)+'일 전';
+  const x=new Date(t); return `${String(x.getFullYear()).slice(2)}.${x.getMonth()+1}.${x.getDate()}`;
+}
+const touch=ed=>{ const v=+get('studioTouch:'+ed); return v||0; };
+const REPORT_NAMES={dossier:'기밀 파일',gov:'공문서',lab:'연구 일지',term:'시스템 로그',note:'깔끔한 문서',news:'신문 기사',school:'생활기록부'};
+
+/* ---------- 이어서 하기 ---------- */
+const SUM={
+  bubble(){
+    const d=json('logbubble-v3'); const src=(d&&d.src)||'';
+    if(!src.trim()) return null;
+    const t=d.title||{}; const head=[t.ep?t.ep+'화':'', t.title||''].filter(Boolean).join(' ');
+    return {tx:[head||'제목 없음', '글자 '+num(src.replace(/\s/g,'').length)+'자'].join(' · '), t:touch('bubble')};
+  },
+  excerpt(){
+    const v=get('log-editor-input')||'';
+    if(!v.trim()) return null;
+    return {tx:'코드 '+(v.length>1024?num(Math.round(v.length/1024))+'KB':num(v.length)+'자')+' 붙여넣음', t:touch('excerpt')};
+  },
+  report(){
+    const d=json('report-editor-v1'); const src=(d&&d.src)||'';
+    if(!src.trim()) return null;
+    const ttl=(d.meta&&d.meta.title)||((src.match(/^#\s+(.+)$/m)||[])[1])||'제목 없음';
+    return {tx:[ttl, REPORT_NAMES[d.preset]||'', '글자 '+num(src.replace(/\s/g,'').length)+'자'].filter(Boolean).join(' · '), t:touch('report')};
+  },
+  status(){
+    let slots=0; try{ for(let i=0;i<localStorage.length;i++){ if(/^makerV3_slot\d+$/.test(localStorage.key(i))) slots++; } }catch(e){}
+    const ex=json('studioStatusExport');
+    if(!slots && !ex) return null;
+    return {tx:[(ex&&ex.name)||'상태창', slots?'저장 슬롯 '+slots+'개':''].filter(Boolean).join(' · '), t:touch('status')||(ex&&ex.t)||0};
+  }
+};
+function tiles(){ return [...tilesEl.querySelectorAll('.tile[data-ed]')]; }
+function paintResume(){
+  tiles().forEach(el=>{
+    const ed=el.dataset.ed, f=SUM[ed]; if(!f) return;
+    let r=el.querySelector('.resume'); if(!r){ r=document.createElement('div'); r.className='resume'; el.appendChild(r); }
+    const s=f();
+    r.classList.toggle('empty',!s);
+    r.innerHTML = s ? `<span class="dot"></span><span class="tx">이어서 하기 · ${esc(s.tx)}</span>${s.t?`<span class="tm">${ago(s.t)}</span>`:''}`
+                    : `<span class="dot"></span><span class="tx">아직 작업한 내용이 없어요</span>`;
+  });
+}
+
+/* ---------- 정렬 ---------- */
+const DEFAULT_ORDER=tiles().map(t=>t.dataset.ed);
+function currentOrder(){
+  if(P.sort==='recent'){
+    return [...DEFAULT_ORDER].sort((a,b)=>{ const ta=(SUM[a]&&SUM[a]()||{}).t||0, tb=(SUM[b]&&SUM[b]()||{}).t||0; return tb-ta || DEFAULT_ORDER.indexOf(a)-DEFAULT_ORDER.indexOf(b); });
+  }
+  if(P.sort==='custom'){
+    const o=(P.order||[]).filter(k=>DEFAULT_ORDER.includes(k));
+    DEFAULT_ORDER.forEach(k=>{ if(!o.includes(k)) o.push(k); });
+    return o;
+  }
+  return DEFAULT_ORDER;
+}
+function applyOrder(){
+  const soon=tilesEl.querySelector('.tile.soon');
+  currentOrder().forEach(k=>{ const el=tilesEl.querySelector(`.tile[data-ed="${k}"]`); if(el) tilesEl.insertBefore(el, soon); });
+}
+function seg(id,key,vals,cb){
+  const box=$h(id); if(!box) return;
+  box.innerHTML=vals.map(([v,l])=>`<button data-v="${v}">${l}</button>`).join('');
+  const paint=()=>box.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===P[key]));
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ P[key]=b.dataset.v; savePref(); paint(); cb&&cb(); });
+  paint();
+}
+seg('sort','sort',[['default','기본 순서'],['recent','최근 쓴 순'],['custom','내 순서']],()=>{ if(P.sort!=='custom') stopEdit(); applyOrder(); });
+
+/* 내 순서: 끌어서 옮기기 + ◀ ▶ 버튼 */
+let editing=false, dragEl=null;
+function saveCustom(){ P.order=tiles().map(t=>t.dataset.ed); P.sort='custom'; savePref(); seg('sort','sort',[['default','기본 순서'],['recent','최근 쓴 순'],['custom','내 순서']],()=>{ if(P.sort!=='custom') stopEdit(); applyOrder(); }); }
+function move(el,dir){
+  const list=tiles(), i=list.indexOf(el), j=i+dir; if(j<0||j>=list.length) return;
+  if(dir<0) tilesEl.insertBefore(el,list[j]); else tilesEl.insertBefore(list[j],el);
+  saveCustom();
+}
+tiles().forEach(el=>{
+  const mv=document.createElement('div'); mv.className='mv';
+  mv.innerHTML='<button type="button" title="앞으로">◀</button><button type="button" title="뒤로">▶</button>';
+  const [a,b]=mv.querySelectorAll('button');
+  a.onclick=e=>{ e.preventDefault(); e.stopPropagation(); move(el,-1); };
+  b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); move(el,1); };
+  el.appendChild(mv);
+  el.addEventListener('click',e=>{ if(editing){ e.preventDefault(); } });
+  el.addEventListener('dragstart',e=>{ if(!editing){ e.preventDefault(); return; } dragEl=el; el.classList.add('drag'); try{ e.dataTransfer.setData('text/plain',el.dataset.ed); e.dataTransfer.effectAllowed='move'; }catch(_){} });
+  el.addEventListener('dragend',()=>{ el.classList.remove('drag'); tiles().forEach(t=>t.classList.remove('over')); dragEl=null; });
+  el.addEventListener('dragover',e=>{ if(!editing||!dragEl||dragEl===el) return; e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave',()=>el.classList.remove('over'));
+  el.addEventListener('drop',e=>{ if(!editing||!dragEl||dragEl===el) return; e.preventDefault(); el.classList.remove('over');
+    const list=tiles(); if(list.indexOf(dragEl)<list.indexOf(el)) tilesEl.insertBefore(dragEl,el.nextSibling); else tilesEl.insertBefore(dragEl,el); saveCustom(); });
+});
+function startEdit(){
+  if(P.sort!=='custom'){ P.order=tiles().map(t=>t.dataset.ed); P.sort='custom'; savePref(); seg('sort','sort',[['default','기본 순서'],['recent','최근 쓴 순'],['custom','내 순서']],()=>{ if(P.sort!=='custom') stopEdit(); applyOrder(); }); }
+  editing=true; tilesEl.classList.add('editing'); tiles().forEach(t=>t.setAttribute('draggable','true'));
+  $h('editBtn').textContent='✔ 순서 정하기 끝'; $h('editBtn').classList.add('primary'); $h('editNote').classList.add('on');
+}
+function stopEdit(){
+  editing=false; tilesEl.classList.remove('editing'); tiles().forEach(t=>t.removeAttribute('draggable'));
+  if($h('editBtn')){ $h('editBtn').textContent='✏️ 순서 바꾸기'; $h('editBtn').classList.remove('primary'); }
+  if($h('editNote')) $h('editNote').classList.remove('on');
+}
+if($h('editBtn')) $h('editBtn').onclick=()=>editing?stopEdit():startEdit();
+
+/* ---------- 열기 방식 ---------- */
+function applyOpen(){
+  tiles().forEach(el=>{ if(P.open==='same'){ el.removeAttribute('target'); } else { el.setAttribute('target','_blank'); el.setAttribute('rel','noopener'); } });
+}
+if(CFG.newTab){ seg('open','open',[['new','새 탭'],['same','같은 탭']],applyOpen); applyOpen(); }
+
+/* ---------- 전체 백업 ---------- */
+function studioKeys(){ const ks=[]; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(STUDIO_RE.test(k)) ks.push(k); } }catch(e){} return ks.sort(); }
+function size(){ let b=0; studioKeys().forEach(k=>{ b+=(k.length+(get(k)||'').length)*2; }); return b; }
+const fmtB=b=>b>=1048576?(b/1048576).toFixed(1)+'MB':Math.max(1,Math.round(b/1024))+'KB';
+function paintMeter(){
+  const el=$h('meter'); if(!el) return;
+  const b=size(), cap=5*1048576, pct=Math.min(100,b/cap*100);
+  el.innerHTML=`<div class="mtx">브라우저에 저장된 스튜디오 데이터 <b>${fmtB(b)}</b> / 약 5MB</div><div class="bar"><span class="${pct>70?'warn':''}" style="width:${Math.max(pct,1.5)}%"></span></div>${pct>70?'<div class="mtx" style="color:#c2410c;margin-top:4px">저장 공간이 꽤 찼어요. 전체 백업을 받아두고, 상태창 이미지 등을 정리해 주세요.</div>':''}`;
+}
+function backupText(){ const data={}; studioKeys().forEach(k=>data[k]=get(k)); return JSON.stringify({app:'log-studio-all', v:1, saved:new Date().toISOString(), data}); }
+let undoSnap=null;
+function restore(txt){
+  let o; try{ o=JSON.parse(txt); }catch(e){ toastH('백업 파일을 읽지 못했어요'); return false; }
+  if(!o || o.app!=='log-studio-all' || !o.data || typeof o.data!=='object'){ toastH('스튜디오 전체 백업 파일이 아니에요'); return false; }
+  const keys=Object.keys(o.data).filter(k=>STUDIO_RE.test(k));
+  const when=o.saved?new Date(o.saved).toLocaleString('ko-KR'):'';
+  if(!confirm(`${when?when+'에 만든 ':''}백업(${keys.length}개 항목)으로 바꿀까요?\n지금 스튜디오에 저장된 내용은 이 백업 내용으로 덮어써져요.`)) return false;
+  const before={}; studioKeys().forEach(k=>before[k]=get(k));
+  try{
+    studioKeys().forEach(k=>localStorage.removeItem(k));
+    keys.forEach(k=>{ if(typeof o.data[k]==='string') localStorage.setItem(k,o.data[k]); });
+  }catch(e){
+    try{ studioKeys().forEach(k=>localStorage.removeItem(k)); Object.keys(before).forEach(k=>localStorage.setItem(k,before[k])); }catch(_){}
+    toastH('저장 공간이 부족해서 불러오지 못했어요'); return false;
+  }
+  undoSnap=before; if($h('undo')) $h('undo').style.display='';
+  refresh(); toastH('백업을 불러왔어요. 에디터를 새로 열면 백업 내용이 보여요'); return true;
+}
+function toastH(m){ const t=document.getElementById('toast'); if(!t){ alert(m); return; } t.textContent=m; t.classList.add('show'); clearTimeout(toastH.h); toastH.h=setTimeout(()=>t.classList.remove('show'),2400); }
+if($h('save')) $h('save').onclick=()=>{
+  try{
+    const d=new Date(), p=n=>String(n).padStart(2,'0');
+    const nm=`스튜디오백업_${String(d.getFullYear()).slice(2)}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`;
+    const url=URL.createObjectURL(new Blob([backupText()],{type:'application/json'}));
+    const a=document.createElement('a'); a.href=url; a.download=nm; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    try{ localStorage.setItem('studio-home-lastBackup',String(Date.now())); }catch(e){}
+    toastH('전체 백업 파일을 저장했어요'); paintLast();
+  }catch(e){ toastH('파일 저장이 막혔어요. 아래 백업 코드 복사를 써 주세요'); }
+};
+if($h('load')) $h('load').onclick=()=>$h('file').click();
+if($h('file')) $h('file').onchange=()=>{ const f=$h('file').files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ restore(String(r.result)); $h('file').value=''; }; r.readAsText(f); };
+if($h('copy')) $h('copy').onclick=async()=>{ const t=backupText(); const ta=$h('code'); ta.value=t;
+  try{ await navigator.clipboard.writeText(t); toastH('백업 코드를 복사했어요. 메모장 등에 보관하세요'); }
+  catch(e){ ta.focus(); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} toastH(ok?'백업 코드를 복사했어요':'코드가 선택됐어요. Ctrl+C로 복사하세요'); } };
+if($h('paste')) $h('paste').onclick=()=>{ const t=$h('code').value.trim(); if(!t){ toastH('백업 코드를 먼저 붙여넣어 주세요'); return; } if(restore(t)) $h('code').value=''; };
+if($h('undo')) $h('undo').onclick=()=>{
+  if(!undoSnap) return;
+  try{ studioKeys().forEach(k=>localStorage.removeItem(k)); Object.keys(undoSnap).forEach(k=>localStorage.setItem(k,undoSnap[k])); }catch(e){ toastH('되돌리지 못했어요'); return; }
+  undoSnap=null; $h('undo').style.display='none'; refresh(); toastH('불러오기 전으로 되돌렸어요');
+};
+function paintLast(){ const el=$h('last'); if(!el) return; const t=+get('studio-home-lastBackup'); el.textContent=t?`마지막 전체 백업: ${ago(t)}`:'아직 전체 백업을 받은 적이 없어요'; }
+
+function refresh(){ paintResume(); applyOrder(); paintMeter(); paintLast(); }
+refresh();
+window.addEventListener('storage',e=>{ if(!e.key||STUDIO_RE.test(e.key)) refresh(); });
+window.addEventListener('focus',refresh);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refresh(); });
+window.addEventListener('hashchange',()=>{ if((location.hash||'#home')==='#home') refresh(); stopEdit(); });
+setInterval(()=>{ if(!document.hidden) paintResume(); },60000);
+})();
+</script>
 </body>
 </html>

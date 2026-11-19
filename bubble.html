@@ -7,23 +7,23 @@
 <title>💬 말풍선 만들기 · 로그 백업 스튜디오</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-  :root{color-scheme:light;--bg:#f4f5f3;--panel:#fff;--ink:#2b2f2d;--sub:#6f7772;--line:#e3e6e2;--accent:#4f9a7d;--accent-d:#3f826a;--accent-soft:#e8f4ee;--ok:#2e7d4f}
+  :root{color-scheme:light;--bg:#eef5fb;--panel:#fff;--ink:#25313c;--sub:#687989;--line:#dbe7f2;--accent:#5a9fd8;--accent-d:#3f80ba;--accent-soft:#e6f1fb;--ok:#2f7fb8}
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:14px}
   textarea,select,input,button{color:var(--ink)}
-  ::placeholder{color:#a3aaa6}
+  ::placeholder{color:#a1b0be}
 
   /* ---------- shell ---------- */
   .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
   .nav{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
   .brand{font-weight:700;font-size:16px;padding:0 10px 4px;letter-spacing:-.3px}
   .brand-sub{font-size:12px;color:var(--sub);padding:0 10px 18px}
-  .nav-label{font-size:11px;color:#9aa19d;padding:12px 10px 6px;letter-spacing:.06em}
+  .nav-label{font-size:11px;color:#97a7b6;padding:12px 10px 6px;letter-spacing:.06em}
   .nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
-  .nav a:hover{background:#f2f4f2}
+  .nav a:hover{background:#eff5fa}
   .nav a.on{background:var(--accent-soft);color:var(--accent-d);font-weight:700}
   .nav a .ic{width:22px;text-align:center}
-  .nav .foot{margin-top:auto;font-size:12px;color:#9aa19d;padding:10px;line-height:1.6}
+  .nav .foot{margin-top:auto;font-size:12px;color:#97a7b6;padding:10px;line-height:1.6}
   .main{min-width:0}
   .view{display:none;padding:24px 28px 48px;max-width:1500px}
   .view.on{display:block}
@@ -46,25 +46,25 @@
   .tile h3{margin:10px 0 6px;font-size:16px}
   .tile p{margin:0;color:var(--sub);line-height:1.6;font-size:13px}
   .tile .use{margin-top:12px;font-size:12px;color:var(--accent-d);font-weight:500}
-  .tile.soon{border-style:dashed;cursor:default;color:#9aa19d}
+  .tile.soon{border-style:dashed;cursor:default;color:#97a7b6}
   .tile.soon:hover{border-color:var(--line);transform:none}
 
   /* ---------- shared components ---------- */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
   .card h2{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
   .step{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;align-items:center;justify-content:center;flex:none}
-  textarea{width:100%;border:1px solid #d9ddd8;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fcfdfc}
+  textarea{width:100%;border:1px solid #d2e0ed;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fbfdff}
   textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
   textarea.mono{font:12px/1.5 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
-  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d9ddd8;border-radius:6px;background:#fff}
-  button{font:inherit;cursor:pointer;border:1px solid #d9ddd8;background:#fff;border-radius:8px;padding:6px 12px}
-  button:hover{background:#f1f4f2}
+  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d2e0ed;border-radius:6px;background:#fff}
+  button{font:inherit;cursor:pointer;border:1px solid #d2e0ed;background:#fff;border-radius:8px;padding:6px 12px}
+  button:hover{background:#edf4fa}
   .btn{border:0;border-radius:8px;padding:9px 16px;font-weight:700}
   .btn.primary,button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover,button.primary:hover{background:var(--accent-d)}
   .btn.ghost{background:#eef0f3}
   .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .hint{color:#8a918d;font-size:12px;line-height:1.6;margin:6px 0 0}
+  .hint{color:#8596a7;font-size:12px;line-height:1.6;margin:6px 0 0}
   .status{font-size:12px;color:var(--sub)}
   .status.ok{color:var(--ok)} .status.warn{color:#b45309}
   label{font-size:13px}
@@ -81,14 +81,14 @@
   @media (max-width:1100px){.t-bubble .grid{grid-template-columns:1fr}}
   .t-bubble #b-src{min-height:260px}
   .t-bubble .field{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-  .t-bubble .field > label{color:#5d6561;min-width:72px}
+  .t-bubble .field > label{color:#566879;min-width:72px}
   .t-bubble input[type=range]{flex:1;min-width:100px;accent-color:var(--accent)}
   .t-bubble .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .t-bubble .presets button{padding:8px 6px;font-size:13px}
   .t-bubble .presets button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-d);font-weight:700}
   .t-bubble .char{display:grid;grid-template-columns:1fr 1fr 34px 28px;gap:6px;align-items:center;margin-bottom:6px}
   .t-bubble .char input[type=text]{width:100%;min-width:0}
-  .t-bubble .char input[type=color]{width:34px;height:30px;border:1px solid #d9ddd8;border-radius:6px;padding:2px;background:#fff}
+  .t-bubble .char input[type=color]{width:34px;height:30px;border:1px solid #d2e0ed;border-radius:6px;padding:2px;background:#fff}
   .t-bubble .char select{padding:5px 4px}
   .t-bubble .char button{padding:4px 0}
   .t-bubble .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
@@ -99,15 +99,15 @@
   .t-bubble #b-stage.dark #b-preview{background:#26272b;color:#e6e6e6;border-color:#3a3b40}
   .t-bubble #b-stage.dark.mobile{background:#1e1f23}
   .t-bubble .pvbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
-  .t-bubble .pv-lb{font-size:12px;color:#5d6561;margin-right:2px}
+  .t-bubble .pv-lb{font-size:12px;color:#566879;margin-right:2px}
   .t-bubble .blk{position:relative;border-radius:8px;outline:1px dashed transparent;outline-offset:4px}
-  .t-bubble .blk:hover{outline-color:#b9d8ca}
+  .t-bubble .blk:hover{outline-color:#b5d3ee}
   .t-bubble .blk.ovr{outline-color:#e9c98f}
-  .t-bubble .ctl{position:absolute;top:-14px;right:0;display:none;gap:4px;z-index:5;background:#fff;border:1px solid #d9ddd8;border-radius:8px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.2}
+  .t-bubble .ctl{position:absolute;top:-14px;right:0;display:none;gap:4px;z-index:5;background:#fff;border:1px solid #d2e0ed;border-radius:8px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.2}
   .t-bubble .blk:hover .ctl{display:flex}
   .t-bubble .ctl select,.t-bubble .ctl button{font-size:12px;padding:3px 6px;border-radius:5px}
   .t-bubble #b-code{min-height:140px}
-  .t-bubble .htmlbox{margin-top:6px;padding:10px;border:1px dashed var(--accent);border-radius:8px;background:#f7fbf9}
+  .t-bubble .htmlbox{margin-top:6px;padding:10px;border:1px dashed var(--accent);border-radius:8px;background:#f4f9fd}
   .t-bubble .howto{margin-top:4px}
   .t-bubble .howto summary{font-size:13px;color:var(--accent-d);cursor:pointer}
   .t-bubble .howto .hint{margin-top:6px}
@@ -126,7 +126,7 @@
   .t-bubble .fmtbar button{padding:3px 9px;font-size:13px;min-width:30px}
   .t-bubble .pal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
   .t-bubble .pal-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-  .t-bubble .pal-lb{flex:none;width:64px;font-size:12px;color:#5d6561}
+  .t-bubble .pal-lb{flex:none;width:64px;font-size:12px;color:#566879}
   .t-bubble .pal-sw{display:flex;gap:4px;flex:1}
   .t-bubble .sw{display:inline-block;width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
   .t-bubble .pal-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;margin-top:6px}
@@ -178,6 +178,18 @@
   .view.solo{display:block}
   @media (max-width:900px){.topbar{padding:10px 14px}}
 </style>
+<style>
+  /* ---------- 하늘색 테마 ---------- */
+  html,body{background:linear-gradient(180deg,#d9ebfa 0px,#e8f3fc 280px,#f1f7fd 700px) fixed;background-color:#f1f7fd}
+  .card{background:rgba(255,255,255,.9);border-color:#d9e7f3;box-shadow:0 4px 18px rgba(90,159,216,.07)}
+  .tile{background:rgba(255,255,255,.88);box-shadow:0 4px 18px rgba(90,159,216,.08)}
+  .tile:hover{box-shadow:0 8px 26px rgba(90,159,216,.16)}
+  .topbar,.nav{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .step{background:linear-gradient(135deg,#7cc0f0,#4f8fd0)}
+  .btn.primary,button.primary{background:linear-gradient(135deg,#6db3ea,#4c8fd0);border-color:#4f93d2}
+  .btn.primary:hover,button.primary:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
+  ::selection{background:#cfe6fb}
+</style>
 </head>
 <body>
 <div class="topbar"><a href="./">← 스튜디오</a><b>💬 말풍선 만들기</b></div>
@@ -193,7 +205,7 @@
           <div class="card">
             <h2><span class="step">1</span>로그 붙여넣기</h2>
             <div class="fmtbar" id="b-fmt">
-              <button data-m="**" title="굵게"><b>B</b></button><button data-m="_" title="기울임"><i>I</i></button><button data-m="__" title="밑줄"><u>U</u></button><button data-m="~~" title="취소선"><s>S</s></button><button data-m="==" title="형광펜"><span id="b-hlSw" style="background:rgba(255,222,89,.7);padding:0 3px">형광펜</span></button><input type="color" id="b-hlColor" title="형광펜 색" style="width:30px;height:28px;padding:2px;border:1px solid #d9ddd8;border-radius:6px;background:#fff"><label class="chk" style="font-size:12px"><input type="checkbox" id="b-hlAuto" checked> 프리셋 색</label>
+              <button data-m="**" title="굵게"><b>B</b></button><button data-m="_" title="기울임"><i>I</i></button><button data-m="__" title="밑줄"><u>U</u></button><button data-m="~~" title="취소선"><s>S</s></button><button data-m="==" title="형광펜"><span id="b-hlSw" style="background:rgba(255,222,89,.7);padding:0 3px">형광펜</span></button><input type="color" id="b-hlColor" title="형광펜 색" style="width:30px;height:28px;padding:2px;border:1px solid #d2e0ed;border-radius:6px;background:#fff"><label class="chk" style="font-size:12px"><input type="checkbox" id="b-hlAuto" checked> 프리셋 색</label>
               <label class="chk" style="margin-left:auto"><input type="checkbox" id="b-keepFmt" checked> 붙여넣을 때 서식 유지</label>
             </div>
             <textarea id="b-src" placeholder="여기에 로그를 붙여넣으세요"></textarea>
@@ -229,7 +241,7 @@
             </details>
           </div>
           <div class="card">
-            <h2><span class="step">＋</span>장면 정보 <span style="font-weight:400;color:#8a918d;font-size:12px">맨 위에 표시돼요</span></h2>
+            <h2><span class="step">＋</span>장면 정보 <span style="font-weight:400;color:#8596a7;font-size:12px">맨 위에 표시돼요</span></h2>
             <div class="title-row"><input type="text" id="b-tEp" placeholder="회차 (예: 12)"><input type="text" id="b-tTitle" placeholder="제목 (예: 우산)"></div>
             <input type="text" id="b-tSub" placeholder="부제 (예: 비 오는 날, 현관 앞에서)" style="width:100%;margin:0 0 10px">
             <div id="b-info"></div>
@@ -241,7 +253,7 @@
           </div>
           <div class="card">
             <h2><span class="step">2</span>등장인물</h2>
-            <div class="char" style="font-size:11px;color:#8a918d"><span>본문 속 이름</span><span>말풍선 표시명</span><span>색</span><span></span></div>
+            <div class="char" style="font-size:11px;color:#8596a7"><span>본문 속 이름</span><span>말풍선 표시명</span><span>색</span><span></span></div>
             <div id="b-chars"></div>
             <div class="field" style="margin-top:6px">
               <button id="b-addChar">+ 인물 추가</button>
@@ -258,7 +270,7 @@
             </div>
           </div>
           <div class="card" id="b-statusCard">
-            <h2><span class="step">＋</span>상태창 붙이기 <span style="font-weight:400;color:#8a918d;font-size:12px">로그 맨 아래에 붙어요</span></h2>
+            <h2><span class="step">＋</span>상태창 붙이기 <span style="font-weight:400;color:#8596a7;font-size:12px">로그 맨 아래에 붙어요</span></h2>
             <div class="field"><label class="chk" style="min-width:0"><input type="checkbox" id="b-stOn"> 상태창 붙이기</label><span style="flex:1"></span><button id="b-stReload">🔄 상태창 새로고침</button></div>
             <div class="hint" id="b-stInfo">상태창 메이커에서 만든 상태창을 불러와요. 메이커에서 고친 뒤 🔄를 누르면 새 상태창으로 바뀌어요.</div>
           </div>
@@ -276,7 +288,7 @@
             </div>
           </div>
           <div class="card">
-            <h2><span class="step">＋</span>백업 <span style="font-weight:400;color:#8a918d;font-size:12px">로그·설정을 파일 하나로</span></h2>
+            <h2><span class="step">＋</span>백업 <span style="font-weight:400;color:#8596a7;font-size:12px">로그·설정을 파일 하나로</span></h2>
             <div class="field"><button id="b-bkSave" class="primary">💾 백업 파일 저장</button><button id="b-bkLoad">📂 백업 불러오기</button><input type="file" id="b-bkFile" accept=".json,application/json" style="display:none"></div>
             <p class="hint">로그, 제목·장면 정보, 등장인물, 내 색조합, 인물 세트, 디자인 설정이 모두 들어가요. 다른 컴퓨터나 브라우저에서 불러오면 그대로 이어서 쓸 수 있어요. 불러온 뒤에도 ↶ 실행 취소로 되돌릴 수 있어요.</p>
             <details class="fr"><summary>파일 저장이 안 될 때 · 백업 코드로 옮기기</summary>
@@ -351,6 +363,7 @@ if(typeof S.src==='string' && S.src.length>1500000){ S.src=''; S.ovr={}; bigDrop
 let bigWarned=false;
 function save(){
   try{ record(); }catch(e){}
+  if(saveReady) try{ localStorage.setItem('studioTouch:bubble', String(Date.now())); }catch(e){}
   try{
     if((S.src||'').length>1500000){ // 브라우저 저장 공간보다 큰 로그는 로그만 빼고 저장
       localStorage.setItem('logbubble-v3', JSON.stringify(Object.assign({},S,{src:'',ovr:{}})));
@@ -696,7 +709,7 @@ function render(){
   blocks.forEach((b,i)=>{
     const w=document.createElement('div'); w.className='blk'+(b.ovr?' ovr':''); w.innerHTML=parts[i];
     const ctl=document.createElement('div'); ctl.className='ctl';
-    if(b.type==='h'){ ctl.innerHTML='<span style="padding:3px 6px;color:#5d6561;">HTML 그대로</span>'; w.appendChild(ctl); inner.appendChild(w); return; }
+    if(b.type==='h'){ ctl.innerHTML='<span style="padding:3px 6px;color:#566879;">HTML 그대로</span>'; w.appendChild(ctl); inner.appendChild(w); return; }
     const ts=document.createElement('select'); ts.innerHTML='<option value="n">나레이션</option><option value="d">대사</option><option value="t">속마음</option><option value="y">시스템 줄</option><option value="s">구분선</option>'; ts.value=b.type;
     ts.onchange=()=>setOvr(b,{type:ts.value});
     ctl.appendChild(ts);
@@ -710,7 +723,7 @@ function render(){
     w.appendChild(ctl); inner.appendChild(w);
   });
   if(foot) inner.insertAdjacentHTML('beforeend',foot);
-  if(stx){ const sw=document.createElement('div'); sw.className='blk'; sw.innerHTML=stx; const c=document.createElement('div'); c.className='ctl'; c.innerHTML='<span style="padding:3px 6px;color:#5d6561;">상태창 · 🔄로 새로고침</span>'; sw.appendChild(c); inner.appendChild(sw); }
+  if(stx){ const sw=document.createElement('div'); sw.className='blk'; sw.innerHTML=stx; const c=document.createElement('div'); c.className='ctl'; c.innerHTML='<span style="padding:3px 6px;color:#566879;">상태창 · 🔄로 새로고침</span>'; sw.appendChild(c); inner.appendChild(sw); }
   save();
 }
 function setOvr(b,patch){ S.ovr[b.key]=Object.assign({},S.ovr[b.key],patch); save(); render(); }
@@ -1021,7 +1034,7 @@ function renderSets(){
   const box=$('setList'); box.innerHTML='';
   (S.sets||[]).forEach((st,i)=>{
     const r=document.createElement('div'); r.className='pal-item';
-    r.innerHTML=`<span class="pal-sw" style="flex:none">${st.chars.map(c=>`<span class="sw" style="background:${c.color}"></span>`).join('')}</span><span class="nm">${esc(st.name)} <span style="color:#9aa19d;font-size:12px">· ${esc(st.chars.map(c=>c.name||c.display).filter(Boolean).join(', '))}</span></span><button>불러오기</button><button title="삭제">✕</button>`;
+    r.innerHTML=`<span class="pal-sw" style="flex:none">${st.chars.map(c=>`<span class="sw" style="background:${c.color}"></span>`).join('')}</span><span class="nm">${esc(st.name)} <span style="color:#97a7b6;font-size:12px">· ${esc(st.chars.map(c=>c.name||c.display).filter(Boolean).join(', '))}</span></span><button>불러오기</button><button title="삭제">✕</button>`;
     const [,, ld, del]=r.children;
     ld.onclick=()=>{ S.chars=st.chars.map(c=>({id:newId(),name:c.name,display:c.display||'',color:c.color,side:'left'})); S.ovr={}; renderChars(); render(); toast(`'${st.name}' 인물을 불러왔어요`); };
     del.onclick=()=>{ S.sets.splice(i,1); save(); renderSets(); };
@@ -1062,6 +1075,7 @@ $('palSave').onclick=()=>{
   S.palettes=S.palettes||[]; S.palettes.unshift({name:nm, colors:S.chars.map(c=>({name:c.name, color:c.color}))});
   $('palName').value=''; save(); renderPal(); toast('색조합을 저장했어요');
 };
+var saveReady=false;
 /* ---------- 실행 취소 / 다시 실행 ---------- */
 const UI_KEYS=['pvDevice','pvTheme','keepFmt','stHtml','stName','stTime'];
 function snap(){ const o={}; for(const k in S){ if(!UI_KEYS.includes(k)) o[k]=S[k]; } return JSON.stringify(o); }
@@ -1140,7 +1154,7 @@ $('bkCopy').onclick=async()=>{ const t=backupText(); const ta=$('bkCode'); ta.va
 $('bkPaste').onclick=()=>{ const t=$('bkCode').value.trim(); if(!t){ toast('백업 코드를 먼저 붙여넣어 주세요'); return; } if(loadBackup(t)) $('bkCode').value=''; };
 
 bindTitle(); stInfo(); renderChars(); renderPresets(); renderInfo(); render(); renderPal(); renderSets();
-recordNow();
+recordNow(); saveReady=true;
 if(bigDropped) setTimeout(()=>toast('너무 큰 로그가 저장되어 있어서 지웠어요. 등장인물·색 설정은 그대로예요'),400);
 
 })();

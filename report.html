@@ -7,23 +7,23 @@
 <title>📋 보고서 정리 · 로그 백업 스튜디오</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-  :root{color-scheme:light;--bg:#f4f5f3;--panel:#fff;--ink:#2b2f2d;--sub:#6f7772;--line:#e3e6e2;--accent:#4f9a7d;--accent-d:#3f826a;--accent-soft:#e8f4ee;--ok:#2e7d4f}
+  :root{color-scheme:light;--bg:#eef5fb;--panel:#fff;--ink:#25313c;--sub:#687989;--line:#dbe7f2;--accent:#5a9fd8;--accent-d:#3f80ba;--accent-soft:#e6f1fb;--ok:#2f7fb8}
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:14px}
   textarea,select,input,button{color:var(--ink)}
-  ::placeholder{color:#a3aaa6}
+  ::placeholder{color:#a1b0be}
 
   /* ---------- shell ---------- */
   .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
   .nav{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
   .brand{font-weight:700;font-size:16px;padding:0 10px 4px;letter-spacing:-.3px}
   .brand-sub{font-size:12px;color:var(--sub);padding:0 10px 18px}
-  .nav-label{font-size:11px;color:#9aa19d;padding:12px 10px 6px;letter-spacing:.06em}
+  .nav-label{font-size:11px;color:#97a7b6;padding:12px 10px 6px;letter-spacing:.06em}
   .nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
-  .nav a:hover{background:#f2f4f2}
+  .nav a:hover{background:#eff5fa}
   .nav a.on{background:var(--accent-soft);color:var(--accent-d);font-weight:700}
   .nav a .ic{width:22px;text-align:center}
-  .nav .foot{margin-top:auto;font-size:12px;color:#9aa19d;padding:10px;line-height:1.6}
+  .nav .foot{margin-top:auto;font-size:12px;color:#97a7b6;padding:10px;line-height:1.6}
   .main{min-width:0}
   .view{display:none;padding:24px 28px 48px;max-width:1500px}
   .view.on{display:block}
@@ -46,25 +46,25 @@
   .tile h3{margin:10px 0 6px;font-size:16px}
   .tile p{margin:0;color:var(--sub);line-height:1.6;font-size:13px}
   .tile .use{margin-top:12px;font-size:12px;color:var(--accent-d);font-weight:500}
-  .tile.soon{border-style:dashed;cursor:default;color:#9aa19d}
+  .tile.soon{border-style:dashed;cursor:default;color:#97a7b6}
   .tile.soon:hover{border-color:var(--line);transform:none}
 
   /* ---------- shared components ---------- */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
   .card h2{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
   .step{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;align-items:center;justify-content:center;flex:none}
-  textarea{width:100%;border:1px solid #d9ddd8;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fcfdfc}
+  textarea{width:100%;border:1px solid #d2e0ed;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fbfdff}
   textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
   textarea.mono{font:12px/1.5 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
-  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d9ddd8;border-radius:6px;background:#fff}
-  button{font:inherit;cursor:pointer;border:1px solid #d9ddd8;background:#fff;border-radius:8px;padding:6px 12px}
-  button:hover{background:#f1f4f2}
+  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d2e0ed;border-radius:6px;background:#fff}
+  button{font:inherit;cursor:pointer;border:1px solid #d2e0ed;background:#fff;border-radius:8px;padding:6px 12px}
+  button:hover{background:#edf4fa}
   .btn{border:0;border-radius:8px;padding:9px 16px;font-weight:700}
   .btn.primary,button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover,button.primary:hover{background:var(--accent-d)}
   .btn.ghost{background:#eef0f3}
   .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .hint{color:#8a918d;font-size:12px;line-height:1.6;margin:6px 0 0}
+  .hint{color:#8596a7;font-size:12px;line-height:1.6;margin:6px 0 0}
   .status{font-size:12px;color:var(--sub)}
   .status.ok{color:var(--ok)} .status.warn{color:#b45309}
   label{font-size:13px}
@@ -119,6 +119,18 @@
   .topbar b{font-size:14px}
   .view.solo{display:block}
   @media (max-width:900px){.topbar{padding:10px 14px}}
+</style>
+<style>
+  /* ---------- 하늘색 테마 ---------- */
+  html,body{background:linear-gradient(180deg,#d9ebfa 0px,#e8f3fc 280px,#f1f7fd 700px) fixed;background-color:#f1f7fd}
+  .card{background:rgba(255,255,255,.9);border-color:#d9e7f3;box-shadow:0 4px 18px rgba(90,159,216,.07)}
+  .tile{background:rgba(255,255,255,.88);box-shadow:0 4px 18px rgba(90,159,216,.08)}
+  .tile:hover{box-shadow:0 8px 26px rgba(90,159,216,.16)}
+  .topbar,.nav{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .step{background:linear-gradient(135deg,#7cc0f0,#4f8fd0)}
+  .btn.primary,button.primary{background:linear-gradient(135deg,#6db3ea,#4c8fd0);border-color:#4f93d2}
+  .btn.primary:hover,button.primary:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
+  ::selection{background:#cfe6fb}
 </style>
 </head>
 <body>
@@ -202,7 +214,8 @@ const DEFAULT={src:'', preset:'dossier', meta:{title:'',sub:'',date:'',code:''},
 let S;
 try{ S=Object.assign({},DEFAULT,JSON.parse(localStorage.getItem(KEY)||'{}')); }catch(e){ S=Object.assign({},DEFAULT); }
 if(!S.meta||typeof S.meta!=='object') S.meta={title:'',sub:'',date:'',code:''};
-function save(){ try{ if((S.src||'').length>1500000) return; localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+let saveReady=false;
+function save(){ try{ if((S.src||'').length>1500000) return; localStorage.setItem(KEY,JSON.stringify(S)); if(saveReady) localStorage.setItem('studioTouch:report', String(Date.now())); }catch(e){} }
 function toast(m){ const t=document.getElementById('toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('show'),1800); }
 
 /* ---------- 글꼴 ---------- */
@@ -555,7 +568,7 @@ $('copyRich').onclick=async()=>{
   catch(e){ const r=document.createRange(); r.selectNodeContents($('preview')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} s.removeAllRanges(); toast(ok?'서식 그대로 복사했어요':'복사가 막혔어요'); }
 };
 
-renderPresets(); render();
+renderPresets(); render(); saveReady=true;
 })();
 </script>
 </body>

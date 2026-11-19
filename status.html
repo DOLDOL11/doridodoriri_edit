@@ -2803,6 +2803,7 @@
             setTimeout(exportForStudio, 0);
             try {
                 localStorage.setItem(slotKey(), json);
+                if (window.__statusReady) localStorage.setItem('studioTouch:status', String(Date.now()));
             } catch (e) {
                 showToast('⚠️ 저장 공간이 부족해요. 파일로 백업해 주세요.');
             }
@@ -3660,6 +3661,7 @@
         } catch (e) {}
         switchTab(startTab, true);
         setTimeout(exportForStudio, 800);
+        setTimeout(() => { window.__statusReady = true; }, 1200);
         try {
             if (!localStorage.getItem('makerHelpSeenV3')) setTimeout(() => openHelp(0), 300);
         } catch (e) {}

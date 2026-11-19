@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📋 보고서 정리 · 로그 백업 스튜디오</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+  :root{color-scheme:light;--bg:#f4f5f3;--panel:#fff;--ink:#2b2f2d;--sub:#6f7772;--line:#e3e6e2;--accent:#4f9a7d;--accent-d:#3f826a;--accent-soft:#e8f4ee;--ok:#2e7d4f}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:14px}
+  textarea,select,input,button{color:var(--ink)}
+  ::placeholder{color:#a3aaa6}
+
+  /* ---------- shell ---------- */
+  .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+  .nav{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+  .brand{font-weight:700;font-size:16px;padding:0 10px 4px;letter-spacing:-.3px}
+  .brand-sub{font-size:12px;color:var(--sub);padding:0 10px 18px}
+  .nav-label{font-size:11px;color:#9aa19d;padding:12px 10px 6px;letter-spacing:.06em}
+  .nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
+  .nav a:hover{background:#f2f4f2}
+  .nav a.on{background:var(--accent-soft);color:var(--accent-d);font-weight:700}
+  .nav a .ic{width:22px;text-align:center}
+  .nav .foot{margin-top:auto;font-size:12px;color:#9aa19d;padding:10px;line-height:1.6}
+  .main{min-width:0}
+  .view{display:none;padding:24px 28px 48px;max-width:1500px}
+  .view.on{display:block}
+  .view > header h1{margin:0 0 4px;font-size:21px;letter-spacing:-.4px}
+  .view > header p{margin:0 0 20px;color:var(--sub);line-height:1.6}
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr}
+    .nav{position:sticky;height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);z-index:20}
+    .brand{padding:0 8px 0 2px;white-space:nowrap}
+    .brand-sub,.nav-label,.nav .foot{display:none}
+    .nav a{white-space:nowrap}
+    .view{padding:16px 14px 40px}
+  }
+
+  /* home */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-decoration:none;color:var(--ink);display:block;transition:border-color .15s,transform .15s}
+  .tile:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .tile .ic{font-size:26px}
+  .tile h3{margin:10px 0 6px;font-size:16px}
+  .tile p{margin:0;color:var(--sub);line-height:1.6;font-size:13px}
+  .tile .use{margin-top:12px;font-size:12px;color:var(--accent-d);font-weight:500}
+  .tile.soon{border-style:dashed;cursor:default;color:#9aa19d}
+  .tile.soon:hover{border-color:var(--line);transform:none}
+
+  /* ---------- shared components ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .card h2{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .step{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;align-items:center;justify-content:center;flex:none}
+  textarea{width:100%;border:1px solid #d9ddd8;border-radius:8px;padding:10px 12px;font:inherit;line-height:1.6;resize:vertical;background:#fcfdfc}
+  textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  textarea.mono{font:12px/1.5 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+  select,input[type=text]{font:inherit;padding:5px 8px;border:1px solid #d9ddd8;border-radius:6px;background:#fff}
+  button{font:inherit;cursor:pointer;border:1px solid #d9ddd8;background:#fff;border-radius:8px;padding:6px 12px}
+  button:hover{background:#f1f4f2}
+  .btn{border:0;border-radius:8px;padding:9px 16px;font-weight:700}
+  .btn.primary,button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover,button.primary:hover{background:var(--accent-d)}
+  .btn.ghost{background:#eef0f3}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .hint{color:#8a918d;font-size:12px;line-height:1.6;margin:6px 0 0}
+  .status{font-size:12px;color:var(--sub)}
+  .status.ok{color:var(--ok)} .status.warn{color:#b45309}
+  label{font-size:13px}
+  .chk{display:flex;gap:6px;align-items:center}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b2f2d;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+  details summary{cursor:pointer;color:var(--accent-d);font-size:13px}
+
+  /* ---------- tool: 보고서 ---------- */
+  .t-report .grid{display:grid;grid-template-columns:minmax(320px,440px) 1fr;gap:20px;align-items:start}
+  @media (max-width:1100px){.t-report .grid{grid-template-columns:1fr}}
+  @media (min-width:1101px){
+    .t-report .grid > div{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
+  }
+  .t-report #r-src{min-height:300px}
+  .t-report .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .t-report .meta-grid input{width:100%;min-width:0}
+  .t-report .meta-grid .wide{grid-column:1 / -1}
+  .t-report .presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .t-report .presets button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 11px;border-radius:10px}
+  .t-report .presets button b{font-size:13px}
+  .t-report .presets button small{font-size:11px;color:var(--sub);line-height:1.4}
+  .t-report .presets button.on{border-color:var(--accent);background:var(--accent-soft)}
+  .t-report .presets button.on b{color:var(--accent-d)}
+  .t-report .pv-head{position:sticky;top:0;z-index:30;background:var(--bg);padding:2px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+  .t-report .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+  .t-report .toolbar .sp{flex:1}
+  .t-report .pvbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .t-report .pv-lb{font-size:12px;color:var(--sub)}
+  .t-report #r-stage{transition:background .15s}
+  .t-report #r-preview{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px 24px;min-height:200px;color:#2b2f2d;margin:0 auto;transition:max-width .2s}
+  .t-report #r-stage.mobile{background:#e9ebef;border-radius:12px;padding:16px 0}
+  .t-report #r-stage.mobile #r-preview{max-width:375px;padding:20px 14px;border-radius:10px}
+  .t-report #r-stage.dark #r-preview{background:#26272b;color:#e6e6e6;border-color:#3a3b40}
+  .t-report #r-stage.dark.mobile{background:#1e1f23}
+  .t-report #r-preview summary{color:inherit;font-size:inherit}
+  .t-report .palpick{display:flex;flex-wrap:wrap;gap:6px}
+  .t-report .palpick button{padding:5px 11px;font-size:12px;border-radius:999px;color:var(--sub)}
+  .t-report .palpick button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-d);font-weight:700}
+  .t-report .empty{color:var(--sub);text-align:center;padding:48px 12px;line-height:1.7}
+  .t-report .range-row{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .t-report .range-row input[type=range]{flex:1}
+  .t-report .range-row span{font-size:12px;color:var(--sub);min-width:40px;text-align:right}
+  .t-report .help{color:var(--sub);font-size:12px;line-height:1.75;margin-top:8px}
+  .t-report .help b{color:var(--ink)}
+  .t-report .help code{background:#f1f3f1;border-radius:4px;padding:0 4px;font-size:11.5px}
+  .t-report #r-code{min-height:140px}
+</style>
+<style>
+  .topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--line)}
+  .topbar a{color:var(--accent-d);text-decoration:none;font-size:13px}
+  .topbar b{font-size:14px}
+  .view.solo{display:block}
+  @media (max-width:900px){.topbar{padding:10px 14px}}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="./">← 스튜디오</a><b>📋 보고서 정리</b></div>
+<div class="main">
+    <section class="view solo t-report" id="view-report">
+      <header><h1>📋 보고서 정리</h1><p>AI가 출력한 보고서(OOC 분석 등)를 붙여넣으면 항목·수치·표를 알아서 나눠 보고서 양식으로 정리해 줘요.</p></header>
+      <div class="grid">
+        <div>
+          <div class="card">
+            <h2><span class="step">1</span>보고서 붙여넣기</h2>
+            <textarea id="r-src" placeholder="AI가 출력한 보고서를 그대로 붙여넣으세요.&#10;&#10;■ 관계 정의&#10;- 표면상 관계: …&#10;&#10;■ 배덕성 지수: 42&#10;- 근거: …"></textarea>
+            <div class="row" style="margin-top:8px;justify-content:flex-end">
+              <button id="r-sample">📄 예시 넣기</button>
+              <button id="r-clear">🗑 비우기</button>
+            </div>
+            <details style="margin-top:8px">
+              <summary>💡 이렇게 인식해요</summary>
+              <div class="help">
+                · <b>항목 제목</b>: <code>■ □ ◆ ● ▶ ★ ※</code> 같은 기호, <code>## 제목</code>, <code>【제목】</code>, <code>**제목**</code>만 있는 줄<br>
+                · <b>항목 수치</b>: <code>■ 배덕성 지수: 42</code>처럼 제목 옆 숫자는 게이지로, <code>■ 위험도: 높음</code>처럼 글자는 배지로 보여요.<br>
+                · <b>이름표</b>: <code>표면상 관계: …</code>, <code>**금기**: …</code>처럼 짧은 이름 뒤 쌍점(:)이 오면 이름표 줄이 돼요.<br>
+                · <b>목록</b>: <code>-</code> <code>•</code> <code>·</code> <code>1.</code>로 시작하는 줄<br>
+                · <b>표</b>: <code>| 과목 | 등급 |</code> 형식의 마크다운 표<br>
+                · <b>결론 강조</b>: 제목에 '최종·결론·판정·총평·종합·요약'이 들어간 항목은 따로 강조돼요.<br>
+                · <code>**굵게**</code> <code>*기울임*</code> <code>~~취소선~~</code>도 그대로 살아나요.<br>
+                · <code>||검열할 말||</code>처럼 감싸면 까만 <b>검열 줄</b>로 가려져요. 드래그하면 읽을 수 있어요.
+              </div>
+            </details>
+          </div>
+          <div class="card">
+            <h2><span class="step">2</span>문서 정보 <span style="font-weight:400;color:#8a918d;font-size:12px">비워두면 안 보여요</span></h2>
+            <div class="meta-grid">
+              <input type="text" id="r-title" class="wide" placeholder="제목 (예: 관계 분석 보고서)">
+              <input type="text" id="r-sub" class="wide" placeholder="대상·부제 (예: 성준언 × 성요한)">
+              <input type="text" id="r-date" placeholder="날짜 (예: 26.11.19)">
+              <input type="text" id="r-codeNo" placeholder="문서 번호 (예: 012)">
+            </div>
+            <p class="hint">제목을 비워두고 보고서 첫 줄이 <code># 제목</code>이면 그 줄을 제목으로 써요.</p>
+          </div>
+          <div class="card">
+            <h2><span class="step">3</span>디자인 양식</h2>
+            <div class="presets" id="r-presets"></div>
+            <div id="r-palRow" style="display:none;margin-top:10px"><label style="display:block;margin-bottom:6px">색감</label><div class="palpick" id="r-termPal"></div></div>
+            <div class="range-row"><label>글자 크기</label><input type="range" id="r-fs" min="12" max="18" step="0.5"><span id="r-fsV"></span></div>
+            <label class="chk" style="margin-top:8px"><input type="checkbox" id="r-final"> 결론 항목 강조하기</label>
+          </div>
+        </div>
+        <div>
+          <div class="pv-head">
+            <div class="toolbar">
+              <button class="btn primary" id="r-copyHtml">HTML 코드 복사</button>
+              <button id="r-copyRich">서식 그대로 복사</button>
+              <span class="sp"></span>
+            </div>
+            <div class="pvbar">
+              <span class="pv-lb">미리보기</span>
+              <div class="seg" id="r-pvDevice"><button data-v="pc">PC</button><button data-v="mobile">모바일</button></div>
+              <div class="seg" id="r-pvTheme"><button data-v="light">밝은 블로그</button><button data-v="dark">어두운 블로그</button></div>
+            </div>
+          </div>
+          <div id="r-stage"><div id="r-preview"></div></div>
+          <div class="card" style="margin-top:16px">
+            <details>
+              <summary>HTML 코드 보기 · 티스토리에 붙이는 방법</summary>
+              <p class="hint">티스토리: 글쓰기 → 오른쪽 위 <b>기본모드</b>를 <b>HTML</b>로 바꾸고 'HTML 코드 복사'한 내용을 붙여넣으세요.<br>
+              HTML 모드가 없는 에디터라면 '서식 그대로 복사'로 일반 편집 화면에 붙여넣어 보세요. 다만 일부 스타일은 사라질 수 있어요.</p>
+              <textarea id="r-code" class="mono" readonly></textarea>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+const $=id=>document.getElementById('r-'+id);
+const KEY='report-editor-v1';
+const DEFAULT={src:'', preset:'dossier', meta:{title:'',sub:'',date:'',code:''}, fs:14.5, final:true, termPal:'ice', pvDevice:'pc', pvTheme:'light'};
+let S;
+try{ S=Object.assign({},DEFAULT,JSON.parse(localStorage.getItem(KEY)||'{}')); }catch(e){ S=Object.assign({},DEFAULT); }
+if(!S.meta||typeof S.meta!=='object') S.meta={title:'',sub:'',date:'',code:''};
+function save(){ try{ if((S.src||'').length>1500000) return; localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function toast(m){ const t=document.getElementById('toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('show'),1800); }
+
+/* ---------- 글꼴 ---------- */
+const SANS="'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+const MONO="ui-monospace,'SF Mono',Menlo,Consolas,'Courier New',monospace";
+const SERIF="'Nanum Myeongjo','Noto Serif KR','AppleMyungjo','Batang',serif";
+const TYPE="'Courier New',Courier,monospace";
+
+/* ---------- 인식 ---------- */
+const MARK=/^\s*[■□▣◆◇◈●○◉▶▷►★☆※▪▫◼◻♦✦✧❖◾◽▸]+\s*/;
+const FINAL_RE=/(최종|결론|판정|총평|종합|요약|결과|소견|summary|conclusion|verdict)/i;
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function inline(s){
+  let h=esc(s);
+  h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\|\|(.+?)\|\|/g,(_,t)=>`<span style="background:${REDACT};color:${REDACT};text-shadow:none;border-radius:1px;padding:0 2px;">${t}</span>`).replace(/__(.+?)__/g,'<u>$1</u>').replace(/~~(.+?)~~/g,'<s>$1</s>')
+     .replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g,'$1<i>$2</i>')
+     .replace(/`([^`]+)`/g,`<code style="font-family:${MONO};font-size:.9em;">$1</code>`);
+  return h;
+}
+function cells(t){ return t.replace(/^\|/,'').replace(/\|\s*$/,'').split('|').map(x=>x.trim()); }
+function splitVal(h){
+  const m=h.match(/^(.{1,40}?)\s*[:：]\s*(.{1,24})$/);
+  return m ? {k:m[1].trim(), v:m[2].trim()} : {k:h.trim(), v:''};
+}
+function splitKV(b){
+  let m=b.match(/^\*\*(.+?)\*\*\s*[:：]\s*(.+)$/);
+  if(m) return {k:m[1].trim(), v:m[2].trim()};
+  m=b.match(/^([^:：]{1,16}?)\s*[:：]\s+(.+)$/);
+  if(m && !/["“”'‘’.,!?*]/.test(m[1])) return {k:m[1].trim(), v:m[2].trim()};
+  return null;
+}
+function nextNumbered(lines,i){
+  for(let j=i+1;j<lines.length;j++){ const t=lines[j].trim(); if(!t) continue; return /^\d{1,2}[.)]\s/.test(t); }
+  return false;
+}
+function parse(src){
+  const lines=String(src||'').replace(/\r/g,'').split('\n');
+  let title=''; const secs=[], pre=[]; let cur=null;
+  const push=b=>(cur?cur.blocks:pre).push(b);
+  let prevNum=false;
+  for(let i=0;i<lines.length;i++){
+    const t=lines[i].trim();
+    if(!t){ continue; }
+    // 마크다운 표
+    if(/^\|.*\|\s*$/.test(t) && i+1<lines.length && /^\|?\s*:?-{2,}/.test(lines[i+1].trim())){
+      const head=cells(t); i++; const rows=[];
+      while(i+1<lines.length && /^\|.*\|\s*$/.test(lines[i+1].trim())){ i++; rows.push(cells(lines[i].trim())); }
+      push({type:'table',head,rows}); prevNum=false; continue;
+    }
+    if(/^(-{3,}|\*{3,}|_{3,}|={3,}|─{3,})$/.test(t)){ push({type:'hr'}); prevNum=false; continue; }
+    let h=null, m;
+    if((m=t.match(/^(#{1,6})\s+(.+)$/))){
+      const lv=m[1].length, tx=m[2].replace(/\s*#+$/,'');
+      if(lv===1 && !title && !secs.length && !pre.length){ title=tx; continue; }
+      if(lv>=3 && cur){ push({type:'sub',text:tx}); continue; }
+      h=tx;
+    }
+    else if(MARK.test(t) && t.replace(MARK,'')) h=t.replace(MARK,'');
+    else if((m=t.match(/^【(.+?)】\s*[:：]?\s*(.*)$/))) h=m[1]+(m[2]?': '+m[2]:'');
+    else if((m=t.match(/^\*\*([^*]{1,40})\*\*$/))) h=m[1];
+    else if((m=t.match(/^\[([^\]]{1,30})\]$/))) h=m[1];
+    else if((m=t.match(/^\d{1,2}[.)]\s+(.{1,30})$/)) && !prevNum && !/[.。!?]$|[다요]$/.test(m[1]) && !nextNumbered(lines,i)) h=m[1];
+    if(h!==null){ const hv=splitVal(h); cur={title:hv.k, value:hv.v, blocks:[]}; secs.push(cur); prevNum=false; continue; }
+    let body=t, n=null, li=false;
+    if((m=body.match(/^[-*•·∙‣◦–—]\s+(.*)$/))){ body=m[1]; li=true; }
+    else if((m=body.match(/^(\d{1,2})[.)]\s+(.*)$/))){ body=m[2]; n=m[1]; li=true; }
+    prevNum=!!n;
+    if(/^>\s?/.test(body)){ push({type:'quote',text:body.replace(/^>\s?/,'')}); continue; }
+    const kv=splitKV(body);
+    if(kv){ push({type:'kv',k:kv.k,v:kv.v}); continue; }
+    push(li?{type:'li',text:body,n}:{type:'p',text:body});
+  }
+  return {title,pre,secs};
+}
+function metric(v){
+  if(!v) return null;
+  let m=v.match(/^(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*(?:점)?$/);
+  if(m){ const a=+m[1], b=+m[2]; if(b>0 && a>=0 && a<=b) return {pct:a/b*100, txt:v}; }
+  m=v.match(/^(-?\d+(?:\.\d+)?)\s*(%|점|pt)?$/i);
+  if(m){ const a=+m[1]; if(a>=0 && a<=100) return {pct:a, txt:m[1], unit:m[2]||''}; }
+  return null;
+}
+let REDACT='#111';
+const pad=n=>String(n).padStart(2,'0');
+const ROMAN=n=>{ const r=[[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s=''; for(const [v,c] of r) while(n>=v){ s+=c; n-=v; } return s; };
+const HANGUL='가나다라마바사아자차카타파하';
+function tbl(b,st){
+  const th=b.head.map(c=>`<th style="${st.th}">${inline(c)}</th>`).join('');
+  const rows=b.rows.map(r=>`<tr>${b.head.map((_,i)=>`<td style="${st.td}">${inline(r[i]==null?'':r[i])}</td>`).join('')}</tr>`).join('');
+  return `<div style="overflow-x:auto;margin:0 0 .9em;"><table style="border-collapse:collapse;width:100%;min-width:${Math.min(b.head.length*70,560)}px;font-size:.88em;line-height:1.5;${st.table||''}"><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+const blocks10=(pct,on,off,w,h,r)=>{ const k=Math.round(pct/10); let s=''; for(let i=0;i<10;i++) s+=`<span style="display:inline-block;width:${w}px;height:${h}px;margin-right:2px;border-radius:${r||0}px;${i<k?`background:${on};`:`box-shadow:inset 0 0 0 1px ${off};`}"></span>`; return s; };
+
+/* ---------- 디자인 양식 ---------- */
+const P={};
+
+// 1. 기밀 파일
+(()=>{ const folder='#d4bc82', paper='#f7f3e8', ink='#1e1c18', red='#b0201a', mut='#6d6656', line='#cbbf9f';
+const banner=t=>`<div style="text-align:center;font-family:${TYPE};font-weight:700;font-size:12px;letter-spacing:.3em;color:${red};">${t}</div>`;
+P.dossier={name:'기밀 파일', desc:'서류철 · CLASSIFIED 도장 · 검열 줄',
+  box:(x,o,m)=>`<div style="max-width:720px;margin:0 auto;font-family:${SANS};font-size:${o.fs}px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;box-sizing:border-box;"><div style="display:inline-block;margin-left:18px;padding:5px 16px 3px;background:${folder};border-radius:8px 8px 0 0;font-family:${TYPE};font-size:11px;font-weight:700;letter-spacing:.16em;color:#4a3d1c;">CASE FILE${m.code?' № '+esc(m.code):''}</div><div style="background:${folder};padding:12px;border-radius:0 6px 6px 6px;"><div style="position:relative;overflow:hidden;background:${paper};color:${ink};padding:18px 22px 16px;box-shadow:0 1px 3px rgba(0,0,0,.2);"><div style="position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) rotate(-28deg);font-family:${TYPE};font-weight:700;font-size:64px;letter-spacing:.1em;color:rgba(176,32,26,.06);white-space:nowrap;pointer-events:none;">CONFIDENTIAL</div><div style="position:relative;">${banner('TOP SECRET // EYES ONLY')}<div style="height:14px;"></div>${x}<div style="height:6px;"></div>${banner('TOP SECRET // EYES ONLY')}</div></div></div></div>`,
+  head:m=>{ const row=(l,v)=>`<div style="display:flex;gap:8px;align-items:baseline;margin:2px 0;"><span style="flex:none;width:7.9em;font-family:${TYPE};font-size:12px;font-weight:700;letter-spacing:.06em;">${l}</span><span style="flex:1;min-width:0;border-bottom:1px dotted ${mut};font-family:${TYPE};font-size:.92em;">${v}</span></div>`;
+    return `<div style="position:relative;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid ${ink};"><div style="position:absolute;right:2px;top:2px;transform:rotate(-12deg);border:3px double ${red};color:${red};font-family:${TYPE};font-weight:700;font-size:14px;letter-spacing:.18em;padding:3px 9px;opacity:.85;background:rgba(247,243,232,.6);">CLASSIFIED</div>${m.title?`<div style="font-family:${TYPE};font-weight:700;font-size:1.4em;line-height:1.35;padding-right:140px;margin-bottom:10px;">${esc(m.title)}</div>`:'<div style="height:34px;"></div>'}${m.sub?row('SUBJECT:',esc(m.sub)):''}${m.date?row('DATE:',esc(m.date)):''}${row('CLEARANCE:','LEVEL 5 — AUTHORIZED PERSONNEL ONLY')}</div>`; },
+  sec:(s,x)=>{
+    const val=s.met?`<span style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;"><span style="white-space:nowrap;line-height:0;">${blocks10(s.met.pct,red,'#b9ab8b',8,12)}</span><span style="font-family:${TYPE};font-weight:700;color:${red};">${esc(s.met.txt)}</span></span>`
+      : s.value?`<span style="margin-left:auto;font-family:${TYPE};font-size:12px;font-weight:700;color:${red};border:2px solid ${red};padding:0 7px;transform:rotate(-3deg);display:inline-block;">${esc(s.value)}</span>`:'';
+    if(s.fin) return `<div style="position:relative;margin:10px 0 18px;padding:14px 18px 10px;border:2px solid ${red};background:rgba(176,32,26,.04);"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:${TYPE};font-size:11px;letter-spacing:.18em;color:${red};font-weight:700;margin-bottom:8px;">■ FINAL DETERMINATION — ${esc(s.title)}${val}</div><div style="font-weight:600;">${x}</div><div style="text-align:right;margin-top:2px;"><span style="display:inline-block;transform:rotate(-8deg);border:2px solid ${red};color:${red};font-family:${TYPE};font-weight:700;font-size:11px;letter-spacing:.2em;padding:1px 8px;opacity:.85;">VERIFIED</span></div></div>`;
+    return `<div style="margin:0 0 20px;"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid ${line};"><span style="background:${ink};color:${paper};font-family:${TYPE};font-weight:700;font-size:11px;letter-spacing:.1em;padding:2px 7px;">§${pad(s.n)}</span><span style="font-weight:700;font-size:1.05em;">${esc(s.title)}</span>${val}</div>${x}</div>`; },
+  kv:(k,v)=>`<div style="margin:0 0 .6em;"><span style="font-family:${TYPE};font-weight:700;font-size:.86em;border-bottom:1px solid ${ink};margin-right:6px;">${k}:</span>${v}</div>`,
+  li:(t,n)=>`<div style="display:flex;gap:8px;margin:0 0 .45em;"><span style="flex:none;font-family:${TYPE};color:${mut};">${n?n+'.':'—'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .6em;padding-left:12px;border-left:3px solid ${line};color:${mut};">${t}</div>`,
+  sub:t=>`<div style="margin:.8em 0 .4em;font-family:${TYPE};font-weight:700;font-size:.9em;letter-spacing:.06em;">▸ ${t}</div>`,
+  hr:()=>`<div style="border-top:1px dashed ${line};margin:12px 0;"></div>`,
+  table:b=>tbl(b,{th:`background:${ink};color:${paper};border:1px solid ${ink};padding:6px 8px;font-family:${TYPE};text-align:center;`,td:`border:1px solid ${line};padding:6px 8px;text-align:center;`})};
+})();
+
+// 2. 공문서
+(()=>{ const ink='#1f1f1f', bd='#9a9a9a', cell='#f2f2f2', red='#c8322a';
+P.gov={name:'공문서 · 결재', desc:'결재란 · 가나다 항목 · 끝.',
+  box:(x,o)=>`<div style="max-width:720px;margin:0 auto;padding:30px 26px 24px;background:#fff;border:1px solid #c4c4c4;color:${ink};font-family:${SANS};font-size:${o.fs}px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;box-sizing:border-box;">${x}</div>`,
+  head:m=>{
+    const td=`border:1px solid ${bd};text-align:center;`;
+    const appr=`<table style="border-collapse:collapse;font-size:11px;flex:none;"><tr><td rowspan="2" style="${td}background:${cell};padding:4px 5px;width:14px;line-height:1.3;">결<br>재</td><td style="${td}background:${cell};padding:2px 10px;">담당</td><td style="${td}background:${cell};padding:2px 10px;">검토</td><td style="${td}background:${cell};padding:2px 10px;">결재</td></tr><tr><td style="${td}height:36px;"></td><td style="${td}"></td><td style="${td}"><span style="display:inline-block;width:28px;height:28px;line-height:26px;border:2px solid ${red};border-radius:50%;color:${red};font-weight:700;font-size:10px;transform:rotate(-10deg);">승인</span></td></tr></table>`;
+    const rows=[['대상',m.sub],['시행일자',m.date],['문서번호',m.code]].filter(r=>r[1]);
+    const meta=rows.length?`<table style="width:100%;border-collapse:collapse;margin:16px 0 0;font-size:.88em;">${rows.map(r=>`<tr><td style="width:84px;background:${cell};border:1px solid ${bd};padding:5px 8px;text-align:center;font-weight:700;">${r[0]}</td><td style="border:1px solid ${bd};padding:5px 10px;">${esc(r[1])}</td></tr>`).join('')}</table>`:'';
+    return `<div style="margin-bottom:24px;padding-bottom:16px;border-bottom:3px double ${ink};"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;"><div style="flex:1 1 220px;min-width:0;font-family:${SERIF};font-weight:700;font-size:1.6em;letter-spacing:.25em;line-height:1.35;">${esc(m.title||'보고서')}</div>${appr}</div>${meta}</div>`; },
+  sec:(s,x)=>{
+    const val=s.met?` <span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle;margin-left:4px;"><span style="display:inline-block;width:90px;height:7px;border:1px solid #444;"><span style="display:block;height:100%;width:${s.met.pct}%;background:#444;"></span></span><b>${esc(s.met.txt)}</b></span>`
+      : s.value?` : <b>${esc(s.value)}</b>`:'';
+    if(s.fin) return `<div style="margin:10px 0 18px;padding:14px 18px 8px;border:3px double #444;"><div style="text-align:center;font-family:${SERIF};font-weight:700;letter-spacing:.3em;margin-bottom:8px;">${esc(s.title)}${val}</div>${x}</div>`;
+    return `<div style="margin:0 0 18px;"><div style="font-weight:700;font-size:1.05em;margin:0 0 8px;">${s.n}. ${esc(s.title)}${val}</div><div style="padding-left:1.1em;">${x}</div></div>`; },
+  kv:(k,v,i)=>`<div style="display:flex;gap:6px;margin:0 0 .55em;"><span style="flex:none;">${HANGUL[i%14]}.</span><span style="min-width:0;"><b>${k}</b> : ${v}</span></div>`,
+  li:(t,n)=>`<div style="display:flex;gap:6px;margin:0 0 .45em;"><span style="flex:none;">${n?n+')':'-'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .6em;padding:6px 12px;background:${cell};">${t}</div>`,
+  sub:t=>`<div style="margin:.8em 0 .4em;font-weight:700;">○ ${t}</div>`,
+  hr:()=>`<div style="border-top:1px solid ${bd};margin:12px 0;"></div>`,
+  table:b=>tbl(b,{th:`background:${cell};border:1px solid ${bd};padding:6px 8px;text-align:center;`,td:`border:1px solid ${bd};padding:6px 8px;text-align:center;`}),
+  foot:()=>`<div style="text-align:right;font-weight:700;margin-top:4px;">끝.</div>`};
+})();
+
+// 3. 연구 일지
+(()=>{ const tl='#2f5f9f', ink='#263238', mut='#78909c';
+P.lab={name:'연구 일지', desc:'모눈종이 · 관찰 기록 · 수치 막대',
+  box:(x,o)=>`<div style="max-width:720px;margin:0 auto;padding:26px 24px 20px;background-color:#fbfcfe;background-image:linear-gradient(rgba(47,95,159,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(47,95,159,.07) 1px,transparent 1px);background-size:18px 18px;border:1px solid #d5deec;border-radius:6px;color:${ink};font-family:${SANS};font-size:${o.fs}px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;box-sizing:border-box;">${x}</div>`,
+  head:m=>{ const chip=t=>`<span style="display:inline-block;border:1px solid ${tl};color:${tl};border-radius:999px;padding:1px 9px;font-size:11px;margin:4px 6px 0 0;">${t}</span>`;
+    return `<div style="padding-bottom:12px;margin-bottom:20px;border-bottom:1.5px solid ${tl};"><div style="font-family:${MONO};font-size:11px;letter-spacing:.16em;color:${tl};">SPECIMEN REPORT${m.code?' · #'+esc(m.code):''}</div>${m.title?`<div style="margin-top:4px;font-weight:700;font-size:1.5em;line-height:1.35;">${esc(m.title)}</div>`:''}${(m.sub||m.date)?`<div>${m.sub?chip('대상 · '+esc(m.sub)):''}${m.date?chip(esc(m.date)):''}</div>`:''}</div>`; },
+  sec:(s,x)=>{
+    const val=s.met?`<span style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-block;width:110px;height:8px;border-radius:4px;background:rgba(47,95,159,.15);overflow:hidden;vertical-align:middle;"><span style="display:block;height:100%;width:${s.met.pct}%;background:${tl};"></span></span><span style="font-family:${MONO};font-weight:700;color:${tl};">${esc(s.met.txt)}</span></span>`
+      : s.value?`<span style="margin-left:auto;font-size:12px;font-weight:700;color:#fff;background:${tl};border-radius:999px;padding:1px 10px;">${esc(s.value)}</span>`:'';
+    if(s.fin) return `<div style="margin:6px 0 16px;padding:12px 16px 6px;background:#fff8d6;border:1px solid #ecd98a;border-radius:4px;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.14em;color:#9a7b12;font-weight:700;margin-bottom:6px;">OBSERVATION ▸ ${esc(s.title)}${val}</div>${x}</div>`;
+    return `<div style="margin:0 0 18px;"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 8px;"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;border:1.5px solid ${tl};color:${tl};font-family:${MONO};font-size:11px;font-weight:700;align-items:center;justify-content:center;flex:none;">${pad(s.n)}</span><span style="font-weight:700;font-size:1.05em;">${esc(s.title)}</span>${val}</div>${x}</div>`; },
+  kv:(k,v)=>`<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px dotted #bfcde3;"><span style="flex:none;width:7em;font-size:.85em;font-weight:700;color:${tl};padding-top:.15em;">${k}</span><span style="flex:1;min-width:0;">${v}</span></div>`,
+  li:(t,n)=>`<div style="display:flex;gap:8px;margin:0 0 .45em;"><span style="flex:none;color:${tl};font-weight:700;">${n?n+'.':'◦'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:.3em 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .6em;padding-left:12px;border-left:3px solid ${tl};color:${mut};">${t}</div>`,
+  sub:t=>`<div style="margin:.8em 0 .4em;font-weight:700;color:${tl};">${t}</div>`,
+  hr:()=>`<div style="border-top:1px dotted ${tl};margin:12px 0;"></div>`,
+  table:b=>tbl(b,{table:'background:#fff;',th:`background:rgba(47,95,159,.1);color:${tl};border:1px solid #cfdaeb;padding:6px 8px;text-align:center;`,td:`border:1px solid #cfdaeb;padding:6px 8px;text-align:center;`})};
+})();
+
+// 4. 터미널
+const TERM_PAL={
+  ice:{name:'아이스 블루',bg:'#050d15',ink:'#d4efff',gr:'#4fd8ff',am:'#ffd36e',dim:'#4a7d98',bd:'#14344c',glow:'79,216,255'},
+  amber:{name:'앰버',bg:'#140d04',ink:'#ffe4b8',gr:'#ffb000',am:'#fff1d6',dim:'#8f6c33',bd:'#3d2b10',glow:'255,176,0'},
+  mono:{name:'흑백+레드',bg:'#0d0d0e',ink:'#e6e6e6',gr:'#ffffff',am:'#ff5a5a',dim:'#6e6e6e',bd:'#2c2c2c',glow:'255,255,255'},
+  violet:{name:'바이올렛',bg:'#0f0a1a',ink:'#e8deff',gr:'#b794ff',am:'#ff8fd1',dim:'#6f5c99',bd:'#2c2147',glow:'183,148,255'},
+  green:{name:'그린',bg:'#07110b',ink:'#b8f5c8',gr:'#39ff88',am:'#ffcc4d',dim:'#4f8a64',bd:'#1d3b28',glow:'57,255,136'}
+};
+function makeTerm(c){ const {bg,ink,gr,am,dim,bd,glow}=c, red='#ff5f56';
+return {name:'시스템 로그', desc:'CRT 모니터 · 부팅 로그 · 트리 구조', redact:gr,
+  box:(x,o,m)=>`<div style="max-width:720px;margin:0 auto;padding:10px;background:#1a1d1b;border-radius:12px;box-shadow:inset 0 0 0 1px #2b302d;box-sizing:border-box;"><div style="background-color:${bg};background-image:repeating-linear-gradient(0deg,rgba(${glow},.05) 0 1px,transparent 1px 3px),radial-gradient(ellipse at center,rgba(${glow},.09),transparent 72%);border:1px solid ${bd};border-radius:8px;color:${ink};font-family:${MONO};font-size:${o.fs-.5}px;line-height:1.75;text-shadow:0 0 6px rgba(${glow},.35);padding:14px 18px 14px;word-break:keep-all;overflow-wrap:anywhere;"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:${dim};border-bottom:1px solid ${bd};padding-bottom:6px;margin-bottom:12px;"><span>ARCHIVE-OS v2.4 · TTY1</span><span><span style="color:${red};">●</span> REC${m.date?' · '+esc(m.date):''}</span></div>${x}</div></div>`,
+  head:m=>`<div style="margin-bottom:16px;"><div style="color:${dim};font-size:.82em;">[ <span style="color:${gr};">OK</span> ] mounting /archive/report${m.code?'_'+esc(m.code):''}</div><div style="color:${dim};font-size:.82em;">[ <span style="color:${gr};">OK</span> ] decrypting file .......... done</div><div style="color:${dim};font-size:.82em;">[ <span style="color:${am};">!!</span> ] access level: CLASSIFIED</div><div style="margin-top:8px;color:${gr};">root@archive:~$ <span style="color:${ink};">cat report.log</span></div>${m.title?`<div style="margin-top:8px;padding:6px 12px;border:1px solid ${gr};color:${gr};font-weight:700;font-size:1.15em;letter-spacing:.03em;box-shadow:0 0 10px rgba(${glow},.15) inset;">▌${esc(m.title)}</div>`:''}${m.sub?`<div style="color:${dim};font-size:.85em;margin-top:6px;">TARGET :: <span style="color:${ink};">${esc(m.sub)}</span></div>`:''}</div>`,
+  sec:(s,x)=>{
+    const k=s.met?Math.round(s.met.pct/10):0, lv=s.met?(s.met.pct>=70?['HIGH',red]:s.met.pct>=40?['MID',am]:['LOW',gr]):null;
+    const val=s.met?`<span style="margin-left:auto;color:${am};white-space:nowrap;">[${'█'.repeat(k)}<span style="color:${bd};">${'░'.repeat(10-k)}</span>] ${esc(s.met.txt)} <span style="color:${lv[1]};">${lv[0]}</span></span>`
+      : s.value?`<span style="margin-left:auto;color:${am};">&lt;${esc(s.value)}&gt;</span>`:'';
+    if(s.fin) return `<div style="margin:6px 0 14px;padding:10px 14px 4px;border:1px solid ${red};background:rgba(255,95,86,.06);"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:${red};font-weight:700;margin-bottom:6px;text-shadow:0 0 6px rgba(255,95,86,.4);">!! ANALYSIS COMPLETE — ${esc(s.title)}${val}</div><div style="color:#eafff0;">${x}</div></div>`;
+    return `<div style="margin:0 0 12px;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:${gr};font-weight:700;"><span style="color:${dim};font-weight:400;">┌─</span><span>[${pad(s.n)}] ${esc(s.title)}</span>${val}</div><div style="border-left:1px solid ${dim};margin-left:4px;padding:4px 0 1px 14px;">${x}</div><div style="color:${dim};line-height:1;margin-left:4px;">└──</div></div>`; },
+  kv:(k,v)=>`<div style="margin:0 0 .5em;"><span style="color:${am};">${k}</span><span style="color:${dim};"> :: </span>${v}</div>`,
+  li:(t,n)=>`<div style="display:flex;gap:8px;margin:0 0 .4em;"><span style="flex:none;color:${gr};">${n?n+'.':'&gt;'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .6em;color:${dim};"># ${t}</div>`,
+  sub:t=>`<div style="margin:.7em 0 .3em;font-size:.92em;color:${am};">// ${t}</div>`,
+  hr:()=>`<div style="color:${bd};margin:8px 0;overflow:hidden;white-space:nowrap;">${'─'.repeat(80)}</div>`,
+  table:b=>tbl(b,{th:`color:${gr};border:1px solid ${bd};padding:6px 8px;font-weight:700;text-align:center;`,td:`border:1px solid ${bd};padding:6px 8px;text-align:center;`}),
+  foot:()=>`<div style="margin-top:6px;color:${dim};font-size:.82em;">-- END OF LOG · 0 errors, 0 warnings --</div><div style="color:${gr};">root@archive:~$ <span style="display:inline-block;width:8px;height:14px;background:${gr};vertical-align:-2px;box-shadow:0 0 6px ${gr};"></span></div>`};
+}
+P.term=makeTerm(TERM_PAL.ice);
+
+// 5. 노션풍
+(()=>{ const ac='#2383e2', ln='rgba(127,127,127,.25)';
+P.note={name:'깔끔한 문서', desc:'노션 느낌 · 블로그 색을 따라감',
+  box:(x,o)=>`<div style="max-width:720px;margin:0 auto;font-family:${SANS};font-size:${o.fs}px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;">${x}</div>`,
+  head:m=>{ const pr=[['대상',m.sub],['날짜',m.date],['번호',m.code]].filter(r=>r[1]);
+    if(!m.title && !pr.length) return '';
+    return `<div style="margin-bottom:24px;">${m.title?`<div style="font-weight:700;font-size:1.75em;line-height:1.3;margin-bottom:10px;">${esc(m.title)}</div>`:''}${pr.map(r=>`<div style="display:flex;gap:12px;font-size:.88em;margin:2px 0;"><span style="flex:none;width:4.5em;opacity:.55;">${r[0]}</span><span>${esc(r[1])}</span></div>`).join('')}<div style="border-top:1px solid ${ln};margin-top:14px;"></div></div>`; },
+  sec:(s,x)=>{
+    const val=s.met?`<span style="display:inline-flex;align-items:center;gap:8px;margin-left:auto;"><span style="display:inline-block;width:96px;height:6px;border-radius:3px;background:rgba(35,131,226,.18);overflow:hidden;"><span style="display:block;height:100%;width:${s.met.pct}%;background:${ac};"></span></span><span style="font-weight:700;color:${ac};font-size:.95em;">${esc(s.met.txt)}</span></span>`
+      : s.value?`<span style="margin-left:auto;font-size:.82em;font-weight:600;color:${ac};background:rgba(35,131,226,.12);border-radius:4px;padding:1px 8px;">${esc(s.value)}</span>`:'';
+    if(s.fin) return `<div style="margin:8px 0 18px;padding:14px 16px 8px;background:rgba(127,127,127,.09);border-radius:6px;display:flex;gap:10px;"><span style="flex:none;font-size:1.1em;">💡</span><div style="min-width:0;flex:1;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;margin-bottom:4px;">${esc(s.title)}${val}</div>${x}</div></div>`;
+    return `<div style="margin:0 0 20px;"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;font-size:1.18em;margin:0 0 6px;">${esc(s.title)}${val}</div>${x}</div>`; },
+  kv:(k,v)=>`<div style="margin:0 0 .5em;"><span style="font-weight:600;">${k}</span><span style="opacity:.4;margin:0 6px;">—</span>${v}</div>`,
+  li:(t,n)=>`<div style="display:flex;gap:8px;margin:0 0 .4em;"><span style="flex:none;width:1em;text-align:center;">${n?n+'.':'•'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .6em;padding-left:12px;border-left:3px solid currentColor;">${t}</div>`,
+  sub:t=>`<div style="margin:.8em 0 .3em;font-weight:700;">${t}</div>`,
+  hr:()=>`<div style="border-top:1px solid ${ln};margin:14px 0;"></div>`,
+  table:b=>tbl(b,{th:`border:1px solid ${ln};padding:6px 8px;font-weight:600;background:rgba(127,127,127,.08);text-align:left;`,td:`border:1px solid ${ln};padding:6px 8px;`})};
+})();
+
+// 6. 신문
+(()=>{ const paper='#f6f3ea', ink='#161616', mut='#555', rl='#c9c3b3';
+P.news={name:'신문 기사', desc:'1면 헤드라인 · 특별판',
+  box:(x,o)=>`<div style="max-width:720px;margin:0 auto;padding:24px 24px 18px;background:${paper};border:1px solid #ddd6c4;color:${ink};font-family:${SERIF};font-size:${o.fs}px;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere;box-sizing:border-box;">${x}</div>`,
+  head:m=>`<div style="margin-bottom:20px;"><div style="text-align:center;border-top:3px solid ${ink};border-bottom:1px solid ${ink};padding:5px 0 3px;font-family:${SANS};font-weight:700;font-size:11px;letter-spacing:.35em;">THE REPORT DAILY</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:${SANS};font-size:11px;color:${mut};padding:4px 0;border-bottom:1px solid ${ink};"><span>${m.code?'제 '+esc(m.code)+' 호':'특별판'}</span><span>${m.date?esc(m.date):'EXTRA'}</span></div>${m.title?`<div style="margin-top:14px;font-weight:900;font-size:1.95em;line-height:1.25;letter-spacing:-.02em;">${esc(m.title)}</div>`:''}${m.sub?`<div style="margin-top:6px;font-style:italic;color:${mut};font-size:1.02em;">${esc(m.sub)}</div>`:''}</div>`,
+  sec:(s,x)=>{
+    const val=s.met?`<span style="margin-left:auto;display:inline-flex;align-items:baseline;gap:3px;"><span style="font-weight:900;font-size:1.7em;line-height:1;">${esc(s.met.txt)}</span><span style="font-family:${SANS};font-size:10px;color:${mut};">${s.met.unit||'pt'}</span></span>`
+      : s.value?`<span style="margin-left:auto;font-family:${SANS};font-size:11px;font-weight:700;border:1px solid ${ink};padding:1px 7px;">${esc(s.value)}</span>`:'';
+    if(s.fin) return `<div style="margin:10px 0 14px;padding:14px 16px 8px;background:${ink};color:${paper};"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:${SANS};font-size:11px;letter-spacing:.25em;font-weight:700;margin-bottom:6px;opacity:.85;">EDITORIAL · ${esc(s.title)}${val}</div><div style="font-size:1.05em;font-weight:700;">${x}</div></div>`;
+    return `<div style="margin:0 0 16px;padding-top:12px;border-top:1px solid ${rl};"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px;"><span style="width:16px;height:3px;background:${ink};flex:none;"></span><span style="font-weight:900;font-size:1.12em;">${esc(s.title)}</span>${val}</div>${x}</div>`; },
+  kv:(k,v)=>`<div style="margin:0 0 .5em;"><b>${k}</b> — ${v}</div>`,
+  li:(t,n)=>`<div style="display:flex;gap:8px;margin:0 0 .4em;"><span style="flex:none;">${n?n+'.':'▪'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .6em;">${t}</div>`,
+  quote:t=>`<div style="margin:.4em 0 .8em;padding:4px 0 4px 14px;border-left:4px solid ${ink};font-style:italic;font-size:1.05em;">${t}</div>`,
+  sub:t=>`<div style="margin:.8em 0 .3em;font-weight:900;">${t}</div>`,
+  hr:()=>`<div style="border-top:1px solid ${ink};margin:12px 0;"></div>`,
+  table:b=>tbl(b,{table:`font-family:${SANS};`,th:`border-top:2px solid ${ink};border-bottom:1px solid ${ink};padding:6px 8px;text-align:center;`,td:`border-bottom:1px solid ${rl};padding:6px 8px;text-align:center;`})};
+})();
+
+// 7. 생활기록부
+(()=>{ const nv='#2c3e6b', cell='#eef1f7', bd='#a9b3c9', ink='#222';
+P.school={name:'생활기록부', desc:'표 양식 · 항목별 칸',
+  box:(x,o)=>`<div style="max-width:720px;margin:0 auto;padding:24px 20px 20px;background:#fff;border:1px solid #c9d0de;color:${ink};font-family:${SANS};font-size:${o.fs}px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;box-sizing:border-box;">${x}</div>`,
+  head:m=>{ const c=[['대상',m.sub],['작성일',m.date],['번호',m.code]].filter(r=>r[1]);
+    return `<div style="margin-bottom:16px;"><div style="text-align:center;font-weight:700;font-size:1.35em;letter-spacing:.2em;color:${nv};padding-bottom:10px;">${esc(m.title||'종합 기록부')}</div>${c.length?`<table style="width:100%;border-collapse:collapse;font-size:.86em;table-layout:fixed;"><tr>${c.map(r=>`<td style="background:${cell};border:1px solid ${bd};padding:5px 6px;text-align:center;font-weight:700;color:${nv};width:16%;">${r[0]}</td><td style="border:1px solid ${bd};padding:5px 8px;">${esc(r[1])}</td>`).join('')}</tr></table>`:`<div style="border-top:2px solid ${nv};"></div>`}</div>`; },
+  sec:(s,x)=>{
+    const val=s.met?`<div style="margin-top:6px;font-size:1.5em;font-weight:800;line-height:1;">${esc(s.met.txt)}</div><div style="margin:6px auto 0;width:70%;height:5px;background:${s.fin?'rgba(255,255,255,.3)':'#d6dcea'};"><div style="height:100%;width:${s.met.pct}%;background:${s.fin?'#fff':nv};"></div></div>`
+      : s.value?`<div style="margin-top:4px;font-size:.95em;">${esc(s.value)}</div>`:'';
+    return `<table style="width:100%;border-collapse:collapse;margin:-1px 0 0;table-layout:fixed;"><tr><th style="width:26%;background:${s.fin?nv:cell};color:${s.fin?'#fff':nv};border:1px solid ${bd};padding:10px 6px;font-weight:700;vertical-align:middle;text-align:center;font-size:.9em;line-height:1.45;">${esc(s.title)}${val}</th><td style="border:1px solid ${bd};padding:10px 12px 4px;vertical-align:top;${s.fin?'font-weight:600;':''}">${x||'<div style="margin:0 0 .5em;">—</div>'}</td></tr></table>`; },
+  kv:(k,v)=>`<div style="margin:0 0 .55em;"><b style="color:${nv};">${k}</b> : ${v}</div>`,
+  li:(t,n)=>`<div style="display:flex;gap:6px;margin:0 0 .4em;"><span style="flex:none;color:${nv};">${n?n+'.':'·'}</span><span style="min-width:0;">${t}</span></div>`,
+  p:t=>`<div style="margin:0 0 .55em;">${t}</div>`,
+  quote:t=>`<div style="margin:0 0 .55em;padding:4px 10px;background:${cell};">${t}</div>`,
+  sub:t=>`<div style="margin:.6em 0 .3em;font-weight:700;color:${nv};">[${t}]</div>`,
+  hr:()=>`<div style="border-top:1px dashed ${bd};margin:10px 0;"></div>`,
+  table:b=>tbl(b,{th:`background:${cell};color:${nv};border:1px solid ${bd};padding:5px 6px;text-align:center;`,td:`border:1px solid ${bd};padding:5px 6px;text-align:center;`})};
+})();
+
+const ORDER=['dossier','gov','lab','term','note','news','school'];
+if(!P[S.preset]) S.preset='dossier';
+
+/* ---------- 만들기 ---------- */
+function blk(p,b,ctx){
+  switch(b.type){
+    case 'kv': return p.kv(inline(b.k),inline(b.v),ctx.kv++);
+    case 'li': return p.li(inline(b.text),b.n);
+    case 'p': return p.p(inline(b.text));
+    case 'table': return p.table(b);
+    case 'quote': return p.quote(inline(b.text));
+    case 'sub': return p.sub(inline(b.text));
+    case 'hr': return p.hr();
+  }
+  return '';
+}
+let outHtml='';
+function build(){
+  if(S.preset==='term') P.term=makeTerm(TERM_PAL[S.termPal]||TERM_PAL.ice);
+  const d=parse(S.src); const p=P[S.preset]; REDACT=p.redact||'#111';
+  if(!d.secs.length && !d.pre.length) return '';
+  const m={title:(S.meta.title||'').trim()||d.title, sub:(S.meta.sub||'').trim(), date:(S.meta.date||'').trim(), code:(S.meta.code||'').trim()};
+  let body='';
+  if(d.pre.length){ const c={kv:0}; body+=d.pre.map(b=>blk(p,b,c)).join(''); }
+  d.secs.forEach((s,i)=>{ const c={kv:0}; const inner=s.blocks.map(b=>blk(p,b,c)).join('');
+    body+=p.sec({title:s.title, value:s.value, met:metric(s.value), n:i+1, fin:!!S.final && FINAL_RE.test(s.title)}, inner); });
+  return p.box(p.head(m)+body+(p.foot?p.foot():''), {fs:S.fs}, m);
+}
+function render(){
+  outHtml=build();
+  $('preview').innerHTML = outHtml || '<div class="empty">왼쪽에 보고서를 붙여넣으면 여기에 정리된 모습이 보여요.<br>처음이라면 <b>📄 예시 넣기</b>를 눌러 보세요.</div>';
+  $('code').value=outHtml;
+  save();
+}
+
+/* ---------- 화면 ---------- */
+function renderPresets(){
+  $('presets').innerHTML=ORDER.map(k=>`<button data-k="${k}" class="${S.preset===k?'on':''}"><b>${P[k].name}</b><small>${P[k].desc}</small></button>`).join('');
+  $('presets').querySelectorAll('button').forEach(b=>b.onclick=()=>{ S.preset=b.dataset.k; renderPresets(); render(); });
+  renderTermPal();
+}
+function renderTermPal(){
+  $('palRow').style.display=S.preset==='term'?'':'none';
+  if(!TERM_PAL[S.termPal]) S.termPal='ice';
+  $('termPal').innerHTML=Object.entries(TERM_PAL).map(([k,c])=>`<button data-v="${k}" class="${S.termPal===k?'on':''}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c.gr};box-shadow:0 0 0 2px ${c.bg};margin-right:5px;vertical-align:-1px;"></span>${c.name}</button>`).join('');
+  $('termPal').querySelectorAll('button').forEach(b=>b.onclick=()=>{ S.termPal=b.dataset.v; renderTermPal(); render(); });
+}
+function seg(id,key,cls){
+  const box=$(id);
+  const apply=()=>{ box.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[key])); cls(); };
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ S[key]=b.dataset.v; apply(); save(); });
+  apply();
+}
+seg('pvDevice','pvDevice',()=>$('stage').classList.toggle('mobile',S.pvDevice==='mobile'));
+seg('pvTheme','pvTheme',()=>$('stage').classList.toggle('dark',S.pvTheme==='dark'));
+
+const src=$('src');
+src.value=S.src||'';
+let tm=null;
+src.addEventListener('input',()=>{ clearTimeout(tm); tm=setTimeout(()=>{ S.src=src.value; render(); },200); });
+[['title','title'],['sub','sub'],['date','date'],['codeNo','code']].forEach(([id,k])=>{
+  const el=$(id); el.value=S.meta[k]||''; el.addEventListener('input',()=>{ S.meta[k]=el.value; render(); });
+});
+$('fs').value=S.fs; $('fsV').textContent=S.fs+'px';
+$('fs').addEventListener('input',()=>{ S.fs=+$('fs').value; $('fsV').textContent=S.fs+'px'; render(); });
+$('final').checked=!!S.final; $('final').onchange=()=>{ S.final=$('final').checked; render(); };
+
+const SAMPLE=`■ 관계 정의
+- 표면상 관계: 오래된 이웃. 같은 우산을 나눠 쓰는 사이.
+- 실제 관계: 서로의 일상을 조금씩 챙기다 생긴, 아직 이름 붙지 않은 마음.
+
+■ 주요 사건
+- **우산 빌려주기**: 비 오는 날 윤하가 하나뿐인 우산을 서준에게 건넸다. 정작 본인은 비를 맞고 돌아갔다.
+- **다음 날 아침**: 서준이 우산을 돌려주며 따뜻한 커피를 함께 내밀었다.
+
+■ 호감도: 72
+- 근거: 사소한 배려가 반복되며 서로를 의식하기 시작했다. 다만 둘 다 먼저 말을 꺼내지 않아 수치가 크게 오르지는 않는다.
+
+■ 긴장도: 35
+- 근거: 오해나 갈등은 없다. 대신 '이대로도 괜찮다'는 안일함이 관계를 붙잡아 두고 있다.
+
+■ 이번 주 기록
+| 요일 | 장소 | 사건 | 변화 |
+|---|---|---|---|
+| 월 | 현관 앞 | 우산 건네기 | +5 |
+| 화 | 편의점 | 커피 | +3 |
+| 수 | 버스 정류장 | 같은 버스 | +2 |
+
+■ 최종 판정
+서로를 챙기는 데에는 익숙하지만 그 이유를 말하는 데에는 서툰, 한 걸음 직전의 관계다.`;
+$('sample').onclick=()=>{ src.value=SAMPLE; S.src=SAMPLE; if(!S.meta.title){ S.meta.title='관계 분석 보고서'; $('title').value=S.meta.title; } if(!S.meta.sub){ S.meta.sub='윤하 × 서준'; $('sub').value=S.meta.sub; } render(); toast('예시 보고서를 넣었어요'); };
+$('clear').onclick=()=>{ if(!src.value){ toast('이미 비어 있어요'); return; } const old=src.value; src.value=''; S.src=''; render();
+  toast('비웠어요'); $('clear').dataset.old=old; };
+
+async function copyText(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ const ta=$('code'); ta.value=t; ta.focus(); ta.select(); try{ return document.execCommand('copy'); }catch(_){ return false; } } }
+$('copyHtml').onclick=async()=>{ if(!outHtml){ toast('먼저 보고서를 붙여넣어 주세요'); return; } toast(await copyText(outHtml)?'HTML 코드를 복사했어요':'복사가 막혔어요. 아래 코드 칸에서 직접 복사해 주세요'); };
+$('copyRich').onclick=async()=>{
+  if(!outHtml){ toast('먼저 보고서를 붙여넣어 주세요'); return; }
+  try{ await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([outHtml],{type:'text/html'}),'text/plain':new Blob([$('preview').innerText],{type:'text/plain'})})]); toast('서식 그대로 복사했어요'); }
+  catch(e){ const r=document.createRange(); r.selectNodeContents($('preview')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} s.removeAllRanges(); toast(ok?'서식 그대로 복사했어요':'복사가 막혔어요'); }
+};
+
+renderPresets(); render();
+})();
+</script>
+</body>
+</html>

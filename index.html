@@ -246,6 +246,12 @@
           <p>AI 채팅 페르소나와 노벨AI 프롬프트를 사진과 함께 모아둬요. 카테고리·태그·검색, 버튼 하나로 복사.</p>
           <div class="use">페르소나 · 프롬프트 보관</div>
         </a>
+        <a class="tile" data-ed="collage" rel="noopener" href="collage.html" target="_blank">
+          <div class="ic">🧩</div>
+          <h3>콜라주 · 스티커</h3>
+          <p>사진을 가로·세로·격자로 이어붙이고, 스티커와 글씨 라벨을 얹어 한 장으로 저장해요. 보관함 사진도 바로 불러올 수 있어요.</p>
+          <div class="use">사진 → 콜라주 이미지</div>
+        </a>
         <div class="tile soon">
           <div class="ic">＋</div>
           <h3>다음 에디터</h3>
@@ -284,7 +290,7 @@ const CFG=window.HOME_CFG||{newTab:true};
 const tilesEl=document.querySelector('#view-home .tiles');
 if(!tilesEl) return;
 const PREF_KEY='studio-home';
-const STUDIO_RE=/^(logbubble-|log-editor-|report-editor-|maker|studioStatusExport$|studio-home$|studioTouch:|vault-)/;
+const STUDIO_RE=/^(logbubble-|log-editor-|report-editor-|maker|studioStatusExport$|studio-home$|studioTouch:|vault-|collage-settings)/;
 const $h=id=>document.getElementById('home-'+id);
 let P={sort:'default', order:[], open:'new'};
 try{ Object.assign(P, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch(e){}
@@ -321,6 +327,10 @@ const SUM={
     if(!src.trim()) return null;
     const ttl=(d.meta&&d.meta.title)||((src.match(/^#\s+(.+)$/m)||[])[1])||'제목 없음';
     return {tx:[ttl, REPORT_NAMES[d.preset]||'', '글자 '+num(src.replace(/\s/g,'').length)+'자'].filter(Boolean).join(' · '), t:touch('report')};
+  },
+  collage(){
+    const v=json('collage-summary'); if(!v||(!v.n&&!v.o)) return null;
+    return {tx:`사진 ${num(v.n||0)}장${v.o?` · 스티커·글씨 ${num(v.o)}개`:''} 작업 중`, t:touch('collage')};
   },
   vault(){
     const v=json('vault-summary'); if(!v||(!v.p&&!v.q)) return null;

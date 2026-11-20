@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#eef5fb">
+<title>🧩 콜라주 · 스티커 · 로그 백업 스튜디오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Gowun+Dodum&family=Jua&family=Black+Han+Sans&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css">
+<style>
+  :root{
+    --paper:#eef5fb; --paper2:#e2edf8; --card:#ffffff;
+    --ink:#25313c; --ink2:#566879; --muted:#8596a7; --line:#d6e3ef;
+    --accent:#4c8fd0; --accent2:#5a9fd8; --accent-soft:#e3effb;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    color:var(--ink); background:linear-gradient(180deg,#d9ebfa 0px,#e8f3fc 280px,#f1f7fd 700px) fixed; background-color:#f1f7fd;
+    -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; min-height:100vh;
+  }
+  button,input,select,textarea{font-family:inherit;color:inherit}
+  ::selection{background:#cfe6fb}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;gap:10px;padding:10px 22px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);flex-wrap:wrap}
+  .back{font-size:13px;color:var(--accent);text-decoration:none;font-weight:600}
+  .brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+  .brand b{font-size:17px;font-weight:700;letter-spacing:-.01em}
+  .brand span{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+  .hbtn{height:36px;padding:0 13px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .hbtn:hover{border-color:var(--accent2)}
+  .hbtn:disabled{opacity:.4;cursor:default}
+  .save{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 20px;border:none;border-radius:999px;background:linear-gradient(135deg,#6db3ea,#4c8fd0);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(76,143,208,.3)}
+  .save:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
+  .save:disabled{opacity:.55;cursor:wait}
+  .save svg{width:15px;height:15px}
+
+  /* ---------- main ---------- */
+  main{flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0}
+  .stage{
+    position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:36px;overflow:hidden;
+    background-color:var(--paper2);background-image:radial-gradient(circle,#c3d6e8 1px,transparent 1.2px);background-size:22px 22px;
+  }
+  .stage.drop::after{content:"놓으면 추가돼요";position:absolute;inset:16px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--accent);border-radius:14px;background:rgba(238,245,251,.9);color:var(--accent);font-weight:700;font-size:15px}
+  .empty{width:min(560px,100%);padding:56px 32px;border:1.5px dashed #b4cbe0;border-radius:16px;background:rgba(255,255,255,.7);display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;cursor:pointer}
+  .empty:hover{border-color:var(--accent)}
+  .empty .plus{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#6db3ea,#4c8fd0);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:300}
+  .empty .main{font-size:17px;font-weight:700}
+  .empty .sub{font-size:13px;color:var(--muted);line-height:1.6}
+  #preview{display:block;max-width:100%;max-height:100%;box-shadow:0 1px 2px rgba(0,0,0,.08),0 18px 40px -18px rgba(30,60,90,.35);touch-action:none;cursor:grab;background:#fff}
+  .stage-info{position:absolute;left:18px;bottom:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:5px 10px;border-radius:999px}
+  .stage-info:empty{display:none}
+  .stage-tip{position:absolute;right:18px;bottom:14px;font-size:11.5px;color:var(--ink2);background:rgba(255,255,255,.85);border:1px solid var(--line);padding:5px 10px;border-radius:999px}
+
+  /* ---------- panel ---------- */
+  .panel{border-left:1px solid var(--line);background:rgba(255,255,255,.72);overflow-y:auto;padding:20px 22px 40px}
+  .panel::-webkit-scrollbar{width:8px}
+  .panel::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .sec{margin-bottom:26px}
+  .sec-title{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:15px;font-weight:700}
+  .sec-title .no{font-family:var(--mono);font-size:11px;font-weight:500;color:#fff;background:linear-gradient(135deg,#7cc0f0,#4f8fd0);border-radius:999px;padding:2px 8px}
+  .field{margin-bottom:18px}
+  .label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:8px}
+  .label .val{font-family:var(--mono);font-size:12px;color:var(--ink);font-weight:500}
+
+  .width-box{display:flex;align-items:center;height:42px;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
+  .width-box:focus-within{border-color:var(--accent)}
+  .width-box input{flex:1;min-width:0;height:100%;border:none;background:transparent;padding:0 14px;font-family:var(--mono);font-size:15px;outline:none}
+  .width-box span{padding:0 14px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .presets{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .pill{height:28px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-family:var(--mono);font-size:11.5px;color:var(--ink2);cursor:pointer}
+  .pill:hover{border-color:var(--accent)}
+  .pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .tile{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 4px 10px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font-size:11.5px;color:var(--ink2)}
+  .tile:hover{border-color:var(--accent2)}
+  .tile svg{width:30px;height:22px}
+  .tile svg rect{fill:#cddcea}
+  .tile.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+  .tile.on svg rect{fill:var(--accent)}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--accent) var(--p,0%),var(--line) var(--p,0%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--line)}
+  input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--accent)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
+
+  .colors{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .dot{width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,.15);cursor:pointer;padding:0}
+  .dot.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--accent)}
+  .custom{position:relative;width:28px;height:28px;border-radius:50%;overflow:hidden;border:1px dashed var(--muted);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--muted);cursor:pointer}
+  .custom.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--accent);border-style:solid}
+  .custom input{position:absolute;inset:-6px;opacity:0;cursor:pointer;width:calc(100% + 12px);height:calc(100% + 12px)}
+
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:3px;border-radius:10px;background:var(--paper2)}
+  .seg button{height:32px;border:none;border-radius:8px;background:transparent;font-size:12.5px;color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--card);color:var(--accent);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .rule{height:1px;background:var(--line);margin:0 0 22px}
+
+  .add{flex:1;height:42px;border:1.5px dashed #b4cbe0;border-radius:12px;background:rgba(255,255,255,.6);font-size:13.5px;font-weight:700;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .add:hover{border-color:var(--accent);color:var(--accent)}
+  .addrow{display:flex;gap:6px}
+  .count{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:400;margin-left:auto}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .item{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+  .item.sel{border-color:var(--accent);box-shadow:0 6px 16px -10px rgba(30,60,90,.4)}
+  .item-head{display:flex;align-items:center;gap:9px;padding:7px 8px 7px 4px;cursor:pointer}
+  .grip{width:22px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;color:#a9bdd0;font-size:16px;cursor:grab;touch-action:none;border-radius:6px;user-select:none;-webkit-user-select:none}
+  .grip:hover{color:var(--ink);background:var(--paper2)}
+  .list.sorting .item{transition:transform .18s ease}
+  .list.sorting .item.dragging{transition:none;z-index:5;position:relative;box-shadow:0 14px 30px -12px rgba(30,60,90,.45);border-color:var(--accent)}
+  .list.sorting{user-select:none;-webkit-user-select:none}
+  .thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;flex:none;background:var(--paper2)}
+  .thumb.txt{display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:16px}
+  .meta{flex:1;min-width:0}
+  .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .name .num{font-family:var(--mono);font-size:11px;color:var(--accent);margin-right:6px}
+  .dim{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px}
+  .tools{display:flex;gap:2px;flex:none}
+  .icon-btn{width:28px;height:28px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .icon-btn:hover{background:var(--paper2);color:var(--ink)}
+  .icon-btn.del:hover{background:#fde8e1;color:#d4553a}
+  .icon-btn:disabled{opacity:.25;cursor:default;background:transparent}
+  .adj{padding:4px 14px 14px;border-top:1px solid var(--line);background:#f7fbff}
+  .adj .field{margin:12px 0 2px}
+  .adj .label{margin-bottom:5px;font-size:12px}
+  .adj-btns{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .adj h5{margin:14px 0 2px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px}
+  .btn{flex:1;min-width:0;height:32px;padding:0 8px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:var(--accent)}
+  .btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);cursor:pointer}
+  .hint{font-size:12px;color:var(--muted);line-height:1.65;margin:14px 0 0;padding:11px 13px;border-radius:10px;background:var(--paper2)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .sel-in{width:100%;height:34px;border:1px solid var(--line);border-radius:9px;background:var(--card);padding:0 8px;font-size:12.5px}
+  textarea.txt-in{width:100%;min-height:64px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:14px;line-height:1.5;resize:vertical;background:#fff}
+  .colorin{display:flex;align-items:center;gap:6px}
+  .colorin input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff;cursor:pointer}
+
+  /* ---------- 모드 · 템플릿 · 스타터 ---------- */
+  .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 20px;position:sticky;top:-20px;z-index:3;background:rgba(244,249,253,.96);padding:8px 0;backdrop-filter:blur(6px)}
+  .modes button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer}
+  .modes button b{font-size:12.5px}
+  .modes button small{font-size:10.5px;color:var(--muted)}
+  .modes button.on{background:linear-gradient(135deg,#6db3ea,#4c8fd0);border-color:#4f93d2;color:#fff}
+  .modes button.on small{color:rgba(255,255,255,.85)}
+  .tpls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .tpls button{aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:7px;cursor:pointer}
+  .tpls button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px rgba(76,143,208,.2)}
+  .tpls svg{width:100%;height:100%}
+  .tpls svg rect{fill:#cddcea}
+  .tpls button.on svg rect{fill:var(--accent)}
+  .starters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .starters button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:11.5px;cursor:pointer}
+  .starters button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+  .sv{display:flex;flex-direction:column;width:26px;height:40px;border-radius:3px;overflow:hidden;font-style:normal}
+  .sv u{flex:1;background:#b7c7d6}
+  .sv u:nth-child(2){background:#9fb2c4}
+  .sv.film{background:#1d2228;padding:2px 5px;gap:2px}
+  .sv.gallery{background:#fff;padding:3px;gap:3px;box-shadow:0 0 0 1px var(--line)}
+  .sv.cine u{border-top:3px solid #1d2228;border-bottom:3px solid #1d2228}
+  textarea.sub-in{display:block;width:calc(100% - 16px);margin:0 8px 8px;min-height:44px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;line-height:1.5;resize:vertical;background:#fbfdff}
+  textarea.sub-in:focus{outline:none;border-color:var(--accent)}
+
+  /* ---------- modal / toast ---------- */
+  .modal{position:fixed;inset:0;background:rgba(30,60,90,.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+  .modal-box{background:#fff;border-radius:16px;max-width:min(920px,100%);max-height:100%;display:flex;flex-direction:column;gap:14px;padding:20px;overflow:auto}
+  .modal-box img.res{max-width:100%;max-height:62vh;object-fit:contain;align-self:center;border-radius:4px}
+  .modal-box p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.6}
+  .modal-box h3{margin:0;font-size:16px}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+  .modal-actions .btn{flex:none;padding:0 16px;display:inline-flex;align-items:center;text-decoration:none;color:var(--ink);height:36px}
+  .modal-actions .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dest{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .dest button{height:84px;border:1.5px solid var(--line);border-radius:14px;background:#f7fbff;cursor:pointer;font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+  .dest button small{font-weight:400;color:var(--muted);font-size:11.5px}
+  .dest button:hover,.dest button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;max-height:56vh;overflow-y:auto;padding:2px}
+  .vgrid button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:0;cursor:pointer;overflow:hidden;text-align:left}
+  .vgrid button:hover{border-color:var(--accent)}
+  .vgrid img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--paper2)}
+  .vgrid span{display:block;font-size:11.5px;padding:5px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);background:#25313c;color:#fff;font-size:13.5px;padding:11px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:900px){
+    header{padding:10px 12px;position:sticky;top:0;z-index:10}
+    .brand span{display:none}
+    main{grid-template-columns:1fr}
+    .stage{height:52vh;padding:14px;position:sticky;top:var(--hh,56px);z-index:5}
+    html,body{height:auto}
+    main{flex:none;display:block}
+    header{flex-wrap:nowrap;gap:6px}
+    .brand{display:none}
+    .back{margin-right:auto}
+    .hbtn{height:34px;padding:0 10px}
+    .save{height:36px;padding:0 14px;font-size:13px}
+    .stage-tip{display:none}
+    .panel{border-left:none;border-top:1px solid var(--line);overflow:visible;padding:20px 16px 40px}
+    .hbtn .tx{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="./">← 스튜디오</a>
+  <div class="brand"><b>🧩 콜라주 · 스티커</b><span>이미지 이어붙이기</span></div>
+  <button class="hbtn" id="undo" title="되돌리기 (Ctrl+Z)" disabled>↶<span class="tx"> 되돌리기</span></button>
+  <button class="hbtn" id="redo" title="다시 실행 (Ctrl+Shift+Z)" disabled>↷</button>
+  <button class="hbtn" id="reset" title="모두 비우고 새로 시작">🗑<span class="tx"> 새로 시작</span></button>
+  <button class="hbtn" id="copy" title="완성 이미지를 클립보드로 복사">⧉<span class="tx"> 복사</span></button>
+  <button class="save" id="save">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>
+    <span id="saveLabel">저장하기</span>
+  </button>
+</header>
+
+<main>
+  <section class="stage" id="stage">
+    <div class="empty" id="empty">
+      <div class="plus">+</div>
+      <div class="main">이미지를 추가하세요</div>
+      <div class="sub">눌러서 고르거나, 파일을 끌어다 놓거나<br>복사한 이미지를 붙여넣기(Ctrl+V) 하세요</div>
+    </div>
+    <canvas id="preview" hidden></canvas>
+    <div class="stage-info" id="info"></div>
+    <div class="stage-tip" id="tip" hidden>휠: 확대·축소 · Shift: 15° 회전 · Alt: 붙기 끄기</div>
+  </section>
+
+  <aside class="panel">
+    <div class="modes" id="modes">
+      <button data-m="collage"><b>자유 콜라주</b><small>가로·세로·격자</small></button>
+      <button data-m="tpl"><b>템플릿</b><small>큰 칸 + 작은 칸</small></button>
+      <button data-m="scene"><b>시네마틱 씬</b><small>영화 한 장면</small></button>
+      <button data-m="seq"><b>시네마틱 시퀀스</b><small>2~5컷 필름</small></button>
+    </div>
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">01</span><span id="sec1Title">배치</span></h2>
+
+      <!-- 자유 콜라주 -->
+      <div data-for="collage">
+        <div class="field">
+          <div class="label">출력 비율</div>
+          <div class="presets" id="ratios" style="margin-top:0">
+            <button class="pill" data-r="free">자유</button>
+            <button class="pill" data-r="16:9">16:9</button>
+            <button class="pill" data-r="1:1">1:1</button>
+            <button class="pill" data-r="4:5">4:5</button>
+            <button class="pill" data-r="9:16">9:16</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label">이어붙이기 방향</div>
+          <div class="tiles" id="dirs">
+            <button class="tile" data-d="h"><svg viewBox="0 0 30 22"><rect x="1" y="5" width="8" height="12" rx="1"/><rect x="11" y="5" width="8" height="12" rx="1"/><rect x="21" y="5" width="8" height="12" rx="1"/></svg>가로</button>
+            <button class="tile" data-d="v"><svg viewBox="0 0 30 22"><rect x="8" y="1" width="14" height="6" rx="1"/><rect x="8" y="8" width="14" height="6" rx="1"/><rect x="8" y="15" width="14" height="6" rx="1"/></svg>세로</button>
+            <button class="tile" data-d="grid"><svg viewBox="0 0 30 22"><rect x="5" y="1" width="9.5" height="9.5" rx="1"/><rect x="15.5" y="1" width="9.5" height="9.5" rx="1"/><rect x="5" y="11.5" width="9.5" height="9.5" rx="1"/><rect x="15.5" y="11.5" width="9.5" height="9.5" rx="1"/></svg>정사각</button>
+            <button class="tile" data-d="rows"><svg viewBox="0 0 30 22"><rect x="1" y="1" width="16" height="9.5" rx="1"/><rect x="18" y="1" width="11" height="9.5" rx="1"/><rect x="1" y="11.5" width="10" height="9.5" rx="1"/><rect x="12" y="11.5" width="17" height="9.5" rx="1"/></svg>원본비율</button>
+          </div>
+        </div>
+        <div class="field" id="colsField">
+          <div class="label">열 개수 <span class="val" id="colsVal"></span></div>
+          <input type="range" id="cols" min="1" max="6" step="1">
+        </div>
+      </div>
+
+      <!-- 템플릿 -->
+      <div data-for="tpl">
+        <div class="field">
+          <div class="label">템플릿</div>
+          <div class="tpls" id="tpls"></div>
+        </div>
+        <div class="field">
+          <div class="label">비율</div>
+          <div class="seg" id="tplRatios"><button data-v="1:1">1:1</button><button data-v="4:5">4:5</button><button data-v="3:2">3:2</button><button data-v="16:9">16:9</button><button data-v="9:16">9:16</button></div>
+        </div>
+      </div>
+
+      <!-- 시네마틱 씬 -->
+      <div data-for="scene">
+        <div class="field">
+          <div class="label">화면비 <span class="val" style="font-family:inherit;color:var(--muted)">보이는 사진 창</span></div>
+          <div class="seg" id="sceneRatios"><button data-v="16:9">16 : 9</button><button data-v="2.39:1">2.39 : 1</button></div>
+        </div>
+        <p class="hint" style="margin:0 0 16px">목록의 <b>첫 번째 사진</b>을 써요. 다른 사진을 쓰려면 목록에서 맨 위로 올려 주세요.</p>
+      </div>
+
+      <!-- 시네마틱 시퀀스 -->
+      <div data-for="seq">
+        <div class="field">
+          <div class="label">스타터</div>
+          <div class="starters" id="starters">
+            <button data-st="classic"><i class="sv classic"><u></u><u></u><u></u></i>클래식</button>
+            <button data-st="film"><i class="sv film"><u></u><u></u><u></u></i>필름 스트립</button>
+            <button data-st="gallery"><i class="sv gallery"><u></u><u></u><u></u></i>갤러리</button>
+            <button data-st="cine"><i class="sv cine"><u></u><u></u><u></u></i>시네마틱 바</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label">컷 화면비 <span class="val" id="seqCount" style="font-family:inherit;color:var(--muted)"></span></div>
+          <div class="seg" id="seqRatios"><button data-v="16:9">16:9</button><button data-v="2.39:1">2.39:1</button><button data-v="3:2">3:2</button><button data-v="4:3">4:3</button></div>
+        </div>
+        <div class="field">
+          <label class="chk"><input type="checkbox" id="filmHoles"> 필름 구멍 (양옆)</label>
+        </div>
+      </div>
+
+      <!-- 공통: 시네마틱 바 -->
+      <div data-for="scene seq">
+        <div class="field">
+          <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="bars"> 사진 위·아래 검은 바 (시네마틱 바)</label>
+          <div class="label">바 두께 <span class="val" id="barVal"></span></div>
+          <input type="range" id="barSize" min="1" max="20" step="1">
+        </div>
+      </div>
+
+      <!-- 공통: 간격 -->
+      <div data-for="collage tpl seq">
+        <div class="field">
+          <div class="label">이미지 간 간격 <span class="val" id="gapVal"></span></div>
+          <input type="range" id="gap" min="0" max="100" step="1">
+        </div>
+        <div class="field">
+          <div class="label">바깥 여백 <span class="val" id="padVal"></span></div>
+          <input type="range" id="pad" min="0" max="200" step="2">
+        </div>
+        <div class="field">
+          <div class="label">사진 모서리 둥글게 <span class="val" id="radVal"></span></div>
+          <input type="range" id="rad" min="0" max="120" step="1">
+        </div>
+        <div class="field">
+          <div class="label">간격·여백 색상</div>
+          <div class="colors" id="colors">
+            <button class="dot" data-c="#000000" style="background:#000" aria-label="검정"></button>
+            <button class="dot" data-c="#FFFFFF" style="background:#fff" aria-label="흰색"></button>
+            <button class="dot" data-c="#EEF5FB" style="background:#EEF5FB" aria-label="하늘"></button>
+            <button class="dot" data-c="#F4F1EA" style="background:#F4F1EA" aria-label="미색"></button>
+            <button class="dot" data-c="#4C8FD0" style="background:#4C8FD0" aria-label="파랑"></button>
+            <label class="custom" id="customColor" title="직접 고르기">+<input type="color" id="gapColor"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="rule"></div>
+
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">02</span>이미지<span class="count" id="count"></span></h2>
+      <div class="addrow"><button class="add" id="pick">＋ 이미지 추가</button><button class="add" id="pickVault" style="flex:0 0 auto;padding:0 14px">🗂 보관함</button></div>
+      <input type="file" id="file" accept="image/*" multiple hidden>
+      <div class="list" id="list"></div>
+      <p class="hint">· <b>⠿</b> 손잡이를 끌거나, 미리보기에서 사진을 다른 칸에 끌어다 놓으면 순서가 바뀌어요.<br>· 미리보기에서 사진을 자기 칸 안에서 끌면 보이는 위치가, 마우스 휠로는 확대가 바뀌어요.<br>· 목록에서 사진을 누르면 확대·회전·반전·보정을 할 수 있어요.</p>
+    </div>
+
+    <div class="rule"></div>
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">03</span>색감<span class="count">모든 사진 공통</span></h2>
+      <div class="presets" id="grades" style="margin:0 0 14px"></div>
+      <div class="field"><div class="label">세기 <span class="val" id="gradeAmtVal"></span></div><input type="range" id="gradeAmt" min="0" max="100" step="1"></div>
+      <div class="field"><div class="label">그레인 <span class="val" id="grainVal"></span></div><input type="range" id="grain" min="0" max="100" step="1"></div>
+      <div class="field"><div class="label">비네트 <span class="val" id="vigVal"></span></div><input type="range" id="vig" min="0" max="100" step="1"></div>
+      <p class="hint" style="margin-top:0">사진마다 따로 하는 노출·대비·채도·색온도·흑백은 02 이미지 목록에서 사진을 누르면 나와요.</p>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">04</span>자막 · 타이틀</h2>
+      <p class="hint" style="margin:0 0 14px">자막은 <b>02 이미지</b> 목록의 사진마다 적는 칸에 써요. 여기서는 모양을 정해요.</p>
+      <div class="field"><div class="label">위치</div>
+        <div class="seg" id="subPos"><button data-v="bc">하단 중앙</button><button data-v="tc">상단 중앙</button><button data-v="bl">하단 좌</button><button data-v="br">하단 우</button><button data-v="c">중앙</button></div></div>
+      <div class="row2">
+        <div class="field"><div class="label">글꼴</div><select class="sel-in" id="subFont"></select></div>
+        <div class="field"><div class="label">글자색</div><div class="colorin"><input type="color" id="subColor"></div></div>
+      </div>
+      <div class="field"><div class="label">크기 <span class="val" id="subSizeVal"></span></div><input type="range" id="subSize" min="16" max="120" step="1"></div>
+      <div class="field"><div class="label">외곽선 <span class="val" style="font-family:inherit;color:var(--muted)">밝은 사진 가독성</span></div>
+        <div class="seg" id="subOutline"><button data-v="none">없음</button><button data-v="thin">얇게</button><button data-v="normal">보통</button><button data-v="thick">굵게</button></div>
+        <div class="colors" id="subOC" style="margin-top:8px"></div></div>
+      <div class="field"><div class="label">그림자 <span class="val" id="subShadowVal"></span></div><input type="range" id="subShadow" min="0" max="100" step="1"></div>
+      <div class="field"><div class="label">기울임 <span class="val" id="subItalicVal"></span></div><input type="range" id="subItalic" min="0" max="30" step="1"></div>
+      <div class="field"><div class="label">색 번짐 <span class="val" id="subBleedVal"></span></div><input type="range" id="subBleed" min="0" max="100" step="1"></div>
+      <div class="field"><div class="label">줄 간격</div>
+        <div class="seg" id="subLH"><button data-v="narrow">좁게</button><button data-v="base">기본</button><button data-v="wide">넓게</button><button data-v="xwide">아주 넓게</button></div></div>
+      <div class="field">
+        <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="titleOn"> 타이틀 카드 <span style="color:var(--muted);font-size:11.5px">— 이미지 좌상단에 작게 (위치·시간 카드)</span></label>
+        <textarea class="txt-in" id="titleText" placeholder="예: SEOUL, 1999&#10;오후 6:20 · 비" style="min-height:52px"></textarea>
+      </div>
+      <div class="adj-btns" style="margin-top:0"><button class="btn" id="subReset">↺ 자막·색감 설정 초기화</button></div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">05</span>스티커 · 글씨<span class="count" id="ocount"></span></h2>
+      <div class="addrow">
+        <button class="add" id="addSticker">＋ 스티커</button>
+        <button class="add" id="addLabel">＋ 글씨</button>
+        <button class="add" id="stickerVault" style="flex:0 0 auto;padding:0 14px">🗂</button>
+      </div>
+      <input type="file" id="sfile" accept="image/*" multiple hidden>
+      <div class="list" id="olist"></div>
+      <div id="opanel"></div>
+      <p class="hint">· 스티커·글씨를 끌면 옮겨지고, 모서리 ● 손잡이로 크기를, 위쪽 ○ 손잡이로 회전을 바꿔요. (Shift: 15°씩, Alt: 가장자리·가운데에 붙지 않게)<br>· 선택한 채로 <b>Delete</b>로 지우고, 방향키로 조금씩 옮길 수 있어요.<br>· 이미지를 붙여넣거나 끌어다 놓으면 <b>사진 칸</b>으로 넣을지 <b>스티커</b>로 넣을지 고를 수 있어요.</p>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="sec">
+      <h2 class="sec-title"><span class="no">06</span>내보내기</h2>
+      <div class="field">
+        <div class="label">최종 너비</div>
+        <div class="width-box"><input id="width" type="number" inputmode="numeric" min="100" max="10000" step="10"><span>px</span></div>
+        <div class="presets" id="presets">
+          <button class="pill" data-w="1080">1080</button>
+          <button class="pill" data-w="1920">1920</button>
+          <button class="pill" data-w="2560">2560</button>
+          <button class="pill" data-w="3840">3840</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">파일 형식</div>
+        <div class="seg" id="formats">
+          <button data-f="png">PNG · 고화질</button>
+          <button data-f="jpg">JPG · 가벼움</button>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:0">작업 중인 사진·스티커·글씨는 이 브라우저에 자동으로 저장돼서, 창을 닫았다 열어도 이어서 할 수 있어요.</p>
+    </div>
+  </aside>
+</main>
+
+<div class="modal" id="modal" hidden><div class="modal-box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ================= 상태 ================= */
+  const SUBDEF = { grade:'none', gradeAmt:100, grain:0, vig:0, subPos:'bc', subSize:44, subFont:'Pretendard', subColor:'#ffffff', subOutline:'normal', subOC:'#000000', subShadow:40, subItalic:0, subBleed:0, subLH:'base', titleOn:false, titleText:'' };
+  const DEF = { width:1920, dir:'h', cols:2, gap:0, pad:0, rad:0, ratio:'free', gapColor:'#000000', format:'png',
+    mode:'collage', tpl:'g4', tplRatio:'1:1', sceneRatio:'16:9', seqRatio:'16:9', seqStyle:'classic', film:false, bars:false, barSize:6, ...SUBDEF };
+  const S = { ...DEF };
+  const KEY = 'collage-settings-v3';
+  try { const saved = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem('collage-editor-settings-v2') || '{}'); for (const k in S) if (k in saved) S[k] = saved[k]; } catch (e) {}
+
+  let items = [];   // 사진 칸: {id,bid,name,w,h,zoom,rot,x,y,flip,br,sat,con,tmp,bw}
+  let objs = [];    // 스티커·글씨: {id,t:'img'|'text',...}
+  let sel = -1, selObj = null, uid = 0, previewInfo = null;
+  const IMGS = new Map(); // bid -> {img,url,w,h}
+  const nid = () => Date.now().toString(36) + (++uid).toString(36);
+
+  let toastT;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); }
+
+  /* ================= 저장소 (IndexedDB) ================= */
+  let db = null;
+  const openDB = () => new Promise(res => {
+    if (!window.indexedDB) return res(null);
+    const r = indexedDB.open('studio-collage', 1);
+    r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); if (!d.objectStoreNames.contains('img')) d.createObjectStore('img'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => res(null);
+  });
+  const tx = (store, mode, fn) => new Promise((res, rej) => { if (!db) return res(null); const t = db.transaction(store, mode); let out; const r = fn(t.objectStore(store)); if (r) r.onsuccess = () => out = r.result; t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); });
+  const putBlob = (id, b) => tx('img', 'readwrite', s => s.put(b, id)).catch(() => {});
+  const getBlob = id => tx('img', 'readonly', s => s.get(id)).catch(() => null);
+
+  function meta() {
+    return JSON.stringify({ S, items: items.map(({ id, bid, name, w, h, zoom, rot, x, y, flip, br, sat, con, tmp, bw, sub }) => ({ id, bid, name, w, h, zoom, rot, x, y, flip, br, sat, con, tmp, bw, sub })),
+      objs: objs.map(o => { const c = { ...o }; delete c._w; delete c._h; return c; }) });
+  }
+  let persistT = null;
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+    clearTimeout(persistT);
+    persistT = setTimeout(async () => {
+      try { await tx('kv', 'readwrite', s => s.put(meta(), 'state')); } catch (e) {}
+      try { localStorage.setItem('collage-summary', JSON.stringify({ n: items.length, o: objs.length })); if (ready) localStorage.setItem('studioTouch:collage', String(Date.now())); } catch (e) {}
+    }, 300);
+  }
+
+  async function blobToImg(bid, blob) {
+    if (IMGS.has(bid)) return IMGS.get(bid);
+    const url = URL.createObjectURL(blob), img = new Image(); img.src = url;
+    await img.decode();
+    const rec = { img, url, w: img.naturalWidth, h: img.naturalHeight };
+    IMGS.set(bid, rec); return rec;
+  }
+
+  /* ================= 실행 취소 ================= */
+  let hist = [], hpos = -1, histT = null, restoring = false;
+  function recordNow() {
+    clearTimeout(histT); histT = null;
+    const s = meta(); if (hist[hpos] === s) return;
+    hist.length = hpos + 1; hist.push(s); if (hist.length > 80) hist.shift(); hpos = hist.length - 1; histBtns();
+  }
+  const record = () => { if (restoring) return; clearTimeout(histT); histT = setTimeout(recordNow, 350); };
+  function histBtns() { $('#undo').disabled = hpos <= 0; $('#redo').disabled = hpos >= hist.length - 1; }
+  function applyMeta(str) {
+    const m = JSON.parse(str);
+    Object.assign(S, m.S);
+    items = m.items.filter(it => IMGS.has(it.bid));
+    objs = m.objs.filter(o => o.t !== 'img' || IMGS.has(o.bid));
+    if (sel >= items.length) sel = -1;
+    if (selObj && !objs.some(o => o.id === selObj)) selObj = null;
+    restoring = true; syncUI(); renderList(); renderObjs(); schedule(); restoring = false;
+  }
+  function undo() { if (histT) recordNow(); if (hpos <= 0) return; hpos--; applyMeta(hist[hpos]); histBtns(); persist(); }
+  function redo() { if (histT) recordNow(); if (hpos >= hist.length - 1) return; hpos++; applyMeta(hist[hpos]); histBtns(); persist(); }
+  $('#undo').onclick = undo; $('#redo').onclick = redo;
+
+  /* ================= 배치 계산 ================= */
+  const rotQuarter = it => it.rot % 90 === 0 && Math.abs(it.rot / 90) % 2 === 1;
+  const ar = it => rotQuarter(it) ? it.h / it.w : it.w / it.h;
+  const RATIOS = { '16:9': 16 / 9, '1:1': 1, '4:5': 4 / 5, '9:16': 9 / 16 };
+  const RAT = { '16:9': 16 / 9, '2.39:1': 2.39, '3:2': 3 / 2, '4:3': 4 / 3, '1:1': 1, '4:5': .8, '9:16': 9 / 16 };
+  const TPL = {
+    g4: { n: 4, r: [[0, 0, .5, .5], [.5, 0, .5, .5], [0, .5, .5, .5], [.5, .5, .5, .5]] },
+    cols: { n: 0, dir: 'c' }, rows: { n: 0, dir: 'r' },
+    bigL: { n: 4, r: [[0, 0, .62, 1], [.62, 0, .38, 1 / 3], [.62, 1 / 3, .38, 1 / 3], [.62, 2 / 3, .38, 1 / 3]] },
+    bigR: { n: 4, r: [[.38, 0, .62, 1], [0, 0, .38, 1 / 3], [0, 1 / 3, .38, 1 / 3], [0, 2 / 3, .38, 1 / 3]] },
+    bigT: { n: 4, r: [[0, 0, 1, .62], [0, .62, 1 / 3, .38], [1 / 3, .62, 1 / 3, .38], [2 / 3, .62, 1 / 3, .38]] },
+    bigB: { n: 4, r: [[0, .38, 1, .62], [0, 0, 1 / 3, .38], [1 / 3, 0, 1 / 3, .38], [2 / 3, 0, 1 / 3, .38]] },
+  };
+  function tplRects(id, n) {
+    const t = TPL[id] || TPL.g4;
+    if (t.dir) { const k = clamp(n, 2, 8); return Array.from({ length: k }, (_, i) => t.dir === 'c' ? [i / k, 0, 1 / k, 1] : [0, i / k, 1, 1 / k]); }
+    return t.r;
+  }
+  const seqN = () => Math.min(items.length, 5);
+  function computeLayout() {
+    const n = items.length; if (!n) return null;
+    if (S.mode === 'scene') { const W = S.width, H = Math.round(W / (RAT[S.sceneRatio] || 16 / 9)); return { W, H, cells: [{ x: 0, y: 0, w: W, h: H, i: 0 }] }; }
+    if (S.mode === 'seq') {
+      const W = S.width, k = seqN(), g = S.gap, py = S.pad, px = S.film ? Math.max(S.pad, Math.round(W * .065)) : S.pad;
+      const cw = W - px * 2, ch = cw / (RAT[S.seqRatio] || 16 / 9), cells = [];
+      for (let i = 0; i < k; i++) cells.push({ x: px, y: py + i * (ch + g), w: cw, h: ch, i });
+      return { W, H: Math.round(py * 2 + k * ch + (k - 1) * g), cells, px };
+    }
+    if (S.mode === 'tpl') {
+      const W = S.width, H = Math.round(W / (RAT[S.tplRatio] || 1)), p = Math.min(S.pad, Math.floor(Math.min(W, H) / 2 - 10)), g = S.gap;
+      const CW = W - p * 2, CH = H - p * 2, rs = tplRects(S.tpl, n), cells = [];
+      rs.forEach((r, i) => { if (i >= n) return;
+        const x0 = p + r[0] * CW + (r[0] > 0.001 ? g / 2 : 0), y0 = p + r[1] * CH + (r[1] > 0.001 ? g / 2 : 0);
+        const x1 = p + (r[0] + r[2]) * CW - (r[0] + r[2] < .999 ? g / 2 : 0), y1 = p + (r[1] + r[3]) * CH - (r[1] + r[3] < .999 ? g / 2 : 0);
+        cells.push({ x: x0, y: y0, w: Math.max(1, x1 - x0), h: Math.max(1, y1 - y0), i }); });
+      return { W, H, cells };
+    }
+    const W = S.width, R = RATIOS[S.ratio] || 0;
+    let pad = Math.max(0, Math.min(S.pad, Math.floor((W - 20) / 2)));
+    if (R) pad = Math.min(pad, Math.floor((W / R - 20) / 2));
+    const nat = naturalLayout(W - 2 * pad);
+    let H;
+    if (R) { H = Math.round(W / R); fitBands(nat.cells, Math.max(1, H - 2 * pad)); }
+    else H = Math.max(1, Math.round(nat.H + 2 * pad));
+    nat.cells.forEach(c => { c.x += pad; c.y += pad; });
+    return { W, H, cells: nat.cells };
+  }
+  function fitBands(cells, target) {
+    const bands = new Map();
+    cells.forEach(c => { const k = c.y.toFixed(3); if (!bands.has(k)) bands.set(k, { y: c.y, h: c.h }); });
+    const list = [...bands.values()].sort((a, b) => a.y - b.y);
+    const sumH = list.reduce((a, b) => a + b.h, 0), gaps = S.gap * (list.length - 1);
+    const k = Math.max(1 / sumH, (target - gaps) / sumH);
+    let acc = 0;
+    list.forEach(b => { b.ny = acc; b.nh = b.h * k; acc += b.nh + S.gap; });
+    cells.forEach(c => { const b = bands.get(c.y.toFixed(3)); c.y = b.ny; c.h = b.nh; });
+  }
+  function naturalLayout(W) {
+    const n = items.length, g = S.gap, cells = [];
+    if (S.dir === 'h') {
+      const sum = items.reduce((a, it) => a + ar(it), 0);
+      const H = Math.max(1, (W - g * (n - 1)) / sum); let x = 0;
+      items.forEach((it, i) => { const w = H * ar(it); cells.push({ x, y: 0, w, h: H, i }); x += w + g; });
+      return { W, H, cells };
+    }
+    if (S.dir === 'v') {
+      let y = 0;
+      items.forEach((it, i) => { const h = W / ar(it); cells.push({ x: 0, y, w: W, h, i }); y += h + g; });
+      return { W, H: Math.max(1, y - g), cells };
+    }
+    const c = Math.max(1, Math.min(S.cols, n));
+    if (S.dir === 'grid') {
+      const s = Math.max(1, (W - g * (c - 1)) / c);
+      items.forEach((it, i) => cells.push({ x: (i % c) * (s + g), y: Math.floor(i / c) * (s + g), w: s, h: s, i }));
+      const rows = Math.ceil(n / c);
+      return { W, H: rows * s + (rows - 1) * g, cells };
+    }
+    let y = 0, prevH = null;
+    for (let start = 0; start < n; start += c) {
+      const row = items.slice(start, start + c), k = row.length;
+      const sum = row.reduce((a, it) => a + ar(it), 0);
+      let h = Math.max(1, (W - g * (k - 1)) / sum), x = 0;
+      if (k < c && prevH !== null && h > prevH) { h = prevH; x = (W - (h * sum + g * (k - 1))) / 2; }
+      row.forEach((it, j) => { const w = h * ar(it); cells.push({ x, y, w, h, i: start + j }); x += w + g; });
+      y += h + g; prevH = h;
+    }
+    return { W, H: Math.max(1, y - g), cells };
+  }
+
+  /* ================= 그리기 ================= */
+  function rrect(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  const HAS_FILTER = (() => { try { return 'filter' in document.createElement('canvas').getContext('2d'); } catch (e) { return false; } })();
+  const GRADES = [
+    ['none', '원본', {}],
+    ['mono', '모노크롬', { gs: 1, con: .06 }],
+    ['noir', '느와르', { gs: 1, con: .45, bri: -.1 }],
+    ['sepia', '세피아', { sep: .85, con: .05 }],
+    ['cine', '시네마틱', { con: .14, sat: -.12, tint: [20, 110, 130, .32], tint2: [255, 150, 70, .1] }],
+    ['cool', '쿨 블루', { sat: -.1, bri: .02, tint: [60, 130, 255, .3] }],
+    ['golden', '골든', { sep: .2, sat: .18, tint: [255, 170, 60, .34] }],
+    ['film', '필름', { con: -.08, sat: -.15, bri: .04, tint: [255, 215, 170, .22], lift: .06 }],
+  ];
+  const gradeOf = id => (GRADES.find(g => g[0] === id) || GRADES[0])[2];
+  let noiseCv = null;
+  function noise() {
+    if (noiseCv) return noiseCv;
+    noiseCv = document.createElement('canvas'); noiseCv.width = noiseCv.height = 160;
+    const c = noiseCv.getContext('2d'), d = c.createImageData(160, 160);
+    for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    c.putImageData(d, 0, 0); return noiseCv;
+  }
+  const LH = { narrow: 1.12, base: 1.32, wide: 1.6, xwide: 1.9 };
+  const OUT = { none: 0, thin: .08, normal: .14, thick: .22 };
+  function drawSub(ctx, text, area, k) {
+    if (!text || !String(text).trim()) return;
+    const fs = S.subSize * k, lines = String(text).split('\n'), lh = fs * (LH[S.subLH] || 1.32);
+    ctx.save();
+    ctx.font = `600 ${fs}px "${S.subFont}", "Pretendard", sans-serif`; ctx.textBaseline = 'middle';
+    const m = Math.max(fs * .9, area.h * .06), blockH = lines.length * lh;
+    let x = area.x + area.w / 2, y0, align = 'center';
+    if (S.subPos === 'tc') y0 = area.y + m + lh / 2;
+    else if (S.subPos === 'c') y0 = area.y + area.h / 2 - blockH / 2 + lh / 2;
+    else y0 = area.y + area.h - m - blockH + lh / 2;
+    if (S.subPos === 'bl') { x = area.x + m * 1.2; align = 'left'; }
+    if (S.subPos === 'br') { x = area.x + area.w - m * 1.2; align = 'right'; }
+    ctx.textAlign = align;
+    const ow = (OUT[S.subOutline] || 0) * fs, bleed = S.subBleed / 100 * fs * .14;
+    lines.forEach((ln, i) => {
+      const y = y0 + i * lh;
+      ctx.save(); ctx.translate(x, y); if (S.subItalic) ctx.transform(1, 0, -Math.tan(S.subItalic * Math.PI / 180), 1, 0, 0);
+      if (bleed) { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .8; ctx.fillStyle = '#ff2a2a'; ctx.fillText(ln, -bleed, 0); ctx.fillStyle = '#20e0ff'; ctx.fillText(ln, bleed, 0); ctx.restore(); }
+      if (S.subShadow) { ctx.shadowColor = `rgba(0,0,0,${Math.min(.95, S.subShadow / 100 + .2)})`; ctx.shadowBlur = S.subShadow / 100 * fs * .5; ctx.shadowOffsetY = fs * .04; }
+      if (ow) { ctx.lineJoin = 'round'; ctx.miterLimit = 2; ctx.lineWidth = ow; ctx.strokeStyle = S.subOC; ctx.strokeText(ln, 0, 0); ctx.shadowColor = 'transparent'; }
+      ctx.fillStyle = S.subColor; ctx.fillText(ln, 0, 0);
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+  function drawCell(ctx, it, r, scale, kk) {
+    const rec = IMGS.get(it.bid); if (!rec) return;
+    ctx.save();
+    rrect(ctx, r.x, r.y, r.w, r.h, S.rad * scale); ctx.clip();
+    const th = it.rot * Math.PI / 180, co = Math.abs(Math.cos(th)), si = Math.abs(Math.sin(th));
+    const cover = Math.max((r.w * co + r.h * si) / it.w, (r.w * si + r.h * co) / it.h) * it.zoom / 100;
+    ctx.save();
+    ctx.translate(r.x + r.w / 2 + it.x / 100 * r.w / 2, r.y + r.h / 2 + it.y / 100 * r.h / 2);
+    ctx.rotate(th);
+    if (it.flip) ctx.scale(-1, 1);
+    const f = [], G = gradeOf(S.grade), a = S.gradeAmt / 100;
+    const bri = 1 + (it.br || 0) / 100 + (G.bri || 0) * a, con = 1 + (it.con || 0) / 100 + (G.con || 0) * a, sat = Math.max(0, 1 + (it.sat || 0) / 100 + (G.sat || 0) * a);
+    if (bri !== 1) f.push(`brightness(${bri})`);
+    if (con !== 1) f.push(`contrast(${con})`);
+    if (sat !== 1) f.push(`saturate(${sat})`);
+    if (G.sep) f.push(`sepia(${G.sep * a})`);
+    if (it.bw) f.push('grayscale(1)'); else if (G.gs) f.push(`grayscale(${G.gs * a})`);
+    if (HAS_FILTER && f.length) ctx.filter = f.join(' ');
+    const dw = it.w * cover, dh = it.h * cover;
+    ctx.drawImage(rec.img, -dw / 2, -dh / 2, dw, dh);
+    ctx.restore();
+    if (it.tmp) {
+      ctx.globalCompositeOperation = 'soft-light';
+      ctx.fillStyle = it.tmp > 0 ? `rgba(255,150,40,${Math.abs(it.tmp) / 100 * .8})` : `rgba(40,140,255,${Math.abs(it.tmp) / 100 * .8})`;
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+    }
+    if (!it.bw) for (const t of [G.tint, G.tint2]) if (t && a) { ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `rgba(${t[0]},${t[1]},${t[2]},${t[3] * a})`; ctx.fillRect(r.x, r.y, r.w, r.h); }
+    if (G.lift && a) { ctx.globalCompositeOperation = 'lighten'; ctx.fillStyle = `rgba(40,36,32,${G.lift * a * 4})`; ctx.fillRect(r.x, r.y, r.w, r.h); }
+    if (S.vig) {
+      ctx.globalCompositeOperation = 'source-over';
+      const cx = r.x + r.w / 2, cy = r.y + r.h / 2, R = Math.hypot(r.w, r.h) / 2;
+      const gr = ctx.createRadialGradient(cx, cy, R * .35, cx, cy, R);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${S.vig / 100 * .85})`);
+      ctx.fillStyle = gr; ctx.fillRect(r.x, r.y, r.w, r.h);
+    }
+    if (S.grain) {
+      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = S.grain / 100 * .55;
+      const pat = ctx.createPattern(noise(), 'repeat'); ctx.fillStyle = pat; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.globalAlpha = 1;
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    let area = { x: r.x, y: r.y, w: r.w, h: r.h };
+    if (S.bars && (S.mode === 'scene' || S.mode === 'seq')) {
+      const bh = r.h * S.barSize / 100; ctx.fillStyle = '#000'; ctx.fillRect(r.x, r.y, r.w, bh); ctx.fillRect(r.x, r.y + r.h - bh, r.w, bh);
+      area = { x: r.x, y: r.y + bh, w: r.w, h: r.h - bh * 2 };
+    }
+    ctx.restore();
+    r.area = area;
+    drawSub(ctx, it.sub, area, kk);
+  }
+  function drawTitle(ctx, area, k) {
+    if (!S.titleOn || !S.titleText.trim()) return;
+    const fs = Math.max(10, S.subSize * .5 * k), lines = S.titleText.split('\n');
+    ctx.save(); ctx.font = `600 ${fs}px "${S.subFont}", "Pretendard", sans-serif`; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    ctx.fillStyle = S.subColor; ctx.shadowColor = 'rgba(0,0,0,.7)'; ctx.shadowBlur = fs * .5;
+    const m = Math.max(fs * 1.2, area.w * .03);
+    lines.forEach((l, i) => { const t = [...l].join(String.fromCharCode(8202)); ctx.fillText(i === 0 ? t.toUpperCase() : l, area.x + m, area.y + m + i * fs * 1.45); });
+    ctx.restore();
+  }
+  function drawFilmHoles(ctx, L, scale) {
+    const px = (L.px || 0) * scale; if (px < 4) return;
+    const hw = px * .38, hh = hw * .7, step = hh * 2.1, ch = Math.round(L.H * scale);
+    ctx.save(); ctx.fillStyle = 'rgba(235,235,235,.9)';
+    for (let y = step * .5; y < ch - hh; y += step) { for (const x of [(px - hw) / 2, ch && (Math.round(L.W * scale) - px + (px - hw) / 2)]) { rrect(ctx, x, y, hw, hh, hh * .25); ctx.fill(); } }
+    ctx.restore();
+  }
+
+  const FONTS = [['Pretendard', '프리텐다드'], ['Gowun Dodum', '고운돋움'], ['Jua', '주아'], ['Black Han Sans', '검은고딕'], ['Nanum Pen Script', '나눔손글씨 펜'], ['Galmuri11', '갈무리 (픽셀)']];
+  const fontStr = (o, px) => `${o.bold ? 700 : 400} ${px}px "${o.font}", "Pretendard", sans-serif`;
+  function textMetrics(ctx, o, fs) {
+    ctx.font = fontStr(o, fs);
+    const deco = o.deco || 'none', orn = '✦';
+    const lines = String(o.text || ' ').split('\n');
+    const decorate = s => (deco === 'before' || deco === 'both' ? orn + ' ' : '') + s + (deco === 'after' || deco === 'both' ? ' ' + orn : '');
+    const padX = fs * .55, padY = fs * .38, lh = fs * 1.3;
+    if (!o.vert) {
+      const ls = lines.map(decorate);
+      const w = Math.max(...ls.map(l => ctx.measureText(l).width), fs * .5) + padX * 2;
+      return { w, h: ls.length * lh + padY * 2 - (lh - fs) * .4, ls, padX, padY, lh };
+    }
+    const cols = lines.map(l => [...(deco === 'before' || deco === 'both' ? '✦' : '') + l + (deco === 'after' || deco === 'both' ? '✦' : '')]);
+    const cw = fs * 1.25, rows = Math.max(...cols.map(c => c.length), 1);
+    return { w: cols.length * cw + padY * 2, h: rows * fs * 1.12 + padX * 1.2, cols, cw, padX, padY, vert: true };
+  }
+  function patternFill(ctx, o, w, h, fs) {
+    const col = o.color, a = .14; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.strokeStyle = col;
+    const s = Math.max(4, fs * .45);
+    if (o.pat === 'check') { for (let y = -h / 2, r = 0; y < h / 2; y += s, r++) for (let x = -w / 2 + (r % 2) * s; x < w / 2; x += s * 2) ctx.fillRect(x, y, s, s); }
+    else if (o.pat === 'stripe') { for (let y = -h / 2; y < h / 2; y += s * 2) ctx.fillRect(-w / 2, y, w, s); }
+    else if (o.pat === 'diag') { ctx.lineWidth = s * .55; for (let x = -w / 2 - h; x < w / 2 + h; x += s * 1.6) { ctx.beginPath(); ctx.moveTo(x, h / 2); ctx.lineTo(x + h, -h / 2); ctx.stroke(); } }
+    else if (o.pat === 'dots') { for (let y = -h / 2 + s / 2; y < h / 2; y += s) for (let x = -w / 2 + s / 2; x < w / 2; x += s) { ctx.beginPath(); ctx.arc(x, y, s * .16, 0, Math.PI * 2); ctx.fill(); } }
+    ctx.restore();
+  }
+  function drawObj(ctx, o, L, scale) {
+    const cx = o.cx * L.W * scale, cy = o.cy * L.H * scale;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate((o.rot || 0) * Math.PI / 180);
+    if (o.t === 'img') {
+      const rec = IMGS.get(o.bid); if (!rec) { ctx.restore(); return; }
+      const w = o.w * L.W * scale, h = w * rec.h / rec.w;
+      const bw = (o.border || 0) * scale, r = (o.radius || 0) * scale;
+      o._w = w / scale; o._h = h / scale;
+      if (o.flip) ctx.scale(-1, 1);
+      if (!bw && !r) {
+        if (o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 22 * scale; ctx.shadowOffsetY = 8 * scale; }
+        ctx.drawImage(rec.img, -w / 2, -h / 2, w, h);
+      } else {
+        ctx.save();
+        if (o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 22 * scale; ctx.shadowOffsetY = 8 * scale; }
+        rrect(ctx, -w / 2 - bw, -h / 2 - bw, w + bw * 2, h + bw * 2, r + bw); ctx.fillStyle = bw ? (o.bcolor || '#fff') : 'rgba(0,0,0,0)';
+        if (bw || o.shadow) { if (!bw) ctx.fillStyle = '#fff'; ctx.fill(); }
+        ctx.restore();
+        ctx.save(); rrect(ctx, -w / 2, -h / 2, w, h, r); ctx.clip(); ctx.drawImage(rec.img, -w / 2, -h / 2, w, h); ctx.restore();
+      }
+    } else {
+      const fs = o.fs * L.W * scale, m = textMetrics(ctx, o, fs);
+      const w = m.w, h = m.h; o._w = w / scale; o._h = h / scale;
+      const rad = o.shape === 'pill' ? h / 2 : o.shape === 'square' ? 0 : fs * .45;
+      if (o.bgOn !== false) {
+        ctx.save();
+        if (o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 16 * scale; ctx.shadowOffsetY = 5 * scale; }
+        rrect(ctx, -w / 2, -h / 2, w, h, rad); ctx.fillStyle = o.bg; ctx.fill(); ctx.restore();
+        if (o.pat && o.pat !== 'none') { ctx.save(); rrect(ctx, -w / 2, -h / 2, w, h, rad); ctx.clip(); patternFill(ctx, o, w, h, fs); ctx.restore(); }
+        if (o.inner && o.inner !== 'none') {
+          const ins = fs * .2; ctx.save(); ctx.strokeStyle = o.color; ctx.lineWidth = Math.max(1, fs * .06); ctx.globalAlpha = .75;
+          if (o.inner === 'dashed') ctx.setLineDash([fs * .25, fs * .18]);
+          rrect(ctx, -w / 2 + ins, -h / 2 + ins, w - ins * 2, h - ins * 2, Math.max(0, rad - ins)); ctx.stroke();
+          if (o.inner === 'double') { const i2 = ins + fs * .14; rrect(ctx, -w / 2 + i2, -h / 2 + i2, w - i2 * 2, h - i2 * 2, Math.max(0, rad - i2)); ctx.stroke(); }
+          ctx.restore();
+        }
+      }
+      ctx.fillStyle = o.color; ctx.font = fontStr(o, fs); ctx.textBaseline = 'middle';
+      if (o.bgOn === false && o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 8 * scale; ctx.shadowOffsetY = 2 * scale; }
+      if (!m.vert) {
+        ctx.textAlign = 'center';
+        const top = -h / 2 + m.padY + fs * .5;
+        m.ls.forEach((l, i) => ctx.fillText(l, 0, top + i * m.lh));
+      } else {
+        ctx.textAlign = 'center';
+        const x0 = -w / 2 + m.padY + m.cw / 2, y0 = -h / 2 + m.padX * .6 + fs * .56;
+        m.cols.forEach((col, ci) => col.forEach((ch, ri) => ctx.fillText(ch, x0 + ci * m.cw, y0 + ri * fs * 1.12)));
+      }
+    }
+    ctx.restore();
+  }
+
+  function render(canvas, scale, opts = {}) {
+    const L = computeLayout(); if (!L) return null;
+    const cw = Math.max(1, Math.round(L.W * scale)), ch = Math.max(1, Math.round(L.H * scale));
+    canvas.width = cw; canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = S.gapColor; ctx.fillRect(0, 0, cw, ch);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    const rects = [];
+    for (const c of L.cells) {
+      const x0 = clamp(Math.round(c.x * scale), 0, cw), y0 = clamp(Math.round(c.y * scale), 0, ch);
+      const x1 = clamp(Math.round((c.x + c.w) * scale), 0, cw), y1 = clamp(Math.round((c.y + c.h) * scale), 0, ch);
+      const r = { x: x0, y: y0, w: x1 - x0, h: y1 - y0, i: c.i };
+      rects.push(r);
+      if (r.w >= 1 && r.h >= 1) drawCell(ctx, items[c.i], r, scale, L.W / 1920 * scale);
+    }
+    if (S.mode === 'seq' && S.film) drawFilmHoles(ctx, L, scale);
+    if (S.titleOn) { const k = L.W / 1920 * scale; drawTitle(ctx, (S.mode === 'scene' || S.mode === 'seq') && rects[0] ? (rects[0].area || rects[0]) : { x: 0, y: 0, w: cw, h: ch }, k); }
+    if (opts.target != null && opts.target >= 0) {
+      const r = rects.find(r => r.i === opts.target);
+      if (r) { const lw = Math.max(3, Math.round(cw / 300)); ctx.save(); ctx.fillStyle = 'rgba(76,143,208,.28)'; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.setLineDash([lw * 3, lw * 2]); ctx.lineWidth = lw; ctx.strokeStyle = '#4c8fd0'; ctx.strokeRect(r.x + lw / 2, r.y + lw / 2, r.w - lw, r.h - lw); ctx.restore(); }
+    }
+    if (opts.highlight != null && opts.highlight >= 0 && !opts.objSel) {
+      const r = rects.find(r => r.i === opts.highlight);
+      if (r) { const lw = Math.max(2, Math.round(cw / 500)); ctx.save(); ctx.lineWidth = lw; ctx.strokeStyle = '#4c8fd0'; ctx.strokeRect(r.x + lw / 2, r.y + lw / 2, r.w - lw, r.h - lw); ctx.restore(); }
+    }
+    for (const o of objs) drawObj(ctx, o, L, scale);
+    if (opts.objSel) drawSelUI(ctx, opts.objSel, L, scale, opts.k || 1);
+    if (opts.guides) { ctx.save(); ctx.strokeStyle = '#ff4fa3'; ctx.lineWidth = Math.max(1, opts.k); ctx.setLineDash([6 * opts.k, 4 * opts.k]);
+      opts.guides.forEach(g => { ctx.beginPath(); if (g.x != null) { ctx.moveTo(g.x * scale, 0); ctx.lineTo(g.x * scale, ch); } else { ctx.moveTo(0, g.y * scale); ctx.lineTo(cw, g.y * scale); } ctx.stroke(); }); ctx.restore(); }
+    return { L, rects, cw, ch, scale };
+  }
+  function drawSelUI(ctx, o, L, scale, k) {
+    if (!o._w) return;
+    const cx = o.cx * L.W * scale, cy = o.cy * L.H * scale, w = o._w * scale, h = o._h * scale;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate((o.rot || 0) * Math.PI / 180);
+    const pad = 4 * k;
+    ctx.strokeStyle = '#4c8fd0'; ctx.lineWidth = 1.6 * k; ctx.setLineDash([5 * k, 4 * k]);
+    ctx.strokeRect(-w / 2 - pad, -h / 2 - pad, w + pad * 2, h + pad * 2); ctx.setLineDash([]);
+    if (!o.lock) {
+      const hr = 7 * k;
+      ctx.beginPath(); ctx.moveTo(0, -h / 2 - pad); ctx.lineTo(0, -h / 2 - pad - 22 * k); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -h / 2 - pad - 22 * k, hr, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(w / 2 + pad, h / 2 + pad, hr, 0, Math.PI * 2); ctx.fillStyle = '#4c8fd0'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * k; ctx.stroke();
+    } else {
+      ctx.font = `${14 * k}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText('🔒', 0, -h / 2 - pad - 3 * k);
+    }
+    ctx.restore();
+  }
+
+  /* ================= 미리보기 ================= */
+  const preview = $('#preview'), stage = $('#stage');
+  let raf = 0, guides = null;
+  function schedule() {
+    persist(); record();
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; drawPreview(); });
+  }
+  const curObj = () => objs.find(o => o.id === selObj) || null;
+  function drawPreview() {
+    const has = items.length > 0;
+    $('#empty').hidden = has; preview.hidden = !has; $('#tip').hidden = !has || window.innerWidth <= 900;
+    if (!has) { previewInfo = null; $('#info').textContent = ''; return; }
+    const L = computeLayout();
+    const pad = window.innerWidth <= 900 ? 36 : 72;
+    const maxW = Math.max(120, stage.clientWidth - pad), maxH = Math.max(120, stage.clientHeight - pad);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const fit = Math.min(maxW / L.W, maxH / L.H);
+    const scale = Math.min(1, fit * dpr);
+    const k = scale / fit; // canvas px per css px
+    previewInfo = render(preview, scale, { highlight: sel, target: drag && drag.target != null ? drag.target : -1, objSel: curObj(), k, guides });
+    previewInfo.k = k;
+    preview.style.width = (L.W * fit) + 'px';
+    preview.style.height = (L.H * fit) + 'px';
+    $('#info').textContent = `${L.W} × ${L.H} px`;
+  }
+
+  function moveItem(from, to) {
+    if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return;
+    const selItem = items[sel]; const [it] = items.splice(from, 1); items.splice(to, 0, it);
+    sel = selItem ? items.indexOf(selItem) : -1;
+  }
+
+  // 화면 좌표 → 결과 이미지 좌표(px)
+  const toLayout = e => { const b = preview.getBoundingClientRect(); return { x: (e.clientX - b.left) / b.width * previewInfo.L.W, y: (e.clientY - b.top) / b.height * previewInfo.L.H, cssK: previewInfo.L.W / b.width }; };
+  const hitTest = e => { const b = preview.getBoundingClientRect(); const px = (e.clientX - b.left) / b.width * preview.width, py = (e.clientY - b.top) / b.height * preview.height; return previewInfo.rects.find(r => px >= r.x && px < r.x + r.w && py >= r.y && py < r.y + r.h); };
+  function local(o, p, L) { const dx = p.x - o.cx * L.W, dy = p.y - o.cy * L.H, t = -(o.rot || 0) * Math.PI / 180; return { x: dx * Math.cos(t) - dy * Math.sin(t), y: dx * Math.sin(t) + dy * Math.cos(t) }; }
+  function hitObj(p) {
+    const L = previewInfo.L;
+    for (let i = objs.length - 1; i >= 0; i--) { const o = objs[i]; if (!o._w) continue; const l = local(o, p, L); if (Math.abs(l.x) <= o._w / 2 + 3 * p.cssK && Math.abs(l.y) <= o._h / 2 + 3 * p.cssK) return o; }
+    return null;
+  }
+  function hitHandle(o, p) {
+    if (!o || o.lock || !o._w) return null;
+    const L = previewInfo.L, l = local(o, p, L), pad = 4 * p.cssK, R = 13 * p.cssK;
+    if (Math.hypot(l.x - (o._w / 2 + pad), l.y - (o._h / 2 + pad)) < R) return 'resize';
+    if (Math.hypot(l.x, l.y - (-o._h / 2 - pad - 22 * p.cssK)) < R) return 'rotate';
+    return null;
+  }
+
+  let drag = null, odrag = null;
+  preview.addEventListener('pointerdown', e => {
+    if (!previewInfo) return;
+    const p = toLayout(e), L = previewInfo.L;
+    const so = curObj(), hnd = hitHandle(so, p);
+    if (hnd) {
+      odrag = { mode: hnd, o: so, start: { ...so }, p0: p, d0: Math.hypot(p.x - so.cx * L.W, p.y - so.cy * L.H) };
+      preview.setPointerCapture(e.pointerId); return;
+    }
+    const o = hitObj(p);
+    if (o) {
+      selObj = o.id; sel = -1; renderList(); renderObjs();
+      if (!o.lock) { odrag = { mode: 'move', o, start: { ...o }, p0: p }; preview.setPointerCapture(e.pointerId); }
+      drawPreview(); return;
+    }
+    if (selObj) { selObj = null; renderObjs(); }
+    const b = preview.getBoundingClientRect();
+    const hit = hitTest(e);
+    if (!hit) { if (sel !== -1) { sel = -1; renderList(); } drawPreview(); return; }
+    if (sel !== hit.i) { sel = hit.i; renderList(); }
+    const it = items[hit.i];
+    drag = { i: hit.i, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, hw: Math.max(1, hit.w * b.width / preview.width / 2), hh: Math.max(1, hit.h * b.height / preview.height / 2) };
+    preview.setPointerCapture(e.pointerId);
+    drawPreview();
+  });
+  function snapMove(o, nx, ny, p, alt) {
+    guides = null; if (alt) return [nx, ny];
+    const L = previewInfo.L, th = 8 * p.cssK, t = (o.rot || 0) * Math.PI / 180;
+    const bw = Math.abs(o._w * Math.cos(t)) + Math.abs(o._h * Math.sin(t)), bh = Math.abs(o._w * Math.sin(t)) + Math.abs(o._h * Math.cos(t));
+    let x = nx * L.W, y = ny * L.H; const g = [];
+    const tx = [[L.W / 2, x], [bw / 2, x], [L.W - bw / 2, x]];
+    for (const [target] of tx) { if (Math.abs(x - target) < th) { x = target; g.push({ x: target === L.W / 2 ? target : (target === bw / 2 ? 0 : L.W) }); break; } }
+    const ty = [L.H / 2, bh / 2, L.H - bh / 2];
+    for (const target of ty) { if (Math.abs(y - target) < th) { y = target; g.push({ y: target === L.H / 2 ? target : (target === bh / 2 ? 0 : L.H) }); break; } }
+    guides = g.length ? g : null;
+    return [x / L.W, y / L.H];
+  }
+  preview.addEventListener('pointermove', e => {
+    if (odrag) {
+      const p = toLayout(e), L = previewInfo.L, o = odrag.o, s = odrag.start;
+      if (odrag.mode === 'move') {
+        const [nx, ny] = snapMove(o, s.cx + (p.x - odrag.p0.x) / L.W, s.cy + (p.y - odrag.p0.y) / L.H, p, e.altKey);
+        o.cx = clamp(nx, -.2, 1.2); o.cy = clamp(ny, -.2, 1.2);
+      } else if (odrag.mode === 'resize') {
+        const d = Math.hypot(p.x - s.cx * L.W, p.y - s.cy * L.H), k = clamp(d / Math.max(1, odrag.d0), .05, 20);
+        if (o.t === 'img') o.w = clamp(s.w * k, .02, 3); else o.fs = clamp(s.fs * k, .006, .5);
+      } else {
+        let a = Math.atan2(p.y - s.cy * L.H, p.x - s.cx * L.W) * 180 / Math.PI + 90;
+        if (e.shiftKey) a = Math.round(a / 15) * 15;
+        a = ((a + 180) % 360 + 360) % 360 - 180; o.rot = Math.round(a);
+      }
+      syncObjPanel(); schedule(); return;
+    }
+    if (!drag) {
+      if (previewInfo && e.pointerType === 'mouse') { const p = toLayout(e); const so = curObj(); const h = hitHandle(so, p); preview.style.cursor = h === 'resize' ? 'nwse-resize' : h === 'rotate' ? 'alias' : hitObj(p) ? 'move' : ''; }
+      return;
+    }
+    const it = items[drag.i]; if (!it) return;
+    const hit = hitTest(e);
+    if (hit && hit.i !== drag.i) { it.x = drag.ox; it.y = drag.oy; drag.target = hit.i; preview.style.cursor = 'copy'; }
+    else {
+      drag.target = null; preview.style.cursor = '';
+      const fx = it.flip ? -1 : 1;
+      it.x = Math.round(clamp(drag.ox + (e.clientX - drag.sx) / drag.hw * 100, -100, 100));
+      it.y = Math.round(clamp(drag.oy + (e.clientY - drag.sy) / drag.hh * 100, -100, 100));
+      void fx;
+    }
+    syncAdj(); schedule();
+  });
+  const endDrag = () => {
+    if (odrag) { odrag = null; guides = null; schedule(); renderObjs(); return; }
+    if (!drag) return;
+    const d = drag; drag = null; preview.style.cursor = '';
+    if (d.target != null) { sel = d.i; moveItem(d.i, d.target); renderList(); toast('순서를 바꿨어요'); }
+    schedule();
+  };
+  preview.addEventListener('pointerup', endDrag);
+  preview.addEventListener('pointercancel', () => { if (drag) drag.target = null; endDrag(); });
+  preview.addEventListener('wheel', e => {
+    if (!previewInfo) return;
+    const p = toLayout(e), o = hitObj(p) || (curObj() && hitObj(p) === curObj() ? curObj() : null);
+    e.preventDefault();
+    const f = e.deltaY < 0 ? 1.06 : 1 / 1.06;
+    if (o && !o.lock) { if (o.t === 'img') o.w = clamp(o.w * f, .02, 3); else o.fs = clamp(o.fs * f, .006, .5); selObj = o.id; renderObjs(); syncObjPanel(); schedule(); return; }
+    const hit = hitTest(e); if (!hit) return;
+    const it = items[hit.i]; it.zoom = Math.round(clamp(it.zoom * f, 50, 300));
+    if (sel !== hit.i) { sel = hit.i; renderList(); } else syncAdj();
+    schedule();
+  }, { passive: false });
+  window.addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; drawPreview(); }); });
+
+  /* ================= 사진 목록 ================= */
+  const fillRange = el => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
+  const ADJ = [
+    { k: 'zoom', label: '확대', min: 50, max: 300, unit: '%' },
+    { k: 'rot', label: '회전', min: -180, max: 180, unit: '°' },
+    { k: 'x', label: '좌우 위치', min: -100, max: 100, unit: '' },
+    { k: 'y', label: '상하 위치', min: -100, max: 100, unit: '' },
+  ];
+  const FIX = [
+    { k: 'br', label: '명도', min: -100, max: 100, unit: '' },
+    { k: 'sat', label: '채도', min: -100, max: 100, unit: '' },
+    { k: 'con', label: '대비', min: -100, max: 100, unit: '' },
+    { k: 'tmp', label: '색온도', min: -100, max: 100, unit: '' },
+  ];
+  function renderList() {
+    const list = $('#list'); list.innerHTML = '';
+    $('#count').textContent = items.length ? `${items.length}장` : '';
+    items.forEach((it, i) => {
+      const rec = IMGS.get(it.bid);
+      const el = document.createElement('div');
+      el.className = 'item' + (i === sel ? ' sel' : ''); el.dataset.i = i;
+      let html = `<div class="item-head" data-a="select">
+          <div class="grip" data-a="grip" title="끌어서 순서 바꾸기">⠿</div>
+          <img class="thumb" src="${rec ? rec.url : ''}" alt="">
+          <div class="meta"><div class="name"><span class="num">${String(i + 1).padStart(2, '0')}</span>${esc(it.name)}</div><div class="dim">${it.w} × ${it.h}</div></div>
+          <div class="tools">
+            <button class="icon-btn" data-a="up" title="앞으로" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button class="icon-btn" data-a="down" title="뒤로" ${i === items.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="icon-btn" data-a="dup" title="복제">⧉</button>
+            <button class="icon-btn" data-a="tosticker" title="스티커로 옮기기">✦</button>
+            <button class="icon-btn del" data-a="del" title="삭제">✕</button>
+          </div></div>`;
+      if (i === sel) {
+        html += '<div class="adj">' + ADJ.map(a => slider(a, it)).join('') +
+          `<div class="adj-btns"><button class="btn" data-a="rotL">↺ 90°</button><button class="btn" data-a="rot90">↻ 90°</button><button class="btn ${it.flip ? 'on' : ''}" data-a="flip">⇋ 좌우 반전</button><button class="btn" data-a="center">⌖ 가운데로</button></div>
+          <h5>보정</h5>` + FIX.map(a => slider(a, it)).join('') +
+          `<div class="adj-btns"><button class="btn ${it.bw ? 'on' : ''}" data-a="bw">흑백</button><button class="btn" data-a="fixreset">↺ 보정 초기화</button><button class="btn" data-a="reset">전부 원래대로</button></div></div>`;
+      }
+      html += `<textarea class="sub-in" data-sub="${i}" rows="1" placeholder="${S.mode === 'scene' && i > 0 ? '시네마틱 씬은 첫 번째 사진만 써요' : S.mode === 'seq' && i > 4 ? '시퀀스는 5컷까지만 써요' : '자막 (선택) — 줄바꿈으로 두 줄'}">${esc(it.sub || '')}</textarea>`;
+      el.innerHTML = html; list.append(el);
+    });
+    list.querySelectorAll('input[type=range]').forEach(fillRange);
+  }
+  const slider = (a, it) => `<div class="field"><div class="label">${a.label} <span class="val" data-v="${a.k}">${it[a.k] || 0}${a.unit}</span></div><input type="range" data-k="${a.k}" min="${a.min}" max="${a.max}" step="1" value="${it[a.k] || 0}"></div>`;
+  function syncAdj() {
+    if (sel < 0 || !items[sel]) return;
+    const it = items[sel];
+    [...ADJ, ...FIX].forEach(a => {
+      const inp = document.querySelector(`#list input[data-k="${a.k}"]`), v = document.querySelector(`#list [data-v="${a.k}"]`);
+      if (inp) { inp.value = it[a.k] || 0; fillRange(inp); } if (v) v.textContent = (it[a.k] || 0) + a.unit;
+    });
+  }
+  $('#list').addEventListener('click', e => {
+    const btn = e.target.closest('[data-a]'); if (!btn) return;
+    const itemEl = btn.closest('.item'); if (!itemEl) return;
+    const i = +itemEl.dataset.i, a = btn.dataset.a, it = items[i];
+    if (a === 'select') { sel = sel === i ? -1 : i; selObj = null; renderObjs(); }
+    else if (a === 'up' && i > 0) { [items[i - 1], items[i]] = [items[i], items[i - 1]]; sel = i - 1; }
+    else if (a === 'down' && i < items.length - 1) { [items[i + 1], items[i]] = [items[i], items[i + 1]]; sel = i + 1; }
+    else if (a === 'dup') { items.splice(i + 1, 0, { ...it, id: nid() }); sel = i + 1; }
+    else if (a === 'del') { items.splice(i, 1); sel = -1; }
+    else if (a === 'tosticker') { items.splice(i, 1); sel = -1; addStickerObj(it.bid); toast('스티커로 옮겼어요'); }
+    else if (a === 'rot90') it.rot = ((it.rot + 90 + 180) % 360 + 360) % 360 - 180;
+    else if (a === 'rotL') it.rot = ((it.rot - 90 + 180) % 360 + 360) % 360 - 180;
+    else if (a === 'flip') it.flip = !it.flip;
+    else if (a === 'center') Object.assign(it, { x: 0, y: 0 });
+    else if (a === 'bw') it.bw = !it.bw;
+    else if (a === 'fixreset') Object.assign(it, { br: 0, sat: 0, con: 0, tmp: 0, bw: false });
+    else if (a === 'reset') Object.assign(it, { zoom: 100, rot: 0, x: 0, y: 0, flip: false, br: 0, sat: 0, con: 0, tmp: 0, bw: false });
+    else return;
+    renderList(); schedule();
+  });
+  $('#list').addEventListener('click', e => { if (e.target.matches('textarea.sub-in')) e.stopPropagation(); }, true);
+  // 목록 끌어서 순서 바꾸기
+  let sort = null;
+  $('#list').addEventListener('pointerdown', e => {
+    const grip = e.target.closest('.grip'); if (!grip) return;
+    e.preventDefault();
+    const list = $('#list'), els = [...list.children];
+    const el = grip.closest('.item'), from = els.indexOf(el);
+    const rects = els.map(x => x.getBoundingClientRect());
+    sort = { el, els, from, to: from, rects, sy: e.clientY, step: rects[from].height + 8 };
+    list.classList.add('sorting'); el.classList.add('dragging');
+    grip.setPointerCapture(e.pointerId);
+  });
+  $('#list').addEventListener('pointermove', e => {
+    if (!sort) return;
+    const { el, els, from, rects, step } = sort, dy = e.clientY - sort.sy;
+    el.style.transform = `translateY(${dy}px)`;
+    const mid = rects[from].top + rects[from].height / 2 + dy; let to = 0;
+    rects.forEach((r, i) => { if (i !== from && r.top + r.height / 2 < mid) to++; });
+    sort.to = to;
+    els.forEach((x, i) => { if (i === from) return; let s = 0; if (from < to && i > from && i <= to) s = -step; if (to < from && i >= to && i < from) s = step; x.style.transform = s ? `translateY(${s}px)` : ''; });
+  });
+  const endSort = () => { if (!sort) return; const { from, to } = sort; sort = null; $('#list').classList.remove('sorting'); moveItem(from, to); renderList(); schedule(); };
+  $('#list').addEventListener('pointerup', endSort);
+  $('#list').addEventListener('pointercancel', endSort);
+  $('#list').addEventListener('input', e => {
+    if (e.target.dataset.sub != null) { const it = items[+e.target.dataset.sub]; if (it) { it.sub = e.target.value; schedule(); } return; }
+    const k = e.target.dataset.k; if (!k || sel < 0) return;
+    items[sel][k] = +e.target.value; fillRange(e.target);
+    const a = [...ADJ, ...FIX].find(a => a.k === k);
+    const v = document.querySelector(`#list [data-v="${k}"]`); if (v) v.textContent = e.target.value + a.unit;
+    schedule();
+  });
+
+  /* ================= 스티커 · 글씨 ================= */
+  function centerOfView() { return { cx: .5 + (Math.random() - .5) * .08, cy: .5 + (Math.random() - .5) * .08 }; }
+  function addStickerObj(bid) {
+    const rec = IMGS.get(bid); if (!rec) return;
+    const L = computeLayout(); const W = L ? L.W : S.width, H = L ? L.H : S.width;
+    let w = .28; const hpx = w * W * rec.h / rec.w; if (hpx > H * .5) w = (H * .5) * rec.w / rec.h / W;
+    const o = { id: nid(), t: 'img', bid, ...centerOfView(), w, rot: 0, border: 0, bcolor: '#ffffff', radius: 0, shadow: false, lock: false, flip: false };
+    objs.push(o); selObj = o.id; sel = -1; renderList(); renderObjs(); schedule();
+  }
+  function addLabel() {
+    if (!items.length) { toast('먼저 사진을 한 장 이상 넣어 주세요'); return; }
+    const o = { id: nid(), t: 'text', text: '텍스트', ...centerOfView(), fs: .045, rot: 0, font: 'Pretendard', bold: true, vert: false, color: '#25313c', bg: '#ffffff', bgOn: true, pat: 'none', inner: 'none', shape: 'round', deco: 'none', shadow: false, lock: false };
+    objs.push(o); selObj = o.id; sel = -1; renderList(); renderObjs(); schedule();
+    setTimeout(() => { const ta = $('#opanel textarea'); if (ta) { ta.focus(); ta.select(); } }, 30);
+  }
+  $('#addLabel').onclick = addLabel;
+  $('#addSticker').onclick = () => { if (!items.length) { toast('먼저 사진을 한 장 이상 넣어 주세요'); return; } $('#sfile').click(); };
+  $('#sfile').addEventListener('change', async e => { await addFiles(e.target.files, 'sticker'); e.target.value = ''; });
+
+  function renderObjs() {
+    const list = $('#olist');
+    $('#ocount').textContent = objs.length ? `${objs.length}개` : '';
+    list.innerHTML = [...objs].reverse().map(o => {
+      const rec = o.t === 'img' ? IMGS.get(o.bid) : null;
+      return `<div class="item ${o.id === selObj ? 'sel' : ''}" data-o="${o.id}"><div class="item-head" data-a="osel" style="padding-left:8px">
+        ${o.t === 'img' ? `<img class="thumb" src="${rec ? rec.url : ''}" alt="" style="object-fit:contain;background:#f1f6fb">` : `<div class="thumb txt">가</div>`}
+        <div class="meta"><div class="name">${o.lock ? '🔒 ' : ''}${o.t === 'img' ? '스티커' : esc(String(o.text).split('\n')[0] || '글씨')}</div><div class="dim">${o.t === 'img' ? '이미지' : FONTS.find(f => f[0] === o.font)?.[1] || ''} · ${o.rot || 0}°</div></div>
+        <div class="tools"><button class="icon-btn" data-a="ofront" title="맨 앞으로">⤒</button><button class="icon-btn" data-a="oback" title="맨 뒤로">⤓</button><button class="icon-btn" data-a="odup" title="복제">⧉</button><button class="icon-btn del" data-a="odel" title="삭제">✕</button></div>
+      </div></div>`;
+    }).join('');
+    renderObjPanel();
+  }
+  $('#olist').addEventListener('click', e => {
+    const b = e.target.closest('[data-a]'); if (!b) return; const el = b.closest('[data-o]'); if (!el) return;
+    objAction(b.dataset.a, el.dataset.o);
+  });
+  function objAction(a, id) {
+    const i = objs.findIndex(o => o.id === id); if (i < 0) return; const o = objs[i];
+    if (a === 'osel') { selObj = selObj === id ? null : id; sel = -1; renderList(); }
+    else if (a === 'ofront') { objs.splice(i, 1); objs.push(o); }
+    else if (a === 'oback') { objs.splice(i, 1); objs.unshift(o); }
+    else if (a === 'odup') { const c = JSON.parse(JSON.stringify(o)); c.id = nid(); c.cx += .03; c.cy += .03; c.lock = false; objs.splice(i + 1, 0, c); selObj = c.id; }
+    else if (a === 'odel') { objs.splice(i, 1); if (selObj === id) selObj = null; }
+    else if (a === 'olock') { o.lock = !o.lock; }
+    else return;
+    renderObjs(); schedule();
+  }
+  const oslider = (k, label, min, max, step, val, unit = '') => `<div class="field"><div class="label">${label} <span class="val" data-ov="${k}">${val}${unit}</span></div><input type="range" data-ok="${k}" min="${min}" max="${max}" step="${step}" value="${val}" data-unit="${unit}"></div>`;
+  function renderObjPanel() {
+    const box = $('#opanel'), o = curObj();
+    if (!o) { box.innerHTML = ''; return; }
+    const sizeVal = o.t === 'img' ? Math.round(o.w * 100) : Math.round(o.fs * 1000);
+    let h = `<div class="adj" style="border:1px solid var(--accent);border-radius:12px;margin-top:10px">
+      <h5 style="margin-top:10px">${o.t === 'img' ? '✦ 스티커 설정' : '가 글씨 설정'}</h5>`;
+    if (o.t === 'text') {
+      h += `<div class="field"><textarea class="txt-in" data-otext>${esc(o.text)}</textarea></div>
+      <div class="row2"><div><div class="label">글꼴</div><select class="sel-in" data-os="font">${FONTS.map(f => `<option value="${f[0]}" ${o.font === f[0] ? 'selected' : ''}>${f[1]}</option>`).join('')}</select></div>
+      <div><div class="label">방향</div><div class="seg"><button data-ob="vert:0" class="${!o.vert ? 'on' : ''}">가로</button><button data-ob="vert:1" class="${o.vert ? 'on' : ''}">세로</button></div></div></div>
+      <div class="row2" style="margin-top:10px"><div><div class="label">굵기</div><div class="seg"><button data-ob="bold:0" class="${!o.bold ? 'on' : ''}">보통</button><button data-ob="bold:1" class="${o.bold ? 'on' : ''}">굵게</button></div></div>
+      <div><div class="label">색</div><div class="colorin"><input type="color" data-oc="color" value="${o.color}" title="글자색"><input type="color" data-oc="bg" value="${o.bg}" title="배경색"><label class="chk"><input type="checkbox" data-ochk="bgOff" ${o.bgOn === false ? 'checked' : ''}>배경 없음</label></div></div></div>
+      <div class="row2" style="margin-top:10px"><div><div class="label">무늬</div><select class="sel-in" data-os="pat">${[['none', '없음'], ['check', '체크'], ['stripe', '줄무늬'], ['diag', '사선'], ['dots', '도트']].map(x => `<option value="${x[0]}" ${o.pat === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div>
+      <div><div class="label">안쪽 테두리</div><select class="sel-in" data-os="inner">${[['none', '없음'], ['solid', '실선'], ['dashed', '점선'], ['double', '이중선']].map(x => `<option value="${x[0]}" ${o.inner === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div></div>
+      <div class="row2" style="margin-top:10px"><div><div class="label">모양</div><select class="sel-in" data-os="shape">${[['round', '둥근 모서리'], ['pill', '알약'], ['square', '각진 모서리']].map(x => `<option value="${x[0]}" ${o.shape === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div>
+      <div><div class="label">장식 ✦</div><select class="sel-in" data-os="deco">${[['none', '없음'], ['before', '앞에만'], ['after', '뒤에만'], ['both', '양쪽']].map(x => `<option value="${x[0]}" ${o.deco === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div></div>`;
+      h += oslider('size', '글자 크기', 6, 300, 1, sizeVal);
+    } else {
+      h += oslider('size', '크기', 2, 300, 1, sizeVal, '%');
+      h += oslider('border', '테두리 두께', 0, 60, 1, o.border || 0, 'px');
+      h += `<div class="field"><div class="label">테두리 색</div><div class="colorin"><input type="color" data-oc="bcolor" value="${o.bcolor || '#ffffff'}"></div></div>`;
+      h += oslider('radius', '모서리 둥글게', 0, 300, 1, o.radius || 0, 'px');
+    }
+    h += oslider('rot', '회전', -180, 180, 1, o.rot || 0, '°');
+    h += `<div class="adj-btns">${o.t === 'img' ? `<button class="btn ${o.flip ? 'on' : ''}" data-oa="flip">⇋ 반전</button>` : ''}<button class="btn ${o.shadow ? 'on' : ''}" data-oa="shadow">그림자</button><button class="btn ${o.lock ? 'on' : ''}" data-oa="olock">🔒 잠금</button></div>
+      <div class="adj-btns"><button class="btn" data-oa="ofront">맨 앞으로</button><button class="btn" data-oa="oback">맨 뒤로</button><button class="btn" data-oa="odup">복제</button><button class="btn" data-oa="odel" style="color:#d4553a">삭제</button></div></div>`;
+    box.innerHTML = h;
+    box.querySelectorAll('input[type=range]').forEach(fillRange);
+  }
+  function syncObjPanel() {
+    const o = curObj(); if (!o) return;
+    const sz = $('#opanel input[data-ok=size]'), rt = $('#opanel input[data-ok=rot]');
+    const set = (inp, v) => { if (!inp) return; inp.value = v; fillRange(inp); const lab = $(`#opanel [data-ov="${inp.dataset.ok}"]`); if (lab) lab.textContent = v + (inp.dataset.unit || ''); };
+    set(sz, o.t === 'img' ? Math.round(o.w * 100) : Math.round(o.fs * 1000)); set(rt, o.rot || 0);
+  }
+  $('#opanel').addEventListener('input', e => {
+    const o = curObj(); if (!o) return; const t = e.target;
+    if (t.dataset.ok) {
+      const v = +t.value; fillRange(t); const lab = $(`#opanel [data-ov="${t.dataset.ok}"]`); if (lab) lab.textContent = v + (t.dataset.unit || '');
+      if (t.dataset.ok === 'size') { if (o.t === 'img') o.w = v / 100; else o.fs = v / 1000; }
+      else o[t.dataset.ok] = v;
+    } else if (t.dataset.oc) o[t.dataset.oc] = t.value;
+    else if (t.hasAttribute('data-otext')) { o.text = t.value; const row = $(`#olist [data-o="${o.id}"] .name`); if (row) row.textContent = (o.lock ? '🔒 ' : '') + (t.value.split('\n')[0] || '글씨'); }
+    schedule();
+  });
+  $('#opanel').addEventListener('change', e => {
+    const o = curObj(); if (!o) return; const t = e.target;
+    if (t.dataset.os) { o[t.dataset.os] = t.value; if (t.dataset.os === 'font') loadFont(o.font); schedule(); }
+    if (t.dataset.ochk === 'bgOff') { o.bgOn = !t.checked; schedule(); }
+  });
+  $('#opanel').addEventListener('click', e => {
+    const o = curObj(); if (!o) return;
+    const b = e.target.closest('[data-ob],[data-oa]'); if (!b) return;
+    if (b.dataset.ob) { const [k, v] = b.dataset.ob.split(':'); o[k] = v === '1'; renderObjPanel(); schedule(); return; }
+    const a = b.dataset.oa;
+    if (a === 'flip' || a === 'shadow') { o[a] = !o[a]; renderObjPanel(); schedule(); return; }
+    objAction(a, o.id);
+  });
+  function loadFont(f) { if (document.fonts && document.fonts.load) Promise.all([document.fonts.load(`400 40px "${f}"`), document.fonts.load(`700 40px "${f}"`)]).then(() => drawPreview()).catch(() => {}); }
+
+  /* ================= 이미지 추가 ================= */
+  let blobSeq = 0;
+  async function addBlob(blob, name, dest) {
+    const bid = 'b' + Date.now().toString(36) + (++blobSeq);
+    let rec; try { rec = await blobToImg(bid, blob); } catch (e) { toast(`${name || '이미지'}를 열 수 없어요`); return null; }
+    putBlob(bid, blob);
+    if (dest === 'sticker') addStickerObj(bid);
+    else items.push({ id: nid(), bid, name: name || '붙여넣은 이미지', w: rec.w, h: rec.h, zoom: 100, rot: 0, x: 0, y: 0, flip: false, br: 0, sat: 0, con: 0, tmp: 0, bw: false });
+    return bid;
+  }
+  async function addFiles(fileList, dest) {
+    const files = [...fileList].filter(f => f && (f.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|avif|bmp|heic|heif)$/i.test(f.name || '')));
+    if (!files.length) return;
+    if (dest === 'sticker' && !items.length) dest = 'cell';
+    for (const f of files) await addBlob(f, f.name, dest);
+    renderList(); renderObjs(); schedule();
+    if (dest === 'sticker') toast(`스티커 ${files.length}개를 넣었어요`);
+  }
+  function askDest(files) {
+    if (!items.length) { addFiles(files, 'cell'); return; }
+    openModal(`<h3>어디에 넣을까요?</h3><p>${files.length}장의 이미지를 넣을 곳을 골라 주세요. (숫자 1·2, Enter)</p>
+      <div class="dest"><button data-d="cell" class="on">① 사진 칸<small>콜라주 칸으로 이어붙이기</small></button><button data-d="sticker">② 스티커<small>사진 위에 자유롭게 붙이기</small></button></div>
+      <div class="modal-actions"><button class="btn" data-close>취소</button></div>`);
+    const go = d => { closeModal(); addFiles(files, d); };
+    $$('#modalBox .dest button').forEach(b => b.onclick = () => go(b.dataset.d));
+    destKey = e => { if (e.key === '1' || e.key === 'Enter') { e.preventDefault(); go('cell'); } else if (e.key === '2') { e.preventDefault(); go('sticker'); } };
+  }
+  let destKey = null;
+  $('#pick').addEventListener('click', () => $('#file').click());
+  $('#empty').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', e => { addFiles(e.target.files, 'cell'); e.target.value = ''; });
+  let dragDepth = 0;
+  window.addEventListener('dragenter', e => { if ([...e.dataTransfer.types].includes('Files')) { dragDepth++; stage.classList.add('drop'); } });
+  window.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) stage.classList.remove('drop'); });
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; stage.classList.remove('drop'); if (e.dataTransfer.files.length) askDest([...e.dataTransfer.files]); });
+  document.addEventListener('paste', e => {
+    if (e.target.closest && e.target.closest('textarea,input')) return;
+    const files = [...(e.clipboardData?.items || [])].filter(x => x.kind === 'file').map(x => x.getAsFile()).filter(Boolean);
+    if (files.length) { e.preventDefault(); askDest(files); }
+  });
+
+  /* ================= 보관함에서 가져오기 ================= */
+  function readVault() {
+    return new Promise(res => {
+      if (!window.indexedDB) return res(null);
+      const r = indexedDB.open('studio-vault', 1);
+      r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); if (!d.objectStoreNames.contains('img')) d.createObjectStore('img'); };
+      r.onerror = () => res(null);
+      r.onsuccess = () => { const d = r.result; const out = { data: null, img: {} };
+        const t = d.transaction(['kv', 'img'], 'readonly');
+        t.objectStore('kv').get('data').onsuccess = ev => out.data = ev.target.result;
+        const c = t.objectStore('img').openCursor(); c.onsuccess = () => { const cur = c.result; if (cur) { out.img[cur.key] = cur.value; cur.continue(); } };
+        t.oncomplete = () => { d.close(); res(out); }; t.onerror = () => { d.close(); res(null); }; };
+    });
+  }
+  async function openVault(dest) {
+    const v = await readVault();
+    const list = [];
+    if (v && v.data) {
+      (v.data.personas || []).forEach(p => { if (p.img && v.img[p.img]) list.push({ n: p.name, src: v.img[p.img] }); (p.aus || []).forEach(a => { if (a.img && v.img[a.img]) list.push({ n: `${a.name || p.name} · ${a.label}`, src: v.img[a.img] }); }); });
+      (v.data.prompts || []).forEach(q => { if (q.img && v.img[q.img]) list.push({ n: '✨ ' + q.title, src: v.img[q.img] }); });
+    }
+    let d = dest || (items.length ? 'cell' : 'cell');
+    const body = () => `<h3>🗂 보관함에서 가져오기</h3>
+      ${list.length ? `<div class="seg" style="max-width:320px"><button data-vd="cell" class="${d === 'cell' ? 'on' : ''}">사진 칸으로</button><button data-vd="sticker" class="${d === 'sticker' ? 'on' : ''}" ${items.length ? '' : 'disabled'}>스티커로</button></div>
+      <div class="vgrid">${list.map((x, i) => `<button data-vi="${i}"><img src="${x.src}" alt=""><span>${esc(x.n)}</span></button>`).join('')}</div>`
+      : `<p>보관함에 사진이 아직 없어요. 스튜디오의 <b>캐릭터·프롬프트 보관함</b>에 페르소나 사진을 넣으면 여기서 바로 가져올 수 있어요.</p>`}
+      <div class="modal-actions"><button class="btn" data-close>닫기</button></div>`;
+    openModal(body());
+    const bind = () => {
+      $$('#modalBox [data-vd]').forEach(b => b.onclick = () => { d = b.dataset.vd; $('#modalBox').innerHTML = body(); bind(); });
+      $$('#modalBox [data-vi]').forEach(b => b.onclick = async () => {
+        const x = list[+b.dataset.vi]; const blob = await (await fetch(x.src)).blob();
+        await addBlob(blob, x.n.replace(/^✨ /, ''), d); renderList(); renderObjs(); schedule(); toast(`'${x.n}'를 ${d === 'sticker' ? '스티커로' : '사진 칸에'} 넣었어요`);
+      });
+      $$('#modalBox [data-close]').forEach(b => b.onclick = closeModal);
+    };
+    bind();
+  }
+  $('#pickVault').onclick = () => openVault('cell');
+  $('#stickerVault').onclick = () => { if (!items.length) { toast('먼저 사진을 한 장 이상 넣어 주세요'); return; } openVault('sticker'); };
+
+  /* ================= 모달 ================= */
+  function openModal(html) { $('#modalBox').innerHTML = html; $('#modal').hidden = false; $$('#modalBox [data-close]').forEach(b => b.onclick = closeModal); }
+  function closeModal() { $('#modal').hidden = true; $('#modalBox').innerHTML = ''; destKey = null; }
+  $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+  /* ================= 키보드 ================= */
+  document.addEventListener('keydown', e => {
+    if (!$('#modal').hidden) { if (e.key === 'Escape') closeModal(); else if (destKey) destKey(e); return; }
+    const typing = e.target.closest && e.target.closest('textarea,input[type=text],input[type=number],select');
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !typing) {
+      const k = e.key.toLowerCase();
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
+      if ((k === 'z' && e.shiftKey) || k === 'y') { e.preventDefault(); redo(); return; }
+      if (k === 'd' && curObj()) { e.preventDefault(); objAction('odup', selObj); return; }
+    }
+    if (typing) return;
+    const o = curObj();
+    if (o && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); objAction('odel', o.id); return; }
+    if (o && !o.lock && e.key.startsWith('Arrow') && previewInfo) {
+      e.preventDefault(); const st = (e.shiftKey ? 10 : 1);
+      if (e.key === 'ArrowLeft') o.cx -= st / previewInfo.L.W; if (e.key === 'ArrowRight') o.cx += st / previewInfo.L.W;
+      if (e.key === 'ArrowUp') o.cy -= st / previewInfo.L.H; if (e.key === 'ArrowDown') o.cy += st / previewInfo.L.H;
+      schedule();
+    }
+    if (e.key === 'Escape' && (selObj || sel >= 0)) { selObj = null; sel = -1; renderList(); renderObjs(); drawPreview(); }
+  });
+
+  /* ================= 설정 ================= */
+  const widthEl = $('#width'), colsEl = $('#cols'), gapEl = $('#gap'), padEl = $('#pad'), radEl = $('#rad'), colorEl = $('#gapColor');
+  // 템플릿 · 색감 · 자막 컨트롤 만들기
+  const tplSvg = id => { const rs = tplRects(id, 4); return `<svg viewBox="0 0 30 30">${rs.map(r => `<rect x="${1 + r[0] * 28 + .7}" y="${1 + r[1] * 28 + .7}" width="${r[2] * 28 - 1.4}" height="${r[3] * 28 - 1.4}" rx="1"/>`).join('')}</svg>`; };
+  $('#tpls').innerHTML = Object.keys(TPL).map(k => `<button data-t="${k}" title="${k}">${tplSvg(k)}</button>`).join('');
+  $('#grades').innerHTML = GRADES.map(g => `<button class="pill" data-g="${g[0]}" style="font-family:inherit">${g[1]}</button>`).join('');
+  $('#subFont').innerHTML = FONTS.map(f => `<option value="${f[0]}">${f[1]}</option>`).join('');
+  $('#subOC').innerHTML = ['#000000', '#ffffff', '#888888', '#efe3c6', '#e9cf5b'].map(c => `<button class="dot" data-oc="${c}" style="background:${c}"></button>`).join('') + '<label class="custom" id="subOCc" title="직접 고르기">+<input type="color" id="subOCin"></label>';
+  const segBind = (id, key, after) => $(id).addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (!b) return; S[key] = b.dataset.v; syncUI(); after && after(); schedule(); });
+  segBind('#tplRatios', 'tplRatio'); segBind('#sceneRatios', 'sceneRatio'); segBind('#seqRatios', 'seqRatio');
+  segBind('#subPos', 'subPos'); segBind('#subOutline', 'subOutline'); segBind('#subLH', 'subLH');
+  $('#modes').addEventListener('click', e => { const b = e.target.closest('button[data-m]'); if (!b) return; S.mode = b.dataset.m; sel = -1; syncUI(); renderList(); schedule();
+    if (S.mode === 'scene' && items.length > 1) toast('시네마틱 씬은 첫 번째 사진만 써요');
+    if (S.mode === 'seq' && items.length > 5) toast('시퀀스는 앞의 5장만 써요'); });
+  $('#tpls').addEventListener('click', e => { const b = e.target.closest('button[data-t]'); if (!b) return; S.tpl = b.dataset.t; syncUI(); schedule(); });
+  const STARTERS = { classic: { gap: 0, pad: 0, rad: 0, gapColor: '#000000', film: false, bars: false },
+    film: { gap: 16, pad: 24, rad: 2, gapColor: '#16191d', film: true, bars: false },
+    gallery: { gap: 28, pad: 56, rad: 6, gapColor: '#FFFFFF', film: false, bars: false },
+    cine: { gap: 0, pad: 0, rad: 0, gapColor: '#000000', film: false, bars: true, barSize: 9 } };
+  $('#starters').addEventListener('click', e => { const b = e.target.closest('button[data-st]'); if (!b) return; S.seqStyle = b.dataset.st; Object.assign(S, STARTERS[S.seqStyle]); syncUI(); schedule(); });
+  $('#grades').addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (!b) return; S.grade = b.dataset.g; if (S.grade === 'film' && !S.grain) S.grain = 22; syncUI(); schedule(); });
+  [['gradeAmt'], ['grain'], ['vig'], ['subSize'], ['subShadow'], ['subItalic'], ['subBleed'], ['barSize']].forEach(([k]) => $('#' + k).addEventListener('input', e => { S[k] = +e.target.value; syncUI(); schedule(); }));
+  $('#subFont').addEventListener('change', e => { S.subFont = e.target.value; loadFont(S.subFont); schedule(); });
+  $('#subColor').addEventListener('input', e => { S.subColor = e.target.value; schedule(); });
+  $('#subOC').addEventListener('click', e => { const b = e.target.closest('[data-oc]'); if (!b) return; S.subOC = b.dataset.oc; syncUI(); schedule(); });
+  $('#subOCin').addEventListener('input', e => { S.subOC = e.target.value; syncUI(); schedule(); });
+  $('#bars').addEventListener('change', e => { S.bars = e.target.checked; syncUI(); schedule(); });
+  $('#filmHoles').addEventListener('change', e => { S.film = e.target.checked; schedule(); });
+  $('#titleOn').addEventListener('change', e => { S.titleOn = e.target.checked; schedule(); });
+  $('#titleText').addEventListener('input', e => { S.titleText = e.target.value; if (e.target.value && !S.titleOn) { S.titleOn = true; $('#titleOn').checked = true; } schedule(); });
+  $('#subReset').addEventListener('click', () => { Object.assign(S, SUBDEF); syncUI(); schedule(); toast('자막·색감 설정을 처음으로 돌렸어요'); });
+  function syncUI() {
+    $$('#modes button').forEach(b => b.classList.toggle('on', b.dataset.m === S.mode));
+    $$('[data-for]').forEach(el => el.hidden = !el.dataset.for.split(' ').includes(S.mode));
+    $('#sec1Title').textContent = { collage: '배치', tpl: '템플릿', scene: '시네마틱 씬', seq: '시네마틱 시퀀스' }[S.mode];
+    $$('#tpls button').forEach(b => b.classList.toggle('on', b.dataset.t === S.tpl));
+    const segOn = (id, v) => $$(id + ' button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    segOn('#tplRatios', S.tplRatio); segOn('#sceneRatios', S.sceneRatio); segOn('#seqRatios', S.seqRatio); segOn('#subPos', S.subPos); segOn('#subOutline', S.subOutline); segOn('#subLH', S.subLH);
+    $$('#starters button').forEach(b => b.classList.toggle('on', b.dataset.st === S.seqStyle));
+    $('#seqCount').textContent = items.length ? `${seqN()}컷 사용${items.length > 5 ? ` (사진 ${items.length}장 중)` : ''}` : '';
+    $$('#grades .pill').forEach(b => b.classList.toggle('on', b.dataset.g === S.grade));
+    const rng = (id, v, txt) => { const el = $('#' + id); el.value = v; fillRange(el); const t = $('#' + id + 'Val'); if (t) t.textContent = txt; };
+    rng('gradeAmt', S.gradeAmt, S.gradeAmt); rng('grain', S.grain, S.grain); rng('vig', S.vig, S.vig);
+    rng('subSize', S.subSize, S.subSize); rng('subShadow', S.subShadow, S.subShadow); rng('subItalic', S.subItalic, S.subItalic + '°'); rng('subBleed', S.subBleed, S.subBleed);
+    rng('barSize', S.barSize, S.barSize + '%'); $('#barVal').textContent = S.barSize + '%';
+    $('#bars').checked = !!S.bars; $('#filmHoles').checked = !!S.film; $('#titleOn').checked = !!S.titleOn;
+    if (document.activeElement !== $('#titleText')) $('#titleText').value = S.titleText || '';
+    $('#subFont').value = S.subFont; $('#subColor').value = S.subColor;
+    let ocp = false; $$('#subOC .dot').forEach(b => { const on = b.dataset.oc.toLowerCase() === S.subOC.toLowerCase(); b.classList.toggle('on', on); ocp = ocp || on; });
+    const occ = $('#subOCc'); occ.classList.toggle('on', !ocp); occ.style.background = ocp ? '' : S.subOC; occ.firstChild.textContent = ocp ? '+' : '';
+    widthEl.value = S.width; colsEl.value = S.cols; gapEl.value = S.gap; padEl.value = S.pad; radEl.value = S.rad; colorEl.value = S.gapColor.toLowerCase();
+    [colsEl, gapEl, padEl, radEl].forEach(fillRange);
+    $('#padVal').textContent = S.pad + 'px'; $('#radVal').textContent = S.rad + 'px';
+    $$('#ratios .pill').forEach(b => b.classList.toggle('on', b.dataset.r === S.ratio));
+    $('#colsVal').textContent = S.cols + '열'; $('#gapVal').textContent = S.gap + 'px';
+    $('#colsField').hidden = !(S.dir === 'grid' || S.dir === 'rows');
+    $$('#dirs .tile').forEach(b => b.classList.toggle('on', b.dataset.d === S.dir));
+    $$('#presets .pill').forEach(b => b.classList.toggle('on', +b.dataset.w === S.width));
+    $$('#formats button').forEach(b => b.classList.toggle('on', b.dataset.f === S.format));
+    let preset = false;
+    $$('#colors .dot').forEach(b => { const on = b.dataset.c.toLowerCase() === S.gapColor.toLowerCase(); b.classList.toggle('on', on); preset = preset || on; });
+    const cc = $('#customColor'); cc.classList.toggle('on', !preset); cc.style.background = preset ? '' : S.gapColor; cc.firstChild.textContent = preset ? '+' : '';
+  }
+  widthEl.addEventListener('input', () => { const v = parseInt(widthEl.value, 10); if (v >= 100 && v <= 10000) { S.width = v; $$('#presets .pill').forEach(b => b.classList.toggle('on', +b.dataset.w === v)); schedule(); } });
+  widthEl.addEventListener('change', () => { const v = parseInt(widthEl.value, 10); S.width = clamp(isNaN(v) ? 1920 : v, 100, 10000); syncUI(); schedule(); });
+  $('#presets').addEventListener('click', e => { const b = e.target.closest('.pill'); if (!b) return; S.width = +b.dataset.w; syncUI(); schedule(); });
+  $('#dirs').addEventListener('click', e => { const b = e.target.closest('.tile'); if (!b) return; S.dir = b.dataset.d; syncUI(); schedule(); });
+  $('#formats').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.format = b.dataset.f; syncUI(); persist(); });
+  colsEl.addEventListener('input', () => { S.cols = +colsEl.value; syncUI(); schedule(); });
+  gapEl.addEventListener('input', () => { S.gap = +gapEl.value; syncUI(); schedule(); });
+  padEl.addEventListener('input', () => { S.pad = +padEl.value; syncUI(); schedule(); });
+  radEl.addEventListener('input', () => { S.rad = +radEl.value; syncUI(); schedule(); });
+  $('#ratios').addEventListener('click', e => { const b = e.target.closest('.pill'); if (!b) return; S.ratio = b.dataset.r; syncUI(); schedule(); });
+  $('#colors').addEventListener('click', e => { const b = e.target.closest('.dot'); if (!b) return; S.gapColor = b.dataset.c; syncUI(); schedule(); });
+  colorEl.addEventListener('input', () => { S.gapColor = colorEl.value; syncUI(); schedule(); });
+
+  /* ================= 새로 시작 ================= */
+  $('#reset').onclick = () => {
+    if (!items.length && !objs.length) { toast('이미 비어 있어요'); return; }
+    openModal(`<h3>새로 시작할까요?</h3><p>사진 ${items.length}장과 스티커·글씨 ${objs.length}개를 모두 비워요. 배치 설정은 그대로 남아요.<br>잘못 눌렀다면 바로 ↶ 되돌리기로 돌아갈 수 있어요.</p>
+      <div class="modal-actions"><button class="btn" data-close>취소</button><button class="btn primary" id="doReset">비우기</button></div>`);
+    $('#doReset').onclick = () => { items = []; objs = []; sel = -1; selObj = null; closeModal(); renderList(); renderObjs(); schedule(); toast('비웠어요'); };
+  };
+
+  /* ================= 저장 · 복사 ================= */
+  const stamp = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; };
+  async function makeBlob(type) {
+    const fams = [...new Set(objs.filter(o => o.t === 'text').map(o => o.font))];
+    if (document.fonts && fams.length) await Promise.all(fams.flatMap(f => [document.fonts.load(`400 40px "${f}"`), document.fonts.load(`700 40px "${f}"`)])).catch(() => {});
+    const L = computeLayout(), MAX = 16_000_000;
+    let scale = 1, note = '';
+    if (L.W * L.H > MAX) { scale = Math.sqrt(MAX / (L.W * L.H)); note = ` (브라우저 한계 때문에 ${Math.round(L.W * scale)}×${Math.round(L.H * scale)}px로 줄였어요)`; }
+    const c = document.createElement('canvas'); render(c, scale);
+    const blob = await new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('이미지 생성 실패')), type, .92));
+    return { blob, note };
+  }
+  let resultUrl = null;
+  function showResult(blob, name, note) {
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
+    resultUrl = URL.createObjectURL(blob);
+    openModal(`<img class="res" src="${resultUrl}" alt="완성된 콜라주"><p>이미지를 길게 누르거나(모바일) 마우스 오른쪽 버튼으로 눌러 저장할 수도 있어요.${note}</p>
+      <div class="modal-actions"><a class="btn primary" href="${resultUrl}" download="${name}">다운로드</a><button class="btn" data-close>닫기</button></div>`);
+  }
+  const saveBtn = $('#save'), saveLabel = $('#saveLabel');
+  saveBtn.addEventListener('click', async () => {
+    if (!items.length) { toast('먼저 이미지를 추가하세요'); return; }
+    saveBtn.disabled = true; saveLabel.textContent = '만드는 중…';
+    await new Promise(r => setTimeout(r, 30));
+    try {
+      const type = S.format === 'jpg' ? 'image/jpeg' : 'image/png';
+      const { blob, note } = await makeBlob(type);
+      const name = `collage_${stamp()}.${S.format}`;
+      if (window.matchMedia('(pointer:coarse)').matches) { showResult(blob, name, note); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      toast('저장했어요' + note);
+    } catch (e) { toast('저장에 실패했어요: ' + (e && e.message || e)); }
+    finally { saveBtn.disabled = false; saveLabel.textContent = '저장하기'; }
+  });
+  $('#copy').addEventListener('click', async () => {
+    if (!items.length) { toast('먼저 이미지를 추가하세요'); return; }
+    try {
+      const { blob } = await makeBlob('image/png');
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      toast('완성 이미지를 클립보드에 복사했어요');
+    } catch (e) { toast('이 브라우저에서는 이미지 복사가 막혀 있어요. 저장하기를 써 주세요'); }
+  });
+
+  /* 모바일: 미리보기를 헤더 바로 아래에 고정 */
+  const setHH = () => document.documentElement.style.setProperty('--hh', $('header').offsetHeight + 'px');
+  setHH(); window.addEventListener('resize', setHH);
+
+  /* ================= 시작 ================= */
+  let ready = false;
+  (async () => {
+    syncUI(); renderList(); renderObjs(); drawPreview();
+    db = await openDB();
+    try {
+      const raw = await tx('kv', 'readonly', s => s.get('state'));
+      if (raw) {
+        const m = JSON.parse(raw);
+        const need = new Set([...(m.items || []).map(i => i.bid), ...(m.objs || []).filter(o => o.t === 'img').map(o => o.bid)]);
+        for (const bid of need) { const b = await getBlob(bid); if (b) { try { await blobToImg(bid, b); } catch (e) {} } }
+        Object.assign(S, m.S || {});
+        items = (m.items || []).filter(i => IMGS.has(i.bid));
+        objs = (m.objs || []).filter(o => o.t !== 'img' || IMGS.has(o.bid));
+        // 쓰지 않는 사진 정리
+        const keys = await tx('img', 'readonly', s => s.getAllKeys()).catch(() => []);
+        (keys || []).filter(k => !need.has(k)).forEach(k => tx('img', 'readwrite', s => s.delete(k)).catch(() => {}));
+        objs.filter(o => o.t === 'text').forEach(o => loadFont(o.font));
+        syncUI(); renderList(); renderObjs(); drawPreview();
+        if (items.length) toast('지난 작업을 불러왔어요');
+      }
+    } catch (e) {}
+    recordNow(); ready = true;
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => drawPreview());
+  })();
+})();
+</script>
+</body>
+</html>

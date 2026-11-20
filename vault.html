@@ -244,6 +244,12 @@
   .pview .outfit.pick.on{border-color:#5a9fd8;background:#f3f9ff;box-shadow:0 0 0 2px rgba(90,159,216,.15)}
   .pview .outfit .rd{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid #b9cde0;background:#fff}
   .pview .outfit.pick.on .rd{border-color:#4c8fd0;background:radial-gradient(circle,#4c8fd0 0 45%,#fff 50%)}
+  /* 끌어서 순서 바꾸기 */
+  .t-vault .pc{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .t-vault .pc.dragging{opacity:.25;transform:none!important}
+  .pc.ghost{transform:rotate(2deg) scale(1.03)!important;box-shadow:0 18px 40px rgba(30,70,110,.28)!important;opacity:.95;cursor:grabbing}
+  body.v-dragging, body.v-dragging *{cursor:grabbing!important}
+  .t-vault .drag-hint{font-size:12px;color:var(--sub);margin:-4px 0 10px}
 </style>
 <style>
   .topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--line)}
@@ -287,10 +293,12 @@
               <option value="upd">최근 수정순</option>
               <option value="new">최근 추가순</option>
               <option value="name">이름순</option>
+              <option value="custom">내 순서 (끌어서 옮기기)</option>
             </select>
             <button class="primary" id="v-new" type="button">＋ 새 페르소나</button>
           </div>
           <div class="v-tagbar" id="v-tagbar"></div>
+          <div class="drag-hint" id="v-dragHint">💡 카드를 끌어서 원하는 순서로 옮길 수 있어요. 휴대폰에서는 꾹 누른 뒤 끌면 돼요.</div>
           <div class="v-grid" id="v-grid"></div>
         </div>
       </div>
@@ -378,8 +386,17 @@ function filtered(){
   if(ws.length) arr=arr.filter(it=>{ const h=hay(it); return ws.every(w=>h.includes(w)); });
   if(U.tag) arr=arr.filter(it=>(it.tags||[]).includes(U.tag));
   const nm=it=>(U.tab==='persona'?it.name:it.title)||'';
-  arr=[...arr].sort((a,b)=>(b.pin?1:0)-(a.pin?1:0) || (U.sort==='name'?nm(a).localeCompare(nm(b),'ko'):U.sort==='new'?(b.created||0)-(a.created||0):(b.updated||0)-(a.updated||0)));
+  if(U.sort==='custom'){ const ord=orderList(); const pos=new Map(ord.map((id,i)=>[id,i])); arr=[...arr].sort((a,b)=>(pos.get(a.id)??-1)-(pos.get(b.id)??-1)); }
+  else arr=[...arr].sort((a,b)=>(b.pin?1:0)-(a.pin?1:0) || (U.sort==='name'?nm(a).localeCompare(nm(b),'ko'):U.sort==='new'?(b.created||0)-(a.created||0):(b.updated||0)-(a.updated||0)));
   return {arr, base};
+}
+/* 내 순서: 저장된 순서 + 새로 생긴 항목은 맨 앞 */
+const ordKey=()=>U.tab==='persona'?'porder':'qorder';
+function orderList(){
+  const ids=items().map(x=>x.id), have=new Set(ids);
+  let o=(D[ordKey()]||[]).filter(id=>have.has(id)); const inO=new Set(o);
+  const fresh=items().filter(x=>!inO.has(x.id)).sort((a,b)=>(b.created||0)-(a.created||0)).map(x=>x.id);
+  return [...fresh,...o];
 }
 function renderSide(){
   const cs=cats(), cur=U.cat[U.tab]||'all';
@@ -428,8 +445,69 @@ function render(){
     const cp=e.target.closest('[data-cp]'); if(cp){ e.stopPropagation(); copy(it[cp.dataset.cp], cp.dataset.cp==='pos'?'긍정 프롬프트를':'부정 프롬프트를'); return; }
     U.tab==='persona'?viewPersona(it):editPrompt(it);
   });
+  enableDrag(g);
+  $('dragHint').style.display=arr.length>1?'':'none';
   g.querySelectorAll('[data-img]').forEach(async el=>{ const id=el.dataset.img; if(!id) return; const v=await img(id); if(v) el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; });
 }
+
+/* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
+let drag=null, justDragged=0;
+function enableDrag(g){
+  g.querySelectorAll('.pc').forEach(el=>{
+    el.querySelectorAll('img').forEach(i=>i.draggable=false);
+    el.addEventListener('contextmenu',e=>{ if(drag||el._hold) e.preventDefault(); });
+    el.addEventListener('pointerdown',e=>{
+      if(e.button>0 || e.target.closest('button')) return;
+      const st={el, x:e.clientX, y:e.clientY, id:e.pointerId, touch:e.pointerType!=='mouse', on:false};
+      el._hold=true;
+      st.timer=st.touch?setTimeout(()=>{ start(st,e.clientX,e.clientY); if(navigator.vibrate) try{ navigator.vibrate(15); }catch(_){} },380):null;
+      const mv=ev=>{ if(ev.pointerId!==st.id) return;
+        const dx=ev.clientX-st.x, dy=ev.clientY-st.y, far=Math.hypot(dx,dy);
+        if(!st.on){ if(st.touch){ if(far>9){ clearTimeout(st.timer); cleanup(); } return; } if(far>6) start(st,ev.clientX,ev.clientY); else return; }
+        move(ev.clientX,ev.clientY); };
+      const up=ev=>{ if(ev.pointerId!==st.id) return; clearTimeout(st.timer); if(st.on) finish(); cleanup(); };
+      const cleanup=()=>{ el._hold=false; window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up); };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+    });
+  });
+}
+function start(st,x,y){
+  st.on=true; const r=st.el.getBoundingClientRect();
+  const gh=st.el.cloneNode(true); gh.className=st.el.className+' ghost';
+  Object.assign(gh.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',pointerEvents:'none',zIndex:90,margin:0});
+  (document.querySelector('.t-vault')||document.body).appendChild(gh); st.el.classList.add('dragging');
+  drag={...st, gh, ox:x-r.left, oy:y-r.top, g:st.el.parentElement};
+  document.body.classList.add('v-dragging');
+}
+function move(x,y){
+  if(!drag) return;
+  drag.gh.style.left=(x-drag.ox)+'px'; drag.gh.style.top=(y-drag.oy)+'px';
+  if(y<70) window.scrollBy(0,-12); else if(y>innerHeight-70) window.scrollBy(0,12);
+  const t=document.elementFromPoint(x,y); const over=t&&t.closest&&t.closest('.v-grid .pc:not(.ghost)');
+  if(!over||over===drag.el) return;
+  const r=over.getBoundingClientRect(), list=[...drag.g.children];
+  const before = (Math.abs(r.top-drag.el.getBoundingClientRect().top)<r.height/2) ? x<r.left+r.width/2 : list.indexOf(drag.el)>list.indexOf(over);
+  drag.g.insertBefore(drag.el, before?over:over.nextSibling);
+}
+async function finish(){
+  const d=drag; drag=null; justDragged=Date.now();
+  d.gh.remove(); d.el.classList.remove('dragging'); document.body.classList.remove('v-dragging');
+  const vis=[...d.g.querySelectorAll('.pc')].map(x=>x.dataset.id);
+  const base=U.sort==='custom'?orderList():filteredAllIds();
+  const visSet=new Set(vis); let k=0;
+  D[ordKey()]=base.map(id=>visSet.has(id)?vis[k++]:id);
+  const was=U.sort; U.sort='custom'; saveUI(); await save(); render();
+  if(was!=='custom') toast('정렬을 \'내 순서\'로 바꿨어요');
+}
+/* 지금 보이는 정렬 기준으로 전체 순서 만들기 (처음 끌 때) */
+function filteredAllIds(){
+  const keep=U.cat[U.tab], q=U.q, tg=U.tag; U.cat[U.tab]='all'; U.q=''; U.tag=null;
+  const all=items().map(x=>x.id); const shown=filtered().arr.map(x=>x.id);
+  U.cat[U.tab]=keep; U.q=q; U.tag=tg;
+  const s=new Set(shown); return [...shown,...all.filter(id=>!s.has(id))];
+}
+document.addEventListener('touchmove',e=>{ if(drag) e.preventDefault(); },{passive:false});
+document.addEventListener('click',e=>{ if(Date.now()-justDragged<350 && e.target.closest('.v-grid')){ e.stopPropagation(); e.preventDefault(); } },true);
 
 /* ---------- 모달 ---------- */
 let modalEl=null, onPaste=null;

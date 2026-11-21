@@ -146,6 +146,10 @@
   .colorin{display:flex;align-items:center;gap:6px}
   .colorin input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff;cursor:pointer}
 
+  .orns{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px}
+  .orns button{height:32px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:14px;cursor:pointer;padding:0 4px;white-space:nowrap}
+  .orns button i{font-style:normal;color:var(--muted);font-size:10px;margin:0 1px}
+  .orns button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
   /* ---------- 모드 · 템플릿 · 스타터 ---------- */
   .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 20px;position:sticky;top:-20px;z-index:3;background:rgba(244,249,253,.96);padding:8px 0;backdrop-filter:blur(6px)}
   .modes button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer}
@@ -491,11 +495,40 @@
     }, 300);
   }
 
+  // 투명한 부분이 있는 이미지인지 (스티커 테두리를 모양대로 그릴지 결정)
+  function hasAlpha(img) {
+    try {
+      const n = 64, c = document.createElement('canvas'); c.width = c.height = n;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, n, n);
+      const d = x.getImageData(0, 0, n, n).data; let t = 0;
+      for (let i = 3; i < d.length; i += 4) if (d[i] < 245) t++;
+      return t > n * n * .01;
+    } catch (e) { return false; }
+  }
+  // 모양을 따라가는 테두리: 그림을 둥글게 여러 방향으로 밀어 찍어 부풀린 뒤 한 색으로 칠함
+  const OUTLINE = new Map();
+  function outlineCanvas(rec, w, h, bw, color) {
+    const key = [rec.url, Math.round(w), Math.round(h), bw.toFixed(2), color].join('|');
+    if (OUTLINE.has(key)) return OUTLINE.get(key);
+    const pad = Math.ceil(bw) + 2, c = document.createElement('canvas');
+    c.width = Math.ceil(w + pad * 2); c.height = Math.ceil(h + pad * 2);
+    const x = c.getContext('2d');
+    const rings = bw > 3 ? [bw, bw * .66, bw * .33] : [bw];
+    for (const r of rings) {
+      const n = Math.min(72, Math.max(16, Math.ceil(2 * Math.PI * r / 1.2)));
+      for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; x.drawImage(rec.img, pad + Math.cos(a) * r, pad + Math.sin(a) * r, w, h); }
+    }
+    x.drawImage(rec.img, pad, pad, w, h);
+    x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    const out = { c, pad };
+    OUTLINE.set(key, out); if (OUTLINE.size > 40) OUTLINE.delete(OUTLINE.keys().next().value);
+    return out;
+  }
   async function blobToImg(bid, blob) {
     if (IMGS.has(bid)) return IMGS.get(bid);
     const url = URL.createObjectURL(blob), img = new Image(); img.src = url;
     await img.decode();
-    const rec = { img, url, w: img.naturalWidth, h: img.naturalHeight };
+    const rec = { img, url, w: img.naturalWidth, h: img.naturalHeight, alpha: hasAlpha(img) };
     IMGS.set(bid, rec); return rec;
   }
 
@@ -732,16 +765,20 @@
   const fontStr = (o, px) => `${o.bold ? 700 : 400} ${px}px "${o.font}", "Pretendard", sans-serif`;
   function textMetrics(ctx, o, fs) {
     ctx.font = fontStr(o, fs);
-    const deco = o.deco || 'none', orn = '✦';
+    const deco = o.deco || 'none', orn = o.orn || '✦', orn2 = o.orn2 || orn;
     const lines = String(o.text || ' ').split('\n');
-    const decorate = s => (deco === 'before' || deco === 'both' ? orn + ' ' : '') + s + (deco === 'after' || deco === 'both' ? ' ' + orn : '');
-    const padX = fs * .55, padY = fs * .38, lh = fs * 1.3;
+    const decorate = s => (deco === 'before' || deco === 'both' ? orn + ' ' : '') + s + (deco === 'after' || deco === 'both' ? ' ' + orn2 : '');
+    const padX = fs * .55, padY = fs * .42, lh = fs * 1.3;
     if (!o.vert) {
       const ls = lines.map(decorate);
+      // 실제 글자 모양의 위·아래 끝을 재서 정확히 가운데에 오게 함
+      let asc = 0, desc = 0;
+      ls.forEach(l => { const m = ctx.measureText(l || ' '); asc = Math.max(asc, m.actualBoundingBoxAscent || 0); desc = Math.max(desc, m.actualBoundingBoxDescent || 0); });
+      if (asc < fs * .3) { asc = fs * .78; desc = Math.max(desc, fs * .12); }
       const w = Math.max(...ls.map(l => ctx.measureText(l).width), fs * .5) + padX * 2;
-      return { w, h: ls.length * lh + padY * 2 - (lh - fs) * .4, ls, padX, padY, lh };
+      return { w, h: (ls.length - 1) * lh + asc + desc + padY * 2, ls, padX, padY, lh, asc };
     }
-    const cols = lines.map(l => [...(deco === 'before' || deco === 'both' ? '✦' : '') + l + (deco === 'after' || deco === 'both' ? '✦' : '')]);
+    const cols = lines.map(l => [...(deco === 'before' || deco === 'both' ? [orn] : []), ...l, ...(deco === 'after' || deco === 'both' ? [orn2] : [])]);
     const cw = fs * 1.25, rows = Math.max(...cols.map(c => c.length), 1);
     return { w: cols.length * cw + padY * 2, h: rows * fs * 1.12 + padX * 1.2, cols, cw, padX, padY, vert: true };
   }
@@ -763,7 +800,12 @@
       const bw = (o.border || 0) * scale, r = (o.radius || 0) * scale;
       o._w = w / scale; o._h = h / scale;
       if (o.flip) ctx.scale(-1, 1);
-      if (!bw && !r) {
+      if (rec.alpha) {
+        // 투명 배경 스티커: 테두리가 그림 모양을 따라감 (모서리 둥글게는 쓰지 않음)
+        if (o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 22 * scale; ctx.shadowOffsetY = 8 * scale; }
+        if (bw > 0.05) { const ol = outlineCanvas(rec, w, h, bw, o.bcolor || '#ffffff'); ctx.drawImage(ol.c, -w / 2 - ol.pad, -h / 2 - ol.pad); ctx.shadowColor = 'transparent'; }
+        ctx.drawImage(rec.img, -w / 2, -h / 2, w, h);
+      } else if (!bw && !r) {
         if (o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 22 * scale; ctx.shadowOffsetY = 8 * scale; }
         ctx.drawImage(rec.img, -w / 2, -h / 2, w, h);
       } else {
@@ -791,16 +833,16 @@
           ctx.restore();
         }
       }
-      ctx.fillStyle = o.color; ctx.font = fontStr(o, fs); ctx.textBaseline = 'middle';
+      ctx.fillStyle = o.color; ctx.font = fontStr(o, fs); ctx.textBaseline = 'alphabetic';
       if (o.bgOn === false && o.shadow) { ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 8 * scale; ctx.shadowOffsetY = 2 * scale; }
       if (!m.vert) {
         ctx.textAlign = 'center';
-        const top = -h / 2 + m.padY + fs * .5;
-        m.ls.forEach((l, i) => ctx.fillText(l, 0, top + i * m.lh));
+        const base = -h / 2 + m.padY + m.asc;
+        m.ls.forEach((l, i) => ctx.fillText(l, 0, base + i * m.lh));
       } else {
         ctx.textAlign = 'center';
-        const x0 = -w / 2 + m.padY + m.cw / 2, y0 = -h / 2 + m.padX * .6 + fs * .56;
-        m.cols.forEach((col, ci) => col.forEach((ch, ri) => ctx.fillText(ch, x0 + ci * m.cw, y0 + ri * fs * 1.12)));
+        const x0 = -w / 2 + m.padY + m.cw / 2, y0 = -h / 2 + m.padX * .6 + fs * 1.12 / 2;
+        m.cols.forEach((col, ci) => col.forEach((ch, ri) => { const t = ctx.measureText(ch); const a = t.actualBoundingBoxAscent || fs * .78, d = t.actualBoundingBoxDescent || 0; ctx.fillText(ch, x0 + ci * m.cw, y0 + ri * fs * 1.12 + (a - d) / 2); }));
       }
     }
     ctx.restore();
@@ -1150,6 +1192,7 @@
     renderObjs(); schedule();
   }
   const oslider = (k, label, min, max, step, val, unit = '') => `<div class="field"><div class="label">${label} <span class="val" data-ov="${k}">${val}${unit}</span></div><input type="range" data-ok="${k}" min="${min}" max="${max}" step="${step}" value="${val}" data-unit="${unit}"></div>`;
+  const ORNS = [['✦'], ['✧'], ['★'], ['☆'], ['♥'], ['♡'], ['❀'], ['✿'], ['☾'], ['☁'], ['♪'], ['◆'], ['●'], ['❝', '❞'], ['「', '」'], ['『', '』'], ['【', '】'], ['〈', '〉'], ['▶', '◀'], ['˚₊‧', '‧₊˚'], ['—', '—'], ['⋆', '⋆']];
   function renderObjPanel() {
     const box = $('#opanel'), o = curObj();
     if (!o) { box.innerHTML = ''; return; }
@@ -1165,13 +1208,17 @@
       <div class="row2" style="margin-top:10px"><div><div class="label">무늬</div><select class="sel-in" data-os="pat">${[['none', '없음'], ['check', '체크'], ['stripe', '줄무늬'], ['diag', '사선'], ['dots', '도트']].map(x => `<option value="${x[0]}" ${o.pat === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div>
       <div><div class="label">안쪽 테두리</div><select class="sel-in" data-os="inner">${[['none', '없음'], ['solid', '실선'], ['dashed', '점선'], ['double', '이중선']].map(x => `<option value="${x[0]}" ${o.inner === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div></div>
       <div class="row2" style="margin-top:10px"><div><div class="label">모양</div><select class="sel-in" data-os="shape">${[['round', '둥근 모서리'], ['pill', '알약'], ['square', '각진 모서리']].map(x => `<option value="${x[0]}" ${o.shape === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div>
-      <div><div class="label">장식 ✦</div><select class="sel-in" data-os="deco">${[['none', '없음'], ['before', '앞에만'], ['after', '뒤에만'], ['both', '양쪽']].map(x => `<option value="${x[0]}" ${o.deco === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div></div>`;
+      <div><div class="label">장식 위치</div><select class="sel-in" data-os="deco">${[['none', '없음'], ['before', '앞에만'], ['after', '뒤에만'], ['both', '양쪽']].map(x => `<option value="${x[0]}" ${o.deco === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select></div></div>`;
+      h += `<div class="field" style="margin-top:10px"><div class="label">장식 모양 <span class="val" style="font-family:inherit;color:var(--muted)">${o.deco && o.deco !== 'none' ? '' : '누르면 양쪽에 붙어요'}</span></div>
+        <div class="orns">${ORNS.map(p => `<button type="button" data-orn="${esc(p[0])}" data-orn2="${esc(p[1] || '')}" class="${(o.orn || '✦') === p[0] && (o.orn2 || '') === (p[1] || '') ? 'on' : ''}">${esc(p[0])}${p[1] ? '<i>…</i>' + esc(p[1]) : ''}</button>`).join('')}</div>
+        <div class="row2" style="margin-top:8px"><input type="text" class="sel-in" maxlength="6" data-ornin="orn" value="${esc(o.orn || '✦')}" placeholder="앞 장식"><input type="text" class="sel-in" maxlength="6" data-ornin="orn2" value="${esc(o.orn2 || '')}" placeholder="뒤 장식 (비우면 앞과 같게)"></div></div>`;
       h += oslider('size', '글자 크기', 6, 300, 1, sizeVal);
     } else {
       h += oslider('size', '크기', 2, 300, 1, sizeVal, '%');
-      h += oslider('border', '테두리 두께', 0, 60, 1, o.border || 0, 'px');
+      const alphaImg = (IMGS.get(o.bid) || {}).alpha;
+      h += oslider('border', alphaImg ? '테두리 두께 · 그림 모양을 따라가요' : '테두리 두께', 0, 60, 1, o.border || 0, 'px');
       h += `<div class="field"><div class="label">테두리 색</div><div class="colorin"><input type="color" data-oc="bcolor" value="${o.bcolor || '#ffffff'}"></div></div>`;
-      h += oslider('radius', '모서리 둥글게', 0, 300, 1, o.radius || 0, 'px');
+      if (!alphaImg) h += oslider('radius', '모서리 둥글게', 0, 300, 1, o.radius || 0, 'px');
     }
     h += oslider('rot', '회전', -180, 180, 1, o.rot || 0, '°');
     h += `<div class="adj-btns">${o.t === 'img' ? `<button class="btn ${o.flip ? 'on' : ''}" data-oa="flip">⇋ 반전</button>` : ''}<button class="btn ${o.shadow ? 'on' : ''}" data-oa="shadow">그림자</button><button class="btn ${o.lock ? 'on' : ''}" data-oa="olock">🔒 잠금</button></div>
@@ -1192,16 +1239,19 @@
       if (t.dataset.ok === 'size') { if (o.t === 'img') o.w = v / 100; else o.fs = v / 1000; }
       else o[t.dataset.ok] = v;
     } else if (t.dataset.oc) o[t.dataset.oc] = t.value;
+    else if (t.dataset.ornin) { o[t.dataset.ornin] = t.value; if (o.deco === 'none' || !o.deco) { o.deco = 'both'; const sel = $('#opanel select[data-os=deco]'); if (sel) sel.value = 'both'; } $$('#opanel .orns button').forEach(x => x.classList.toggle('on', x.dataset.orn === (o.orn || '✦') && x.dataset.orn2 === (o.orn2 || ''))); }
     else if (t.hasAttribute('data-otext')) { o.text = t.value; const row = $(`#olist [data-o="${o.id}"] .name`); if (row) row.textContent = (o.lock ? '🔒 ' : '') + (t.value.split('\n')[0] || '글씨'); }
     schedule();
   });
   $('#opanel').addEventListener('change', e => {
     const o = curObj(); if (!o) return; const t = e.target;
-    if (t.dataset.os) { o[t.dataset.os] = t.value; if (t.dataset.os === 'font') loadFont(o.font); schedule(); }
+    if (t.dataset.os) { o[t.dataset.os] = t.value; if (t.dataset.os === 'font') loadFont(o.font); if (t.dataset.os === 'deco') renderObjPanel(); schedule(); }
     if (t.dataset.ochk === 'bgOff') { o.bgOn = !t.checked; schedule(); }
   });
   $('#opanel').addEventListener('click', e => {
     const o = curObj(); if (!o) return;
+    const ob = e.target.closest('[data-orn]');
+    if (ob) { o.orn = ob.dataset.orn; o.orn2 = ob.dataset.orn2 || ''; if (!o.deco || o.deco === 'none') o.deco = 'both'; renderObjPanel(); schedule(); return; }
     const b = e.target.closest('[data-ob],[data-oa]'); if (!b) return;
     if (b.dataset.ob) { const [k, v] = b.dataset.ob.split(':'); o[k] = v === '1'; renderObjPanel(); schedule(); return; }
     const a = b.dataset.oa;

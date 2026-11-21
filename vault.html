@@ -273,6 +273,9 @@
   .v-lb img{max-width:100%;max-height:calc(100vh - 70px);object-fit:contain;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
   .v-lb span{color:#cfdbe6;font-size:12px}
   @media (max-width:600px){ .v-form.big{grid-template-columns:1fr} .v-form.big .v-drop.sq{max-width:none;max-height:50vh} .t-vault .v-grid.prompts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+  .v-dialog.nudge{animation:vnudge .32s ease}
+  @keyframes vnudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 </style>
 <style>
   .topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--line)}
@@ -506,7 +509,7 @@ function render(){
   });
   enableDrag(g);
   $('dragHint').style.display=arr.length>1?'':'none';
-  g.querySelectorAll('[data-img]').forEach(async el=>{ const id=el.dataset.img; if(!id) return; const v=await img(id); if(v) el.insertAdjacentHTML('afterbegin',`<img src="${v}" alt="" loading="lazy">`); });
+  g.querySelectorAll('[data-img]').forEach(async el=>{ const id=el.dataset.img; if(!id) return; const v=await img(id); if(!v) return; if(el.classList.contains('cover')) el.insertAdjacentHTML('afterbegin',`<img src="${v}" alt="" loading="lazy">`); else el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; });
 }
 
 /* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
@@ -570,10 +573,15 @@ document.addEventListener('click',e=>{ if(Date.now()-justDragged<350 && e.target
 
 /* ---------- 모달 ---------- */
 let modalEl=null, onPaste=null;
-function modal(html,{sm=false,lock=false,cls=''}={}){
+let guard=null, armed=0;
+function tryClose(){
+  if(guard && guard() && Date.now()-armed>2200){ armed=Date.now(); toast('저장하지 않은 내용이 있어요. 한 번 더 누르면 닫혀요'); const d=modalEl.querySelector('.v-dialog'); if(d){ d.classList.remove('nudge'); void d.offsetWidth; d.classList.add('nudge'); } return; }
+  armed=0; close();
+}
+function modal(html,{sm=false,lock=false,cls='',dirty=null}={}){
   if(!modalEl){ modalEl=document.createElement('div'); modalEl.className='v-modal'; document.body.appendChild(modalEl);
-    modalEl.addEventListener('mousedown',e=>{ if(e.target===modalEl && !modalEl.dataset.lock) close(); }); }
-  modalEl.dataset.lock=lock?'1':'';
+    modalEl.addEventListener('mousedown',e=>{ if(e.target===modalEl && !modalEl.dataset.lock) tryClose(); }); }
+  modalEl.dataset.lock=lock?'1':''; guard=dirty; armed=0;
   modalEl.innerHTML=`<div class="v-dialog ${sm?'sm':''} ${cls}">${html}</div>`;
   modalEl.classList.add('on'); document.body.style.overflow='hidden';
   modalEl.querySelectorAll('.x,[data-close]').forEach(b=>b.onclick=close);
@@ -581,7 +589,7 @@ function modal(html,{sm=false,lock=false,cls=''}={}){
   return modalEl;
 }
 function close(){ if(modalEl){ modalEl.classList.remove('on'); modalEl.innerHTML=''; } document.body.style.overflow=''; onPaste=null; }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(zoomEl&&zoomEl.classList.contains('on')){ zoomEl.classList.remove('on'); return; } if(modalEl&&modalEl.classList.contains('on')) close(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(zoomEl&&zoomEl.classList.contains('on')){ zoomEl.classList.remove('on'); return; } if(modalEl&&modalEl.classList.contains('on')){ if(modalEl.dataset.lock) close(); else tryClose(); } } });
 document.addEventListener('paste',e=>{ if(!onPaste) return; const it=[...(e.clipboardData||{}).items||[]].find(i=>i.type&&i.type.startsWith('image/')); if(it){ e.preventDefault(); onPaste(it.getAsFile()); } });
 let zoomEl=null;
 function zoom(src){ if(!zoomEl){ zoomEl=document.createElement('div'); zoomEl.className='v-zoom'; zoomEl.onclick=()=>zoomEl.classList.remove('on'); document.body.appendChild(zoomEl); } zoomEl.innerHTML=`<img src="${src}" alt="">`; zoomEl.classList.add('on'); }
@@ -769,7 +777,7 @@ async function editPersona(p0,auMode){
 /* ---------- 프롬프트 ---------- */
 async function editPrompt(q0){
   const isNew=!q0; const q=JSON.parse(JSON.stringify(q0||{id:uid(),title:'',tags:[],cat:curCat()}));
-  const src=await img(q.img);
+  const src=await img(q.img); let dirtyFn=null;
   const m=modal(`<div class="v-dh"><b>${isNew?'＋ 새 프롬프트':'✨ 프롬프트'}</b><button class="x" type="button">×</button></div>
     <div class="v-db"><div class="v-form big">
       <div><div class="v-drop sq" id="v-drop"></div><div class="v-meta" id="v-meta"></div></div>
@@ -781,7 +789,7 @@ async function editPrompt(q0){
         <div><label>메모</label><input type="text" id="v-f-memo" value="${esc(q.memo)}" placeholder="예: 스텝 28, 가이던스 5"></div>
         <label class="chk"><input type="checkbox" id="v-f-pin" ${q.pin?'checked':''}> 📌 맨 앞에 고정</label>
       </div></div></div>
-    <div class="v-df">${isNew?'':'<button type="button" class="danger" id="v-del">삭제</button><button type="button" id="v-dup">사본 만들기</button>'}<span class="sp"></span><button type="button" data-close>${isNew?'취소':'닫기'}</button><button type="button" class="primary" id="v-save">저장</button></div>`,{lock:true});
+    <div class="v-df">${isNew?'':'<button type="button" class="danger" id="v-del">삭제</button><button type="button" id="v-dup">사본 만들기</button>'}<span class="sp"></span><button type="button" data-close>${isNew?'취소':'닫기'}</button><button type="button" class="primary" id="v-save">저장</button></div>`,{dirty:()=>!!(dirtyFn&&dirtyFn())});
   const getOrig=async()=>q.img&&q.orig?await imgGet(ORIG(q.img)).catch(()=>null):null;
   const fmtSize=b=>b>=1048576?(b/1048576).toFixed(1)+'MB':Math.max(1,Math.round(b/1024))+'KB';
   const paintMeta=st=>{
@@ -802,6 +810,8 @@ async function editPrompt(q0){
   const st=imgPicker($('drop'),src,true,{hasOrig:!!q.orig, getOrig, onChange:s2=>{ if(s2.meta&&s2.meta.pos) fill(s2.meta,false); paintMeta(s2); }});
   paintMeta(st);
   const getTags=tagInput($('f-tags'),q.tags||[]);
+  const formState=()=>JSON.stringify([$('f-title').value,$('f-cat').value,$('f-pos').value,$('f-neg').value,$('f-memo').value,$('f-pin').checked,getTags()]);
+  const snap0=formState(); dirtyFn=()=>st.changed||formState()!==snap0;
   $('cpPos').onclick=()=>copy($('f-pos').value.trim(),'긍정 프롬프트를');
   $('cpNeg').onclick=()=>copy($('f-neg').value.trim(),'부정 프롬프트를');
   const collect=()=>Object.assign(q,{title:$('f-title').value.trim(), cat:$('f-cat').value||null, tags:getTags(), pos:$('f-pos').value.trim(), neg:$('f-neg').value.trim(), memo:$('f-memo').value.trim(), pin:$('f-pin').checked, updated:Date.now()});

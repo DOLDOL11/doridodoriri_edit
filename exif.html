@@ -433,14 +433,15 @@ async function toVault(it){
     const data=await new Promise(res=>{ const g=db.transaction('kv').objectStore('kv').get('data'); g.onsuccess=()=>res(g.result||{v:1,personas:[],prompts:[],pcats:[],qcats:[]}); g.onerror=()=>res({v:1,personas:[],prompts:[],pcats:[],qcats:[]}); });
     if(!data.prompts) data.prompts=[];
     // 썸네일
-    const bm=await decodeBitmap(it.out||it.file); const k=Math.min(1,700/Math.max(bm.width,bm.height)); const c=document.createElement('canvas'); c.width=Math.round(bm.width*k); c.height=Math.round(bm.height*k); c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+    const bm=await decodeBitmap(it.out||it.file); const k=Math.min(1,1100/Math.max(bm.width,bm.height)); const c=document.createElement('canvas'); c.width=Math.round(bm.width*k); c.height=Math.round(bm.height*k); c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
     let thumb=c.toDataURL('image/webp',.85); if(!/^data:image\/webp/.test(thumb)) thumb=c.toDataURL('image/jpeg',.88);
     const id=Date.now().toString(36)+Math.random().toString(36).slice(2,7), img='i'+id;
-    data.prompts.push({id, title:baseName(it.name).slice(0,60), pos:it.ai.pos, neg:it.ai.neg||'', memo:it.ai.src+'에서 가져옴', tags:[it.ai.src==='NovelAI'?'노벨AI':'AI'], img, cat:null, created:Date.now(), updated:Date.now()});
-    await new Promise((res,rej)=>{ const t=db.transaction(['kv','img'],'readwrite'); t.objectStore('img').put(thumb,img); t.objectStore('kv').put(data,'data'); t.oncomplete=res; t.onerror=()=>rej(t.error); });
+    data.prompts.push({id, title:baseName(it.name).slice(0,60), pos:it.ai.pos, neg:it.ai.neg||'', memo:it.ai.src+'에서 가져옴', tags:[it.ai.src==='NovelAI'?'노벨AI':'AI'], img, orig:{name:it.name, size:it.file.size}, cat:null, created:Date.now(), updated:Date.now()});
+    const origData=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(it.file); });
+    await new Promise((res,rej)=>{ const t=db.transaction(['kv','img'],'readwrite'); t.objectStore('img').put(thumb,img); t.objectStore('img').put(origData,img+':o'); t.objectStore('kv').put(data,'data'); t.oncomplete=res; t.onerror=()=>rej(t.error); });
     db.close();
     try{ localStorage.setItem('vault-summary',JSON.stringify({p:(data.personas||[]).length,q:data.prompts.length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
-    toast('보관함의 프롬프트 보관함에 저장했어요');
+    toast('보관함에 원본 그대로 저장했어요');
   }catch(e){ toast('보관함에 저장하지 못했어요'); }
 }
 $('list').addEventListener('click',e=>{

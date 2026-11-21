@@ -808,7 +808,11 @@ $('new').onclick=()=>U.tab==='persona'?editPersona(null):editPrompt(null);
   catch(e){ $('grid').innerHTML='<div class="v-empty">이 브라우저에서는 보관함 저장소를 열 수 없어요.<br>시크릿 모드라면 일반 창에서 열어 주세요.</div>'; return; }
   try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
   try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length})); }catch(e){}
+  const hm=(location.hash||'').match(/^#(p|q|tab)=([\w-]+)$/);
+  if(hm){ U.tab=(hm[1]==='q'||(hm[1]==='tab'&&hm[2]==='prompt'))?'prompt':'persona'; saveUI(); }
   render();
+  if(hm && hm[1]!=='tab'){ const it=(hm[1]==='p'?D.personas:D.prompts).find(x=>x.id===hm[2]); if(it) hm[1]==='p'?viewPersona(it):editPrompt(it); }
+  if(hm){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
 })();
 window.addEventListener('focus',async()=>{ if(!db||(modalEl&&modalEl.classList.contains('on'))) return; try{ const d=await kvGet('data'); if(d){ D=Object.assign(BLANK(),d); IMG.clear(); render(); } }catch(e){} });
 })();

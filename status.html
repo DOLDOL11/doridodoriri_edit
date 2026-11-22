@@ -1649,6 +1649,41 @@
             }
     
     </style>
+<!--status-unify:start-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
+<style>
+  /* ---------- 스튜디오 공통 디자인 (작업 화면만, 상태창 미리보기는 그대로) ---------- */
+  .sl-hide{display:none!important}
+  body.maker-app,body{background:#f7f9fc}
+  .sidebar{border-right:1px solid #e4ebf2!important;background:#fff!important}
+  .rail{background:#fff!important;border-right:1px solid #e4ebf2;padding:14px 8px!important;gap:6px!important;width:72px!important}
+  .rail-btn{color:#6b7785!important;border-radius:14px!important}
+  .rail-btn b{filter:grayscale(.15)}
+  .rail-btn:hover{background:#f2f6fa!important;color:#1d2430!important}
+  .rail-btn.active,.rail-btn.parent-active{background:#e7f1fb!important;color:#3f80ba!important;font-weight:700}
+  .rail-sub{background:#f4f8fc!important}
+  .rail-home{margin-bottom:8px}
+  .rail-home b{display:flex;align-items:center;justify-content:center;height:24px}
+  .sl-bub{position:relative;display:inline-block;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 9%,rgba(255,255,255,.35) 20%,#bfe0fa 48%,#8cc4f0 78%,#6aa9e3 100%);box-shadow:inset -2px -3px 6px rgba(70,130,200,.25),inset 2px 2px 5px rgba(255,255,255,.7),0 3px 8px rgba(90,159,216,.25)}
+  .sl-bub::after{content:"";position:absolute;width:9px;height:9px;right:-5px;bottom:-2px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,#d4ebfd 50%,#9fcdf3 100%)}
+  .controls-area{background:#f7f9fc!important}
+  .panel-title{background:#f7f9fc!important;border-bottom:1px solid #e4ebf2!important;font-weight:700!important;color:#1d2430}
+  .ctrl-box{border:1px solid #e4ebf2!important;border-radius:20px!important;box-shadow:none!important}
+  .ctrl-box h3{border-bottom:1px solid #eef2f6!important;color:#1d2430}
+  .preset-card{border-color:#e4ebf2!important;box-shadow:none!important;border-radius:16px!important}
+  .preset-card.on,.preset-card.active,.preset-card.sel{border-color:#8db9e6!important;box-shadow:0 0 0 3px rgba(141,185,230,.25)!important}
+  .controls-area button.primary,.modal button.primary{background:#4f8fd0!important;border-color:#4f8fd0!important;color:#fff!important}
+  .controls-area button.primary:hover,.modal button.primary:hover{background:#3f80ba!important}
+  .controls-area input[type=text],.controls-area input[type=number],.controls-area select,.controls-area textarea{border-color:#e1e8ef!important;border-radius:10px!important}
+  .controls-area input:focus,.controls-area select:focus,.controls-area textarea:focus{border-color:#a9cdee!important;box-shadow:0 0 0 3px rgba(141,185,230,.18)!important;outline:none}
+  .controls-area .seg{border-color:#dde6ef!important;border-radius:10px!important}
+  .controls-area .seg button.on{background:#e7f1fb!important;color:#3f80ba!important}
+  .text-bar{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:1px solid #e4ebf2!important;box-shadow:none!important}
+  .tb-btn{border-radius:10px!important}
+  .preview-scroll{background:#f7f9fc}
+  .modal{border-radius:22px!important}
+</style>
+<!--status-unify:end-->
 </head>
 
 <body class="maker-app">
@@ -1657,7 +1692,7 @@
         <!-- === 왼쪽: 아이콘 레일 + 컨트롤 패널 === -->
         <aside class="sidebar">
             <nav class="rail">
-                <a class="rail-btn" href="./" title="로그 백업 스튜디오로 돌아가기" style="text-decoration:none"><b>🏠</b><span>스튜디오</span></a>
+                <a class="rail-btn rail-home" href="./" title="Log Studio 홈으로" style="text-decoration:none"><b><span class="sl-bub" aria-hidden="true"></span></b><span>홈</span></a>
                 <button class="rail-btn active" data-tab="style" onmousedown="event.preventDefault()" onclick="switchTab('style')"><b>🎨</b><span>꾸미기</span></button>
                 <button class="rail-btn" id="rail-edit" onmousedown="event.preventDefault()" onclick="toggleEditFold()" title="내용 편집"><b>✏️</b><span>편집</span></button>
                 <button class="rail-btn" data-tab="save" onmousedown="event.preventDefault()" onclick="switchTab('save')"><b>💾</b><span>저장</span></button>
@@ -1717,8 +1752,8 @@
                     <button id="undo-btn" class="tb-btn" onmousedown="event.preventDefault()" onclick="undoHist()" title="되돌리기 (Ctrl+Z)" disabled>↶</button>
                     <button id="redo-btn" class="tb-btn" onmousedown="event.preventDefault()" onclick="redoHist()" title="다시 실행 (Ctrl+Shift+Z / Ctrl+Y)" disabled>↷</button>
                 </div>
-                <span class="tb-sep"></span>
-                <div class="tb-group">
+                <span class="tb-sep sl-hide"></span>
+                <div class="tb-group sl-hide">
                     <button class="tb-btn tb-fmt" data-cmd="bold" onmousedown="event.preventDefault()" onclick="fmtCmd('bold')" title="굵게 (Ctrl+B)"><b>B</b></button>
                     <button class="tb-btn tb-fmt" data-cmd="italic" onmousedown="event.preventDefault()" onclick="fmtCmd('italic')" title="기울임 (Ctrl+I)"><i>I</i></button>
                     <button class="tb-btn tb-fmt" data-cmd="underline" onmousedown="event.preventDefault()" onclick="fmtCmd('underline')" title="밑줄 (Ctrl+U)"><u>U</u></button>
@@ -1729,8 +1764,8 @@
                     </label>
                     <button class="tb-btn" onmousedown="event.preventDefault()" onclick="fmtCmd('removeFormat')" title="서식 지우기">⌫</button>
                 </div>
-                <span class="tb-sep"></span>
-                <div class="tb-group fx-wrap">
+                <span class="tb-sep sl-hide"></span>
+                <div class="tb-group fx-wrap sl-hide">
                     <button class="tb-btn fx-btn" id="fx-btn" onmousedown="event.preventDefault()" onclick="toggleFxMenu()" title="글자 효과">✨ 효과 <span class="fx-caret">▾</span></button>
                     <div class="fx-pop" id="fx-pop">
                         <div class="fx-pop-head">고른 글자에 효과 넣기 <small>다시 누르면 풀려요</small></div>
@@ -1749,7 +1784,7 @@
                     <button class="tb-btn tb-zoom-label" id="zoom-label" onmousedown="event.preventDefault()" onclick="zoomPreview(0)" title="눌러서 기본 크기로">100%</button>
                     <button class="tb-btn" onmousedown="event.preventDefault()" onclick="zoomPreview(0.1)" title="미리보기 확대">＋</button>
                 </div>
-                <div class="tb-hint" id="tb-hint">미리보기에서 글자를 드래그해 고른 뒤 눌러주세요</div>
+                <div class="tb-hint sl-hide" id="tb-hint">미리보기에서 글자를 드래그해 고른 뒤 눌러주세요</div>
             </div>
 
             <div class="preview-area" id="capture-area" data-font="preset"></div>

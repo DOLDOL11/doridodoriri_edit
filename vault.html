@@ -276,7 +276,103 @@
 
   .v-dialog.nudge{animation:vnudge .32s ease}
   @keyframes vnudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  /* 페어 정리함 */
+  .t-vault .v-grid.pairs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+  .t-vault .rc .rcov{aspect-ratio:16/10;background:linear-gradient(150deg,#d8ebfb,#f3e9fb);position:relative;overflow:hidden}
+  .t-vault .rc .rcov .cover{position:absolute;inset:0}
+  .t-vault .rc .rcov .cover img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+  .t-vault .rc .duo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px}
+  .t-vault .rc .duo .av{width:96px;height:96px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 6px 18px rgba(60,110,160,.18);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#7fb2df}
+  .t-vault .rc .duo .av img{width:100%;height:100%;object-fit:cover;object-position:center top}
+  .t-vault .rc .duo .x{font-size:20px;color:#8aaed0;font-weight:300}
+  .t-vault .rc .who{font-size:12.5px;color:#567;margin-top:1px}
+  .t-vault .rc .who i{font-style:normal;color:#9bb7d2;margin:0 2px}
+  .r-pick{display:flex;align-items:center;gap:10px}
+  .r-pick .av{flex:none;width:46px;height:46px;border-radius:50%;background:#e7f1fb;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;color:#6e9fcc;font-size:17px}
+  .r-pick .av img{width:100%;height:100%;object-fit:cover;object-position:center top}
+  .v-form.big .v-drop:not(.sq){aspect-ratio:16/11;max-width:none}
+  .v-form.big .v-drop:not(.sq) img{width:100%;height:100%;object-fit:cover}
+  /* 스튜디오 사이드바 */
+  .vshell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+  .vshell > .main{min-width:0}
+  .vside{position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:34px 18px 22px;background:#fff;border-right:1px solid #e4ebf2;font-family:'Noto Sans KR',sans-serif}
+  .vside .lbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;color:#9aa8b6;padding:22px 12px 8px}
+  .vside a.it{position:relative;display:flex;align-items:center;gap:10px;padding:8px 12px 8px 24px;border-radius:10px;color:#4a5563;text-decoration:none;font-size:14.5px}
+  .vside a.it:hover{background:#f2f6fa;color:#1d2430}
+  .vside a.it .n{margin-left:auto;font-size:12px;color:#a3b0bd}
+  .vside a.it.on{font-weight:700;color:#1d2430}
+  .vside a.it.on::before{content:"";position:absolute;left:10px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#8db9e6}
+  .vside a.it.on{background:transparent!important}
+  .vside a.it.on:hover{background:#f2f6fa}
+  @media (min-width:821px){
+    .vshell .topbar{display:none}
+    .t-vault .v-tabs .tab{display:none}
+    .t-vault{position:relative}
+    .t-vault > header{padding-right:300px}
+    .t-vault > .v-tabs{position:absolute;right:28px;top:30px;margin:0}
+  }
+  @media (max-width:820px){ .vshell{grid-template-columns:1fr} .vside{display:none} }
+  /* 페어 편집 (히어로형) */
+  .v-dialog.pairm{max-width:640px;border-radius:28px}
+  .pm-hero{position:relative;background:#eaf1fb;border-bottom:1px solid #e3eaf3}
+  .pm-one,.pm-two{height:300px}
+  .pm-two{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#dfe9f5}
+  .pm-hero .v-drop.pm-drop{aspect-ratio:auto;max-width:none;width:100%;height:100%;border:0;border-radius:0;background:#eaf1fb;flex-direction:column}
+  .pm-two .v-drop.pm-drop{background:#edf3fb}
+  .pm-hero .v-drop.pm-drop img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+  .pm-hero .v-drop.pm-drop:not(.has) > div{font-size:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .pm-hero .v-drop.pm-drop:not(.has) > div::before{content:"";width:34px;height:34px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f6fa8' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='3'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21'/%3E%3C/svg%3E")}
+  .pm-hero .v-drop.pm-drop:not(.has)::after{content:attr(data-ph);font-size:14px;color:#3f6fa8;margin-top:8px}
+  .pm-hero .v-drop.pm-drop:not(.has){color:#3f6fa8}
+  .pm-x{position:absolute;top:16px;right:18px;z-index:3;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.75);font-size:22px;line-height:1;color:#3f5f86;padding:0}
+  .pm-x:hover{background:#fff}
+  .pm-body{padding:22px 30px 22px;display:flex;flex-direction:column;gap:14px}
+  .pm-row{display:flex;align-items:center;gap:10px}
+  .pm-lb{font-size:13px;font-weight:600;color:#5b6470;margin-bottom:6px;display:block}
+  .pm-row .pm-lb{margin:0;flex:1}
+  .pm-seg{display:inline-flex;padding:4px;border:1px solid #e3e8ef;border-radius:999px;background:#fff}
+  .pm-seg button{border:0;background:transparent;border-radius:999px;padding:7px 14px;font-size:13px;color:#6b7480}
+  .pm-seg button.on{background:#e8f0fb;color:#2f5f96;font-weight:700}
+  .pm-title{border:0!important;background:transparent!important;padding:0!important;font-size:30px!important;font-weight:800!important;letter-spacing:-.6px;color:#1d2430;box-shadow:none!important;height:auto!important}
+  .pm-title::placeholder{color:#b7b2b4}
+  .pm-sub{font-size:15px;font-weight:600;color:#3f5f86;margin-top:-10px}
+  .pm-sub.ph{color:#b7b2b4}
+  .pm-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:10px}
+  .pm-pair .r-pick{display:grid;gap:6px}
+  .pm-times{padding-top:10px;color:#9bb4cf;font-size:18px}
+  .pairm .pm-body input[type=text]:not(.pm-title),.pairm .pm-body input[type=date],.pairm .pm-body select,.pairm .pm-body textarea,.pairm .pm-body .v-taginput{background:#f6f6f8;border:1px solid transparent;border-radius:16px;padding:11px 16px;font-size:14px;width:100%;box-sizing:border-box}
+  .pairm .pm-body input:focus,.pairm .pm-body select:focus,.pairm .pm-body textarea:focus{border-color:#bcd3ec;background:#fff;outline:none}
+  .pairm .pm-body textarea{min-height:120px;resize:vertical}
+  .pm-dd{display:flex;gap:10px}
+  .pm-dd input{flex:1}
+  .pm-badge{flex:none;display:flex;align-items:center;justify-content:center;min-width:92px;padding:0 16px;border-radius:16px;background:#e8f0fb;color:#2f5f96;font-weight:700;font-size:16px;font-family:'Outfit',sans-serif}
+  .pm-badge.ph{color:#8aa6c8}
+  .pm-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pm-more summary{cursor:pointer;font-size:13px;color:#6b7c90;padding:4px 0}
+  .pm-more[open] summary{margin-bottom:10px}
+  .pm-more .pm-f + .pm-f{margin-top:12px}
+  .pm-mini{padding:2px 10px;font-size:11.5px;border-radius:999px}
+  .pm-foot{display:flex;align-items:center;gap:10px;padding-top:6px}
+  .pm-foot .sp{flex:1}
+  .pm-del{border:0;background:transparent;color:#c0504d;font-size:13px;padding:8px 4px}
+  .pm-pin{font-size:13px;color:#6b7480}
+  .pm-save{border:0;border-radius:999px;padding:12px 30px;font-size:15px;font-weight:700;background:#cfe0f5;color:#2f5f96}
+  .pm-save:hover{background:#bcd4f0}
+  .t-vault .rc .half{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff}
+  .t-vault .rc .half .hf{display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#7fb2df;background:linear-gradient(150deg,#d8ebfb,#f3e9fb);overflow:hidden}
+  .t-vault .rc .half .hf img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+  .t-vault .rc .ddb{position:absolute;right:10px;bottom:10px;z-index:2;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:#2f5f96;background:rgba(255,255,255,.9);border-radius:999px;padding:3px 10px}
+  @media (max-width:600px){ .pm-one,.pm-two{height:210px} .pm-body{padding:18px} .pm-title{font-size:24px!important} .pm-2{grid-template-columns:1fr} }
+  .pm-hero .v-drop .ibtns{top:auto;bottom:10px;right:10px}
+
+  .vside .bub{position:relative;flex:none;display:inline-block;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 9%,rgba(255,255,255,.35) 20%,#bfe0fa 48%,#8cc4f0 78%,#6aa9e3 100%);box-shadow:inset -3px -4px 8px rgba(70,130,200,.25),inset 2px 2px 6px rgba(255,255,255,.7),0 4px 10px rgba(90,159,216,.25)}
+  .vside .bub::after{content:"";position:absolute;width:13px;height:13px;right:-7px;bottom:-3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,#d4ebfd 50%,#9fcdf3 100%);box-shadow:0 2px 5px rgba(90,159,216,.25)}
+  .vside .brand{display:flex;align-items:center;gap:14px;padding:0 12px 34px;text-decoration:none;color:#1d2430}
+  .vside .brand .bt{display:flex;flex-direction:column;line-height:1.1}
+  .vside .brand b{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px}
+  .vside .brand small{font-family:'Outfit',sans-serif;font-size:11.5px;letter-spacing:.08em;color:#8fa3b6;margin-top:3px}
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
   .topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--line)}
   .topbar a{color:var(--accent-d);text-decoration:none;font-size:13px}
@@ -298,13 +394,32 @@
 </style>
 </head>
 <body>
+<div class="vshell">
+<aside class="vside" id="v-vside">
+  <a class="brand" href="./"><span class="bub" aria-hidden="true"></span><span class="bt"><b>Log Studio</b><small>backup &amp; archive</small></span></a>
+  <a class="it" href="./">홈</a>
+  <div class="lbl">CREATE</div>
+  <a class="it" href="bubble.html">말풍선 만들기</a>
+  <a class="it" href="excerpt.html">발췌기 정리</a>
+  <a class="it" href="status.html">상태창 메이커</a>
+  <a class="it" href="report.html">보고서 정리</a>
+  <div class="lbl">ARCHIVE</div>
+  <a class="it" href="#tab=persona" data-vtab="persona">캐릭터<span class="n"></span></a>
+  <a class="it" href="#tab=pair" data-vtab="pair">페어<span class="n"></span></a>
+  <a class="it" href="#tab=prompt" data-vtab="prompt">프롬프트<span class="n"></span></a>
+  <div class="lbl">TOOLS</div>
+  <a class="it" href="collage.html">콜라주 · 스티커</a>
+  <a class="it" href="exif.html">EXIF 제거기</a>
+</aside>
+<div>
 <div class="topbar"><a href="./">← 스튜디오</a><b>🗂 캐릭터·프롬프트 보관함</b></div>
 <div class="main">
     <section class="view solo t-vault" id="view-vault">
-      <header><h1>🗂 캐릭터·프롬프트 보관함</h1><p>AI 채팅 페르소나와 노벨AI 프롬프트를 모아두는 곳이에요. 사진까지 넉넉하게 담을 수 있는 큰 저장소에 저장돼요.</p></header>
+      <header><h1>🗂 캐릭터·프롬프트 보관함</h1><p>AI 채팅 페르소나와 페어, 노벨AI 프롬프트를 모아두는 곳이에요. 사진까지 넉넉하게 담을 수 있는 큰 저장소에 저장돼요.</p></header>
       <div class="v-tabs">
-        <button class="tab" data-tab="persona">🧑 페르소나 보관함</button>
-        <button class="tab" data-tab="prompt">✨ 프롬프트 보관함</button>
+        <button class="tab" data-tab="persona">🧑 캐릭터</button>
+        <button class="tab" data-tab="pair">💞 페어</button>
+        <button class="tab" data-tab="prompt">✨ 프롬프트</button>
         <span class="sp"></span>
         <button id="v-export" type="button">💾 보관함 내보내기</button>
         <button id="v-import" type="button">📂 불러오기</button>
@@ -330,6 +445,8 @@
       </div>
     </section>
 </div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
@@ -354,19 +471,20 @@ const imgDel=id=>tx('img','readwrite',s=>s.delete(id));
 const imgAll=()=>new Promise((res,rej)=>{ const out={}; const t=db.transaction('img','readonly'); const c=t.objectStore('img').openCursor(); c.onsuccess=()=>{ const cur=c.result; if(cur){ out[cur.key]=cur.value; cur.continue(); } }; t.oncomplete=()=>res(out); t.onerror=()=>rej(t.error); });
 const imgClear=()=>tx('img','readwrite',s=>s.clear());
 
-const BLANK=()=>({v:1, personas:[], prompts:[], pcats:[], qcats:[]});
+const BLANK=()=>({v:1, personas:[], prompts:[], pairs:[], pcats:[], qcats:[], rcats:[]});
 let D=BLANK();
 const IMG=new Map();
 async function img(id){ if(!id) return null; if(IMG.has(id)) return IMG.get(id); const v=await imgGet(id).catch(()=>null); IMG.set(id,v||null); return v||null; }
 
-let U={tab:'persona', cat:{persona:'all',prompt:'all'}, q:'', tag:null, sort:'upd'};
+let U={tab:'persona', cat:{persona:'all',prompt:'all',pair:'all'}, q:'', tag:null, sort:'upd'};
 try{ Object.assign(U, JSON.parse(localStorage.getItem('vault-ui')||'{}')); }catch(e){}
-if(!U.cat||typeof U.cat!=='object') U.cat={persona:'all',prompt:'all'};
+if(!U.cat||typeof U.cat!=='object') U.cat={persona:'all',prompt:'all',pair:'all'};
+if(!['persona','prompt','pair'].includes(U.tab)) U.tab='persona';
 const saveUI=()=>{ try{ localStorage.setItem('vault-ui',JSON.stringify({tab:U.tab,cat:U.cat,sort:U.sort})); }catch(e){} };
 
 async function save(){
   try{ await kvSet('data',D); }catch(e){ toast('저장하지 못했어요: '+(e&&e.name||'오류')); return; }
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
 }
 
 /* ---------- 원본 메타데이터 (PNG 텍스트 정보) ---------- */
@@ -428,8 +546,9 @@ async function copy(t,label){
 }
 
 /* ---------- 목록 ---------- */
-const items=()=>U.tab==='persona'?D.personas:D.prompts;
-const cats=()=>U.tab==='persona'?D.pcats:D.qcats;
+const TABS={persona:{list:'personas',cats:'pcats',ord:'porder'}, prompt:{list:'prompts',cats:'qcats',ord:'qorder'}, pair:{list:'pairs',cats:'rcats',ord:'rorder'}};
+const items=()=>D[TABS[U.tab].list]||(D[TABS[U.tab].list]=[]);
+const cats=()=>D[TABS[U.tab].cats]||(D[TABS[U.tab].cats]=[]);
 const kids=id=>cats().filter(c=>c.parent===id).map(c=>c.id);
 function inCat(it,c){
   if(c==='all') return !it.hideAll;
@@ -438,6 +557,7 @@ function inCat(it,c){
 }
 function hay(it){
   if(U.tab==='persona') return [it.name,it.intro,it.age,it.height,it.gender,it.with,it.au,it.setting,it.memo,it.pos,(it.tags||[]).join(' '),(it.outfits||[]).map(o=>o.name+' '+o.desc).join(' '),(it.aus||[]).map(a=>[a.label,a.name,a.intro,a.setting,a.with].join(' ')).join(' ')].join(' ').toLowerCase();
+  if(U.tab==='pair') return [it.name,pairName(it.a),pairName(it.b),it.dday,it.rel,it.callAB,it.callBA,it.story,it.pos,it.memo,(it.tags||[]).join(' ')].join(' ').toLowerCase();
   return [it.title,it.pos,it.neg,it.memo,it.src,(it.tags||[]).join(' ')].join(' ').toLowerCase();
 }
 function filtered(){
@@ -447,13 +567,13 @@ function filtered(){
   const ws=U.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   if(ws.length) arr=arr.filter(it=>{ const h=hay(it); return ws.every(w=>h.includes(w)); });
   if(U.tag) arr=arr.filter(it=>(it.tags||[]).includes(U.tag));
-  const nm=it=>(U.tab==='persona'?it.name:it.title)||'';
+  const nm=it=>(U.tab==='prompt'?it.title:it.name)||'';
   if(U.sort==='custom'){ const ord=orderList(); const pos=new Map(ord.map((id,i)=>[id,i])); arr=[...arr].sort((a,b)=>(pos.get(a.id)??-1)-(pos.get(b.id)??-1)); }
   else arr=[...arr].sort((a,b)=>(b.pin?1:0)-(a.pin?1:0) || (U.sort==='name'?nm(a).localeCompare(nm(b),'ko'):U.sort==='new'?(b.created||0)-(a.created||0):(b.updated||0)-(a.updated||0)));
   return {arr, base};
 }
 /* 내 순서: 저장된 순서 + 새로 생긴 항목은 맨 앞 */
-const ordKey=()=>U.tab==='persona'?'porder':'qorder';
+const ordKey=()=>TABS[U.tab].ord;
 function orderList(){
   const ids=items().map(x=>x.id), have=new Set(ids);
   let o=(D[ordKey()]||[]).filter(id=>have.has(id)); const inO=new Set(o);
@@ -487,25 +607,34 @@ function renderTags(base){
 function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
 function render(){
   document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===U.tab));
-  $('new').textContent=U.tab==='persona'?'＋ 새 페르소나':'＋ 새 프롬프트';
-  $('q').placeholder=U.tab==='persona'?'이름, 태그, 설정, 의상으로 찾기':'제목, 태그, 프롬프트 내용으로 찾기';
+  document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>{ const t=a.dataset.vtab, n=(D[TABS[t].list]||[]).length; a.classList.toggle('on',t===U.tab); a.querySelector('.n').textContent=n||''; });
+  const H={persona:['🧑 캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['💞 페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],prompt:['✨ 프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
+  const hh=document.querySelector('.t-vault > header'); if(hh){ hh.querySelector('h1').textContent=H[0]; hh.querySelector('p').textContent=H[1]; }
+  $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어'}[U.tab];
+  $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기'}[U.tab];
   $('sort').value=U.sort;
   renderSide();
   const {arr,base}=filtered(); renderTags(base);
-  const g=$('grid'); g.classList.toggle('prompts',U.tab==='prompt');
+  const g=$('grid'); g.classList.toggle('prompts',U.tab==='prompt'); g.classList.toggle('pairs',U.tab==='pair');
   if(!arr.length){
-    g.innerHTML=`<div class="v-empty">${items().length?'조건에 맞는 항목이 없어요.':(U.tab==='persona'?'아직 저장한 페르소나가 없어요.<br><b>＋ 새 페르소나</b>로 첫 캐릭터를 넣어 보세요.':'아직 저장한 프롬프트가 없어요.<br><b>＋ 새 프롬프트</b>로 자주 쓰는 프롬프트를 모아 보세요.')}</div>`;
+    g.innerHTML=`<div class="v-empty">${items().length?'조건에 맞는 항목이 없어요.':(U.tab==='pair'?'아직 정리한 페어가 없어요.<br><b>＋ 새 페어</b>로 두 캐릭터를 묶어 보세요.':U.tab==='persona'?'아직 저장한 페르소나가 없어요.<br><b>＋ 새 페르소나</b>로 첫 캐릭터를 넣어 보세요.':'아직 저장한 프롬프트가 없어요.<br><b>＋ 새 프롬프트</b>로 자주 쓰는 프롬프트를 모아 보세요.')}</div>`;
     return;
   }
   if(U.tab==='persona'){
     g.innerHTML=arr.map(p=>`<div class="pc" data-id="${p.id}">${p.pin?'<span class="pin">📌</span>':''}${(p.aus||[]).length?`<span class="aub">AU ${p.aus.length}</span>`:''}<div class="im" data-img="${p.img||''}">${initial(p.name)}</div><div class="bd"><div class="nm">${esc(p.name)}</div>${p.intro?`<div class="in">${esc(p.intro)}</div>`:''}${(p.tags||[]).length?`<div class="tg">${p.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`).join('');
+  } else if(U.tab==='pair'){
+    g.innerHTML=arr.map(r=>{ const A=pairSide(r.a), B=pairSide(r.b), dd=ddayText(r.dday);
+      const ia=r.imgA||A.img, ib=r.imgB||B.img;
+      const cov=r.mode==='two'?`<div class="half"><span data-img="${ia||''}" class="hf">${initial(A.name)}</span><span data-img="${ib||''}" class="hf">${initial(B.name)}</span></div>`
+        :r.img?`<div class="cover" data-img="${r.img}"></div>`:`<div class="duo"><span class="av" data-img="${A.img||''}">${initial(A.name)}</span><span class="x">×</span><span class="av" data-img="${B.img||''}">${initial(B.name)}</span></div>`;
+      return `<div class="pc rc" data-id="${r.id}">${r.pin?'<span class="pin">📌</span>':''}<div class="rcov">${cov}${dd?`<span class="ddb">${dd}</span>`:''}</div><div class="bd"><div class="nm">${esc(r.name||(A.name+' × '+B.name))}</div><div class="who">${esc(A.name||'?')} <i>×</i> ${esc(B.name||'?')}</div>${r.rel?`<div class="in">${esc(r.rel)}</div>`:''}${(r.tags||[]).length?`<div class="tg">${r.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
   } else {
     g.innerHTML=arr.map(q=>`<div class="pc qc" data-id="${q.id}">${q.pin?'<span class="pin">📌</span>':''}${q.img?`<div class="cover" data-img="${q.img}">${q.orig?'<span class="ob" title="원본(메타데이터 포함) 보관 중">원본</span>':''}</div>`:''}<div class="top"><div style="min-width:0;flex:1"><div class="nm" style="font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.title)}</div>${(q.tags||[]).length?`<div class="tg" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${q.tags.slice(0,4).map(t=>`<span style="font-size:10.5px;color:#4f7ea8;background:#eaf3fc;border-radius:999px;padding:1px 7px">#${esc(t)}</span>`).join('')}</div>`:''}${q.memo?`<div style="font-size:12px;color:var(--sub);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.memo)}</div>`:''}</div></div>${q.pos?`<div class="pv">${esc(q.pos)}</div>`:''}${q.neg?`<div class="pv neg">${esc(q.neg)}</div>`:''}<div class="acts"><button data-cp="pos" ${q.pos?'':'disabled'}>긍정 복사</button><button data-cp="neg" ${q.neg?'':'disabled'}>부정 복사</button></div></div>`).join('');
   }
   g.querySelectorAll('.pc').forEach(el=>el.onclick=e=>{
     const it=items().find(x=>x.id===el.dataset.id); if(!it) return;
     const cp=e.target.closest('[data-cp]'); if(cp){ e.stopPropagation(); copy(it[cp.dataset.cp], cp.dataset.cp==='pos'?'긍정 프롬프트를':'부정 프롬프트를'); return; }
-    U.tab==='persona'?viewPersona(it):editPrompt(it);
+    U.tab==='persona'?viewPersona(it):U.tab==='pair'?editPair(it):editPrompt(it);
   });
   enableDrag(g);
   $('dragHint').style.display=arr.length>1?'':'none';
@@ -831,6 +960,82 @@ async function editPrompt(q0){
   if(isNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) $('f-title').focus(); },50);
 }
 
+/* ---------- 페어 정리함 ---------- */
+function pairSide(x){
+  x=x||{}; const p=x.pid&&D.personas.find(y=>y.id===x.pid);
+  return p?{name:p.name||x.name||'', img:p.img||'', pid:p.id}:{name:x.name||'', img:'', pid:''};
+}
+function pairName(x){ return pairSide(x).name; }
+function ddayText(d){
+  if(!d) return ''; const t=new Date(d+'T00:00:00'); if(isNaN(t)) return '';
+  const now=new Date(); now.setHours(0,0,0,0); const n=Math.round((now-t)/86400000);
+  return n===0?'D-Day':n>0?'D+'+n:'D'+n;
+}
+async function editPair(r0){
+  const isNew=!r0; const r=JSON.parse(JSON.stringify(r0||{id:uid(),name:'',a:{},b:{},tags:[],cat:curCat(),mode:'one'}));
+  if(!r.mode) r.mode='one';
+  let dirtyFn=null;
+  const ps=[...D.personas].sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
+  const pick=(k,x)=>{ x=x||{}; const has=x.pid&&ps.some(p=>p.id===x.pid);
+    return `<div class="r-pick"><select id="v-f-${k}sel"><option value="">✏️ 직접 입력</option>${ps.map(p=>`<option value="${p.id}" ${has&&x.pid===p.id?'selected':''}>${esc(p.name||'이름 없음')}</option>`).join('')}</select>
+      <input type="text" id="v-f-${k}name" value="${esc(has?'':x.name||'')}" placeholder="캐릭터 ${k.toUpperCase()}" style="${has?'display:none':''}"></div>`; };
+  modal(`<div class="pm-hero" id="v-pmHero">
+      <div class="pm-one" id="v-pmOne"><div class="v-drop pm-drop" id="v-drop"></div></div>
+      <div class="pm-two" id="v-pmTwo"><div class="v-drop pm-drop" id="v-dropA"></div><div class="v-drop pm-drop" id="v-dropB"></div></div>
+      <button class="x pm-x" type="button" title="닫기">×</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-row"><span class="pm-lb">이미지</span><div class="pm-seg" id="v-pmMode"><button type="button" data-m="one">대표 이미지 하나</button><button type="button" data-m="two">두 사람 나란히</button></div></div>
+      <input type="text" class="pm-title" id="v-f-name" value="${esc(r.name)}" placeholder="제목">
+      <div class="pm-sub" id="v-pmSub"></div>
+      <div class="pm-pair">${pick('a',r.a)}<span class="pm-times">×</span>${pick('b',r.b)}</div>
+      <div class="pm-f"><label class="pm-lb">기준일 (디데이)</label><div class="pm-dd"><input type="date" id="v-f-dday" value="${esc(r.dday||'')}"><span class="pm-badge" id="v-pmDD">D-Day</span></div></div>
+      <div class="pm-f"><label class="pm-lb">관계 한 줄</label><input type="text" id="v-f-rel" value="${esc(r.rel)}" placeholder="예: 10년지기 소꿉친구 → 계약 연애"></div>
+      <div class="pm-2"><div class="pm-f"><label class="pm-lb">A → B 호칭</label><input type="text" id="v-f-callAB" value="${esc(r.callAB)}" placeholder="예: 선배"></div><div class="pm-f"><label class="pm-lb">B → A 호칭</label><input type="text" id="v-f-callBA" value="${esc(r.callBA)}" placeholder="예: 야, 너"></div></div>
+      <div class="pm-2"><div class="pm-f"><label class="pm-lb">태그</label><div class="v-taginput" id="v-f-tags"></div></div><div class="pm-f"><label class="pm-lb">카테고리</label><select id="v-f-cat">${catOptions(r.cat)}</select></div></div>
+      <div class="pm-f"><label class="pm-lb">소개</label><textarea id="v-f-story" placeholder="둘이 어떻게 만났는지, 지금 어떤 사이인지, 중요한 사건…">${esc(r.story)}</textarea></div>
+      <details class="pm-more" ${r.pos||r.memo?'open':''}><summary>페어 프롬프트 · 메모</summary>
+        <div class="pm-f"><label class="pm-lb" style="display:flex;align-items:center">페어 프롬프트<span style="flex:1"></span><button type="button" id="v-cpPos" class="pm-mini">복사</button></label><textarea class="mono" id="v-f-pos" style="min-height:80px" placeholder="2boys, ... (투샷용 노벨AI 프롬프트)">${esc(r.pos)}</textarea></div>
+        <div class="pm-f"><label class="pm-lb">메모</label><input type="text" id="v-f-memo" value="${esc(r.memo)}" placeholder="예: 3화까지 백업함"></div>
+      </details>
+      <div class="pm-foot">${isNew?'':'<button type="button" class="pm-del" id="v-del">삭제</button>'}<label class="chk pm-pin"><input type="checkbox" id="v-f-pin" ${r.pin?'checked':''}> 📌 고정</label><span class="sp"></span><button type="button" class="pm-save" id="v-save">저장</button></div>
+    </div>`,{cls:'pairm',dirty:()=>!!(dirtyFn&&dirtyFn())});
+  const side=k=>{ const sel=$('f-'+k+'sel').value; return sel?{pid:sel,name:(ps.find(p=>p.id===sel)||{}).name||''}:{name:$('f-'+k+'name').value.trim()}; };
+  /* 이미지 */
+  const stOne=imgPicker($('drop'),await img(r.img),false);
+  const sideImg=async k=>{ const own=r['img'+k.toUpperCase()]; if(own) return await img(own); const x=pairSide(side(k)); return x.img?await img(x.img):null; };
+  const st={a:null,b:null};
+  const mkSide=async k=>{ const el=$('drop'+k.toUpperCase()); const keep=st[k]; if(keep&&keep.changed) return; st[k]=imgPicker(el,await sideImg(k),false); st[k].fromPersona=!r['img'+k.toUpperCase()]; el.dataset.ph=side(k).name||('캐릭터 '+k.toUpperCase()); };
+  await mkSide('a'); await mkSide('b');
+  const setMode=m=>{ r.mode=m; $('pmOne').style.display=m==='one'?'':'none'; $('pmTwo').style.display=m==='two'?'':'none'; $('pmMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); };
+  $('pmMode').querySelectorAll('button').forEach(b=>b.onclick=()=>setMode(b.dataset.m)); setMode(r.mode);
+  $('drop').dataset.ph='대표 이미지';
+  /* 부제 · 디데이 */
+  const paintSub=()=>{ const A=side('a').name, B=side('b').name; $('pmSub').textContent=(A||B)?`${A||'?'} × ${B||'?'}`:'페어명 (A × B)'; $('pmSub').classList.toggle('ph',!(A||B)); };
+  const paintDD=()=>{ const t=ddayText($('f-dday').value); $('pmDD').textContent=t||'D-Day'; $('pmDD').classList.toggle('ph',!t); };
+  ['a','b'].forEach(k=>{ const upd=()=>{ $('f-'+k+'name').style.display=$('f-'+k+'sel').value?'none':''; paintSub(); if(st[k]&&!st[k].changed&&st[k].fromPersona) { st[k]=null; mkSide(k); } };
+    $('f-'+k+'sel').onchange=upd; $('f-'+k+'name').oninput=paintSub; });
+  $('f-dday').oninput=paintDD; $('f-dday').onchange=paintDD; paintSub(); paintDD();
+  const getTags=tagInput($('f-tags'),r.tags||[]);
+  $('cpPos').onclick=()=>copy($('f-pos').value.trim(),'페어 프롬프트를');
+  const formState=()=>JSON.stringify([$('f-name').value,side('a'),side('b'),$('f-dday').value,$('f-rel').value,$('f-callAB').value,$('f-callBA').value,$('f-cat').value,$('f-story').value,$('f-pos').value,$('f-memo').value,$('f-pin').checked,getTags()]);
+  const mode0=r.mode, snap0=formState(); dirtyFn=()=>stOne.changed||(st.a&&st.a.changed)||(st.b&&st.b.changed)||r.mode!==mode0||formState()!==snap0;
+  $('save').onclick=async()=>{
+    Object.assign(r,{name:$('f-name').value.trim(), a:side('a'), b:side('b'), dday:$('f-dday').value, rel:$('f-rel').value.trim(), callAB:$('f-callAB').value.trim(), callBA:$('f-callBA').value.trim(), cat:$('f-cat').value||null, tags:getTags(), story:$('f-story').value.trim(), pos:$('f-pos').value.trim(), memo:$('f-memo').value.trim(), pin:$('f-pin').checked, updated:Date.now()});
+    if(!r.name && !r.a.name && !r.b.name){ toast('제목이나 캐릭터를 적어 주세요'); $('f-name').focus(); return; }
+    if(isNew) r.created=Date.now();
+    try{
+      await commitImg(r,stOne);
+      for(const k of ['a','b']){ const s2=st[k]; if(!s2||!s2.changed) continue; const key='img'+k.toUpperCase(); const t={img:r[key]}; await commitImg(t,s2); r[key]=t.img||null; }
+    }catch(e){ toast('이미지를 저장하지 못했어요'); return; }
+    if(!D.pairs) D.pairs=[];
+    const i=D.pairs.findIndex(x=>x.id===r.id); if(i<0) D.pairs.push(r); else D.pairs[i]=r;
+    await save(); close(); render(); toast(isNew?'페어를 저장했어요':'수정했어요');
+  };
+  if(!isNew) $('del').onclick=()=>confirmBox(`'${r.name||pairName(r.a)+' × '+pairName(r.b)}' 페어를 삭제할까요?\n(캐릭터 자체는 지워지지 않아요)`,'삭제',async()=>{ D.pairs=D.pairs.filter(x=>x.id!==r.id); for(const id of [r.img,r.imgA,r.imgB]) if(id){ await imgDel(id).catch(()=>{}); IMG.delete(id); } await save(); close(); render(); toast('삭제했어요'); },()=>editPair(r0));
+  if(isNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) $('f-name').focus(); },50);
+}
+
 /* ---------- 카테고리 ---------- */
 function catModal(c){
   const isNew=!c, cs=cats();
@@ -879,8 +1084,8 @@ $('export').onclick=async()=>{
 $('import').onclick=()=>$('importFile').click();
 $('importFile').onchange=()=>{ const f=$('importFile').files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $('importFile').value=''; let o; try{ o=JSON.parse(r.result); }catch(e){ toast('파일을 읽지 못했어요'); return; }
   if(!o||o.app!=='studio-vault'||!o.data){ toast('보관함 백업 파일이 아니에요'); return; }
-  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length;
-  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
+  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length, nr=(o.data.pairs||[]).length;
+  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개${nr?`, 페어 <b>${nr}</b>개`:''}가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
   $('imMerge').onclick=()=>importData(o,false); $('imReplace').onclick=()=>importData(o,true);
 }; r.readAsText(f); };
 async function importData(o,replace){
@@ -888,26 +1093,27 @@ async function importData(o,replace){
     const inc=Object.assign(BLANK(),o.data), ims=o.images||{};
     if(replace){ await imgClear(); IMG.clear(); D=inc; for(const [k,v] of Object.entries(ims)) await imgSet(k,v); }
     else {
-      for(const key of ['pcats','qcats','personas','prompts']){ const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
+      for(const key of ['pcats','qcats','rcats','personas','prompts','pairs']){ if(!D[key]) D[key]=[]; const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
     }
     await save(); close(); render(); toast(replace?'보관함을 바꿨어요':'보관함에 합쳤어요');
   }catch(e){ toast('불러오지 못했어요: '+(e&&e.name||'오류')); }
 }
 
 /* ---------- 시작 ---------- */
+document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.preventDefault(); if(modalEl&&modalEl.classList.contains('on')) close(); U.tab=a.dataset.vtab; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0); });
 document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); });
 let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').value; render(); },120); };
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
-$('new').onclick=()=>U.tab==='persona'?editPersona(null):editPrompt(null);
+$('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):editPrompt(null);
 (async()=>{
   try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d); }
   catch(e){ $('grid').innerHTML='<div class="v-empty">이 브라우저에서는 보관함 저장소를 열 수 없어요.<br>시크릿 모드라면 일반 창에서 열어 주세요.</div>'; return; }
   try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length})); }catch(e){}
-  const hm=(location.hash||'').match(/^#(p|q|tab)=([\w-]+)$/);
-  if(hm){ U.tab=(hm[1]==='q'||(hm[1]==='tab'&&hm[2]==='prompt'))?'prompt':'persona'; saveUI(); }
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length})); }catch(e){}
+  const hm=(location.hash||'').match(/^#(p|q|r|tab)=([\w-]+)$/);
+  if(hm){ U.tab=hm[1]==='tab'?(TABS[hm[2]]?hm[2]:'persona'):{p:'persona',q:'prompt',r:'pair'}[hm[1]]; saveUI(); }
   render();
-  if(hm && hm[1]!=='tab'){ const it=(hm[1]==='p'?D.personas:D.prompts).find(x=>x.id===hm[2]); if(it) hm[1]==='p'?viewPersona(it):editPrompt(it); }
+  if(hm && hm[1]!=='tab'){ const it=(D[TABS[U.tab].list]||[]).find(x=>x.id===hm[2]); if(it) hm[1]==='p'?viewPersona(it):hm[1]==='r'?editPair(it):editPrompt(it); }
   if(hm){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
 })();
 window.addEventListener('focus',async()=>{ if(!db||(modalEl&&modalEl.classList.contains('on'))) return; try{ const d=await kvGet('data'); if(d){ D=Object.assign(BLANK(),d); IMG.clear(); render(); } }catch(e){} });

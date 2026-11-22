@@ -172,10 +172,14 @@
   :root{--ln:#e4ebf2;--dot:#8db9e6;--soft:#e7f1fb;--deep:#3f80ba;--en:'Outfit','Noto Sans KR',sans-serif}
   .shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
   .side{position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:34px 18px 22px;background:#fff;border-right:1px solid var(--ln)}
-  .side .brand{display:block;padding:0 12px 34px;text-decoration:none;color:#1d2430;font-family:var(--en);line-height:1.05}
-  .side .brand b{display:block;font-size:26px;font-weight:700;letter-spacing:-.6px}
-  .side .brand b i{font-style:normal;color:var(--dot)}
-  .side .brand span{display:block;font-size:22px;font-weight:400;letter-spacing:-.5px}
+  .bub{position:relative;flex:none;display:inline-block;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 9%,rgba(255,255,255,.35) 20%,#bfe0fa 48%,#8cc4f0 78%,#6aa9e3 100%);box-shadow:inset -3px -4px 8px rgba(70,130,200,.25),inset 2px 2px 6px rgba(255,255,255,.7),0 4px 10px rgba(90,159,216,.25)}
+  .bub::after{content:"";position:absolute;width:13px;height:13px;right:-7px;bottom:-3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,#d4ebfd 50%,#9fcdf3 100%);box-shadow:0 2px 5px rgba(90,159,216,.25)}
+  .side .brand{display:flex;align-items:center;gap:14px;padding:0 12px 34px;text-decoration:none;color:#1d2430}
+  .side .brand .bt{display:flex;flex-direction:column;line-height:1.1}
+  .side .brand b{font-family:var(--en);font-size:22px;font-weight:700;letter-spacing:-.5px}
+  .side .brand small{font-family:var(--en);font-size:11.5px;letter-spacing:.08em;color:#8fa3b6;margin-top:3px}
+  .topbar2 .m-brand .bub{width:24px;height:24px;margin-right:10px;vertical-align:-5px}
+  .topbar2 .m-brand .bub::after{width:9px;height:9px;right:-5px}
   .side .lbl{font-family:var(--en);font-size:11px;font-weight:600;letter-spacing:.16em;color:#9aa8b6;padding:22px 12px 8px}
   .side a.it{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 24px;border-radius:10px;color:#4a5563;text-decoration:none;font-size:14.5px}
   .side a.it:hover{background:#f2f6fa;color:#1d2430}
@@ -198,7 +202,7 @@
   .rbtn.on{background:var(--soft);border-color:#bcd8f2;color:var(--deep)}
   .rbtn svg,.sc svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 
-  .dash{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;max-width:1500px}
+  .dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;max-width:1500px}
   .w{background:#fff;border:1px solid var(--ln);border-radius:26px;padding:26px 28px;min-width:0;min-height:300px;display:flex;flex-direction:column}
   .w.s2{grid-column:span 2}
   .w.short{min-height:0}
@@ -214,7 +218,7 @@
   .pill.blue:hover{background:#d6e8f9}
 
   /* shortcuts */
-  .scs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .scs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
   .sc{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 6px 18px;border:1px solid var(--ln);border-radius:18px;text-decoration:none;color:#2a323d;font-size:13.5px;text-align:center;background:#fff;transition:border-color .15s,background .15s}
   .sc svg{width:22px;height:22px;color:#4f86bf}
   .sc:hover{border-color:#bcd8f2;background:#f7fbff}
@@ -289,8 +293,50 @@
   .hm textarea{width:100%;min-height:90px;margin-top:8px}
   .hm ul{margin:4px 0 0;padding-left:18px;color:#7a8794;font-size:12px;line-height:1.75}
 
-  @media (max-width:1280px){
-    .dash{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .w.s3{grid-column:1/-1;min-height:0}
+  .dds{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .dd{display:flex;align-items:center;gap:14px;padding:12px 16px 12px 12px;border:1px solid var(--ln);border-radius:20px;text-decoration:none;color:inherit;background:#fff;transition:border-color .15s,background .15s}
+  .dd:hover{border-color:#bcd8f2;background:#f7fbff}
+  .ddp{flex:none;width:64px;height:64px;border-radius:18px;overflow:hidden;background:var(--soft) center 25%/cover no-repeat}
+  .ddp.two{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff}
+  .ddp.two i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;color:var(--deep);background:var(--soft) center 20%/cover no-repeat}
+  .ddt{flex:1;min-width:0}
+  .ddt b{display:block;font-size:15px;font-weight:700;color:#1d2430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ddt small{display:block;font-size:12.5px;color:#7a8794;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ddn{flex:none;text-align:right}
+  .ddn b{display:block;font-family:var(--en);font-size:24px;font-weight:600;color:var(--deep);letter-spacing:-.4px;line-height:1.1}
+  .ddn small{display:block;font-size:11.5px;color:#8a97a4;margin-top:3px}
+  /* hero */
+  .hero{position:relative;overflow:hidden;min-height:300px;border-radius:30px;margin-bottom:22px;max-width:1500px;display:flex;align-items:flex-end;background:linear-gradient(135deg,#a9d3f6 0%,#cfe6fb 45%,#f1f8ff 100%);border:1px solid #d3e5f5}
+  .hero-bg{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity .3s}
+  .hero.has-img .hero-bg{opacity:1}
+  .hero.has-img::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(15,30,50,.55),rgba(15,30,50,.05) 65%);pointer-events:none}
+  .hero.has-img.ink-dark::after{background:linear-gradient(0deg,rgba(255,255,255,.7),rgba(255,255,255,0) 65%)}
+  .hero.has-img .bb{display:none}
+  .hero-tx{position:relative;z-index:2;padding:40px 48px;color:#1d3c5c}
+  .hero.has-img:not(.ink-dark) .hero-tx{color:#fff}
+  .hero-k{font-family:var(--en);font-size:12px;font-weight:600;letter-spacing:.28em;opacity:.7;margin-bottom:10px}
+  .hero-tx h2{margin:0;font-family:var(--en),'Noto Sans KR',sans-serif;font-size:46px;font-weight:700;letter-spacing:-1.2px;line-height:1.08;word-break:keep-all}
+  .hero-tx p{margin:12px 0 0;font-size:15.5px;opacity:.85;word-break:keep-all}
+  .hero-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .hero-acts a{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.85);color:#2c5f8f;font-size:13.5px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .hero-acts a:hover{background:#fff}
+  .hero-acts a.main{background:#3f80ba;border-color:#3f80ba;color:#fff}
+  .hero-acts a.main:hover{background:#356fa3}
+  .hero-edit{position:absolute;top:18px;right:18px;z-index:3;border-radius:999px;padding:6px 13px;font-size:12px;background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.9);color:#3f5c78;opacity:0;transition:opacity .2s}
+  .hero:hover .hero-edit,.hero-edit:focus{opacity:1}
+  .bb{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 6%,rgba(255,255,255,.2) 22%,rgba(200,230,255,.14) 55%,rgba(255,214,245,.38) 78%,rgba(255,255,255,.8) 100%);box-shadow:inset 0 0 18px rgba(255,255,255,.6);animation:bfl 7s ease-in-out infinite alternate}
+  .bb.b1{width:190px;height:190px;right:8%;top:-40px}
+  .bb.b2{width:96px;height:96px;right:26%;top:120px;animation-delay:-2s}
+  .bb.b3{width:58px;height:58px;right:5%;bottom:34px;animation-delay:-4s}
+  .bb.b4{width:34px;height:34px;right:36%;top:36px;animation-delay:-1s}
+  @keyframes bfl{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+  @media (prefers-reduced-motion:reduce){.bb{animation:none}}
+  .stats span{white-space:nowrap}
+
+  @media (max-width:1100px){
+    .dash{grid-template-columns:1fr}
+    .dash .w.s2{grid-column:auto}
   }
   @media (max-width:820px){
     .shell{grid-template-columns:1fr}
@@ -305,8 +351,21 @@
     .sc{padding:14px 2px;font-size:12px;border-radius:14px}
     .chars{grid-template-columns:1fr}
     .pr .th{width:84px;height:110px}
-    .rc{grid-template-columns:70px minmax(0,1fr) auto}
+    .hero{min-height:220px;border-radius:22px;margin-bottom:14px}
+    .hero-tx{padding:26px 22px}
+    .hero-tx h2{font-size:30px}
+    .hero-tx p{font-size:13.5px}
+    .hero-edit{opacity:1;top:12px;right:12px}
+    .bb.b1{width:120px;height:120px}
+    .bb.b2{display:none}
   }
+</style>
+<style>
+  .hm .home-backup .bk-big{font-size:14px}
+  .hm .home-backup .bk-big b{font-size:22px}
+  .hm .home-backup .bk-btns{padding-top:12px;margin-top:0}
+  .hm .home-backup ul{margin-top:12px}
+  @media (max-width:820px){ .scs{grid-template-columns:repeat(4,minmax(0,1fr))} }
 </style>
 </head>
 <body>
@@ -314,24 +373,24 @@
 <section class="view solo" id="view-home">
 <div class="shell">
   <aside class="side">
-    <a class="brand" href="#"><b>Log<i>.</i></b><span>Backup Studio</span></a>
+    <a class="brand" href="#"><span class="bub" aria-hidden="true"></span><span class="bt"><b>Log Studio</b><small>backup &amp; archive</small></span></a>
     <a class="it home" href="#">홈</a>
     <div id="home-sideList"></div>
     <div class="bottom">
-      <button type="button" id="home-sideSet"><span class="q">⚙</span>설정 · 백업 코드</button>
+      <button type="button" id="home-sideSet"><span class="q">⚙</span>설정</button>
     </div>
   </aside>
 
   <div class="home-main">
     <div class="topbar2">
-      <h1>홈</h1><span class="m-brand">Log<i>.</i> Studio</span>
+      <h1>홈</h1><span class="m-brand"><span class="bub" aria-hidden="true"></span>Log Studio</span>
       <span class="sp"></span>
       <button type="button" class="rbtn" id="home-editBtn" title="바로가기 순서 바꾸기"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>
       <button type="button" class="rbtn" id="home-gear" title="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     </div>
 
     <div class="dash">
-      <section class="w s2 short">
+      <section class="w s3 short">
         <div class="wh"><h2>SHORTCUTS</h2></div>
         <div class="scs" id="home-scs">
           <a class="sc" data-ed="bubble" data-grp="create" data-nm="말풍선 만들기" href="bubble.html"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><span>말풍선</span></a>
@@ -345,37 +404,13 @@
         <div class="edit-note" id="home-editNote">끌어다 놓거나 ◀ ▶ 버튼으로 순서를 바꿔요. 다 바꿨으면 오른쪽 위 버튼을 한 번 더 눌러 주세요.</div>
       </section>
 
-      <section class="w home-backup">
-        <div class="wh"><h2>BACKUP</h2></div>
-        <div class="bk-big" id="home-last"></div>
-        <div id="home-meter"></div>
-        <div class="bk-btns">
-          <button type="button" class="pill blue" id="home-save">전체 백업 저장</button>
-          <button type="button" class="pill" id="home-load">불러오기</button>
-          <button type="button" class="pill" id="home-undo" style="display:none">↶ 불러오기 전으로</button>
-          <input type="file" id="home-file" accept=".json,application/json" style="display:none">
-        </div>
+
+      <section class="w s3">
+        <div class="wh"><h2>D-DAY</h2><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
+        <div id="home-dday" style="flex:1;display:flex;flex-direction:column"></div>
       </section>
 
-      <section class="w">
-        <div class="wh"><h2>ARCHIVE</h2></div>
-        <div class="stats" id="home-stats"></div>
-      </section>
 
-      <section class="w s2">
-        <div class="wh"><h2>CHARACTERS</h2><a class="more" href="vault.html#tab=persona" data-link>전체</a></div>
-        <div id="home-chars" style="flex:1;display:flex;flex-direction:column"></div>
-      </section>
-
-      <section class="w s2">
-        <div class="wh"><h2>PROMPT</h2><button type="button" class="more" id="home-shuffle" title="다른 프롬프트">다른 거 ↻</button></div>
-        <div id="home-prompt" style="flex:1;display:flex;flex-direction:column"></div>
-      </section>
-
-      <section class="w s2">
-        <div class="wh"><h2>RECENT</h2></div>
-        <div id="home-recent" style="flex:1;display:flex;flex-direction:column"></div>
-      </section>
     </div>
   </div>
 </div>
@@ -385,15 +420,21 @@
     <div class="wh"><h2>SETTINGS</h2><button type="button" class="x" id="home-setClose" title="닫기">✕</button></div>
     <div class="set-row"><span class="lb">정렬</span><div class="home-seg" id="home-sort"></div></div>
     <div class="set-row" id="home-openRow"><span class="lb">열기</span><div class="home-seg" id="home-open"></div></div>
-    <div class="set-row" style="display:block">
+    <div class="set-row home-backup" style="display:block">
       <span class="lb">전체 백업</span>
+      <div class="bk-big" id="home-last" style="margin-top:8px"></div>
+      <div id="home-meter"></div>
+      <div class="bk-btns">
+        <button type="button" class="pill blue" id="home-save">전체 백업 저장</button>
+        <button type="button" class="pill" id="home-load">불러오기</button>
+        <button type="button" class="pill" id="home-undo" style="display:none">↶ 불러오기 전으로</button>
+        <input type="file" id="home-file" accept=".json,application/json" style="display:none">
+      </div>
       <ul>
         <li>말풍선·발췌기·보고서 작업 내용, 상태창 슬롯, 보관함(사진 포함), 홈 설정까지 파일 하나에 담겨요.</li>
         <li>다른 기기에서 <b>불러오기</b>로 열면 스튜디오 전체가 그대로 옮겨져요.</li>
-        <li>파일 저장이 막혀 있으면 아래 백업 코드로 옮길 수 있어요.</li>
+        <li>브라우저 기록을 지우면 내용이 사라질 수 있으니 가끔 받아두세요.</li>
       </ul>
-      <textarea id="home-code" class="mono" placeholder="백업 코드를 여기에 붙여넣고 '코드로 불러오기'를 누르세요"></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button type="button" class="pill" id="home-copy">백업 코드 복사</button><button type="button" class="pill" id="home-paste">코드로 불러오기</button></div>
     </div>
   </div>
 </div>
@@ -429,7 +470,7 @@ const scBox=$h('scs');
 const apps=()=>[...scBox.querySelectorAll('.sc[data-ed]')];
 const DEFAULT_ORDER=apps().map(a=>a.dataset.ed);
 const GRPS=[['create','CREATE'],['archive','ARCHIVE'],['tools','TOOLS']];
-let V={personas:[],prompts:[],img:{}};
+let V={personas:[],prompts:[],pairs:[],img:{}};
 
 /* ---------- 사이드바 ---------- */
 function paintSide(){
@@ -437,6 +478,10 @@ function paintSide(){
   box.innerHTML=GRPS.map(([g,l])=>{
     const its=apps().filter(a=>a.dataset.grp===g);
     if(!its.length) return '';
+    if(g==='archive'){ const vh=(its[0]||{getAttribute:()=>'vault.html'}).getAttribute('href').split('#')[0];
+      const n=x=>x?`<span class="n">${x}</span>`:'';
+      return `<div class="lbl">${l}</div>`+[['persona','캐릭터',V.personas.length],['pair','페어',V.pairs.length],['prompt','프롬프트',V.prompts.length]]
+        .map(([t,nm,c])=>`<a class="it" data-ed="vault" href="${vh}#tab=${t}">${nm}${n(c)}</a>`).join(''); }
     return `<div class="lbl">${l}</div>`+its.map(a=>{
       const n=a.dataset.ed==='vault'&&V.personas.length?`<span class="n">${V.personas.length}</span>`:'';
       return `<a class="it" data-ed="${a.dataset.ed}" href="${a.getAttribute('href')}">${esc(a.dataset.nm)}${n}</a>`;
@@ -514,7 +559,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ openSettings(fals
 
 /* ---------- 열기 방식 ---------- */
 function applyOpen(){
-  home.querySelectorAll('.sc[data-ed], .side a.it[data-ed], [data-link], .ch, .rc, .pr a.pill').forEach(el=>{
+  home.querySelectorAll('.sc[data-ed], .side a.it[data-ed], [data-link]').forEach(el=>{
     if(!CFG.newTab || P.open==='same'){ el.removeAttribute('target'); } else { el.setAttribute('target','_blank'); el.setAttribute('rel','noopener'); }
   });
 }
@@ -526,73 +571,58 @@ async function loadVault(){
   const d=await vdb().catch(()=>null); if(!d){ paintWidgets(); return; }
   await new Promise(res=>{
     try{
-      const t=d.transaction(['kv','img'],'readonly'); const g=t.objectStore('kv').get('data');
-      g.onsuccess=()=>{ const v=g.result||{}; V.personas=v.personas||[]; V.prompts=v.prompts||[]; };
-      const want=new Set();
+      const t=d.transaction(['kv'],'readonly'); const g=t.objectStore('kv').get('data');
+      g.onsuccess=()=>{ const v=g.result||{}; V.personas=v.personas||[]; V.prompts=v.prompts||[]; V.pairs=v.pairs||[]; };
       t.oncomplete=()=>res(); t.onerror=()=>res();
     }catch(e){ res(); }
   });
-  const ids=[...new Set([...V.personas,...V.prompts].map(x=>x.img).filter(Boolean))];
-  if(ids.length){
-    await new Promise(res=>{
-      try{
-        const t=d.transaction('img','readonly'), s=t.objectStore('img');
-        ids.forEach(id=>{ if(V.img[id]) return; const r=s.get(id); r.onsuccess=()=>{ const x=r.result; if(x) V.img[id]=typeof x==='string'?x:URL.createObjectURL(x); }; });
-        t.oncomplete=()=>res(); t.onerror=()=>res();
-      }catch(e){ res(); }
-    });
-  }
+  const ids=new Set(); ddPairs().forEach(r=>pairImgs(r).forEach(id=>id&&ids.add(id)));
+  const need=[...ids].filter(id=>!(id in V.img));
+  if(need.length) await new Promise(res=>{
+    try{ const t=d.transaction('img','readonly'), st=t.objectStore('img');
+      need.forEach(id=>{ const q=st.get(id); q.onsuccess=()=>{ const x=q.result; V.img[id]=x?(typeof x==='string'?x:URL.createObjectURL(x)):null; }; });
+      t.oncomplete=()=>res(); t.onerror=()=>res();
+    }catch(e){ res(); }
+  });
   d.close(); paintWidgets();
 }
-const byNew=(a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0);
-let pick=null;
-function paintWidgets(){
-  /* 통계 */
-  let slots=0; try{ for(let i=0;i<localStorage.length;i++){ if(/^makerV3_slot\d+$/.test(localStorage.key(i))) slots++; } }catch(e){}
-  const aus=V.personas.reduce((n,p)=>n+((p.aus||[]).length),0);
-  const outs=V.personas.reduce((n,p)=>n+((p.outfits||[]).length)+((p.aus||[]).reduce((m,a)=>m+((a.outfits||[]).length),0)),0);
-  const col=json('collage-summary')||{};
-  $h('stats').innerHTML=[[V.personas.length,'캐릭터'],[aus,'AU'],[outs,'의상'],[V.prompts.length,'프롬프트'],[slots,'상태창 슬롯'],[col.n||0,'콜라주 사진']]
-    .map(([n,l])=>`<div><b>${n}</b><span>${l}</span></div>`).join('');
-
-  /* 캐릭터 */
-  const ps=[...V.personas].sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||byNew(a,b)).slice(0,6);
-  $h('chars').innerHTML=ps.length
-    ? `<div class="chars">${ps.map(p=>{ const src=p.img&&V.img[p.img];
-        return `<a class="ch" href="vault.html#p=${esc(p.id)}"><span class="av"${src?` style="background-image:url('${src}')"`:''}>${src?'':esc((p.name||'?').slice(0,1))}</span><span class="tx"><b>${esc(p.name||'이름 없음')}</b><small>${esc(p.intro||((p.aus||[]).length?'AU '+p.aus.length+'개':'')||' ')}</small></span></a>`; }).join('')}</div>`
-    : `<div class="empty2">보관함에 넣은 캐릭터가 여기 떠요.<a class="pill" href="vault.html#tab=persona" data-link>캐릭터 넣으러 가기</a></div>`;
-
-  /* 프롬프트 */
-  const qs=V.prompts;
-  if(!qs.length){ pick=null; $h('shuffle').style.display='none';
-    $h('prompt').innerHTML=`<div class="empty2">저장한 프롬프트가 여기서 무작위로 떠요.<a class="pill" href="vault.html#tab=prompt" data-link>프롬프트로 가기</a></div>`;
-  } else {
-    $h('shuffle').style.display=qs.length>1?'':'none';
-    if(!pick || !qs.find(q=>q.id===pick)) pick=qs[Math.floor(Math.random()*qs.length)].id;
-    const q=qs.find(x=>x.id===pick); const src=q.img&&V.img[q.img];
-    $h('prompt').innerHTML=`<div class="pr">${src?`<div class="th" style="background-image:url('${src}')"></div>`:''}<div class="bd">
-      <div class="tt">${esc(q.title||'제목 없음')}</div>
-      ${(q.tags||[]).length?`<div class="tg">${q.tags.slice(0,5).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}
-      <div class="ps">${esc(q.pos||'(긍정 프롬프트 없음)')}</div>
-      <div class="ac"><button type="button" class="pill blue" data-cp="pos">긍정 복사</button>${q.neg?'<button type="button" class="pill" data-cp="neg">부정 복사</button>':''}<a class="pill" href="vault.html#q=${esc(q.id)}">열기</a></div>
-    </div></div>`;
-    $h('prompt').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copyText(q[b.dataset.cp]||'', b.dataset.cp==='pos'?'긍정 프롬프트를 복사했어요':'부정 프롬프트를 복사했어요'));
-  }
-
-  /* 최근 */
-  const rec=[...V.personas.map(x=>({k:'캐릭터',n:x.name,t:x.updated||x.created||0,h:'vault.html#p='+x.id})),
-             ...V.prompts.map(x=>({k:'프롬프트',n:x.title,t:x.updated||x.created||0,h:'vault.html#q='+x.id}))]
-             .filter(x=>x.t).sort((a,b)=>b.t-a.t).slice(0,5);
-  $h('recent').innerHTML=rec.length
-    ? rec.map(r=>`<a class="rc" href="${esc(r.h)}"><span>${r.k}</span><b>${esc(r.n||'이름 없음')}</b><time>${md(r.t)}</time></a>`).join('')
-    : `<div class="empty2">보관함에 새로 넣거나 고친 항목이 여기 떠요.</div>`;
-  paintSide();
+/* ---------- 페어 디데이 ---------- */
+const DAY=86400000;
+function dayDiff(s){ const t=new Date(s+'T00:00:00'); if(isNaN(t)) return null; const n=new Date(); n.setHours(0,0,0,0); return Math.round((n-t)/DAY); }
+const ddText=n=>n===0?'D-Day':n>0?'D+'+n:'D'+n;
+function sideOf(x){ x=x||{}; const p=x.pid&&V.personas.find(y=>y.id===x.pid); return {name:(p&&p.name)||x.name||'', img:(p&&p.img)||''}; }
+function pairImgs(r){ const A=sideOf(r.a), B=sideOf(r.b); return r.mode==='two'?[r.imgA||A.img, r.imgB||B.img]:r.img?[r.img]:[A.img,B.img]; }
+function ddPairs(){ return V.pairs.filter(r=>r.dday && dayDiff(r.dday)!==null).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||(b.updated||0)-(a.updated||0)); }
+function nextMark(s){
+  const n=dayDiff(s); if(n===null) return '';
+  if(n<0) return `시작까지 ${-n}일`;
+  const day=n+1; /* 시작한 날 = 1일 */
+  const k=Math.ceil(day/100)*100; const to100=k-day;
+  const st=new Date(s+'T00:00:00'), now=new Date(); now.setHours(0,0,0,0);
+  let y=now.getFullYear()-st.getFullYear(); let an=new Date(st); an.setFullYear(st.getFullYear()+y); if(an<now){ y++; an=new Date(st); an.setFullYear(st.getFullYear()+y); }
+  const toY=Math.round((an-now)/DAY);
+  if(to100===0) return `오늘 ${k}일 🎉`;
+  if(y>0 && toY===0) return `오늘 ${y}주년 🎉`;
+  return (y>0 && toY<to100)?`${y}주년까지 ${toY}일`:`${k}일까지 ${to100}일`;
 }
-$h('shuffle').onclick=()=>{ const qs=V.prompts; if(qs.length<2) return; let n; do{ n=qs[Math.floor(Math.random()*qs.length)].id; }while(n===pick); pick=n; paintWidgets(); };
+function paintDday(){
+  const box=$h('dday'); if(!box) return;
+  const list=ddPairs().slice(0,6);
+  if(!list.length){ box.innerHTML=`<div class="empty2">페어 정리함에서 기준일을 넣으면 여기 디데이가 떠요.<a class="pill" href="vault.html#tab=pair" data-link>페어 정리하러 가기</a></div>`; applyOpen(); return; }
+  box.innerHTML=`<div class="dds">${list.map(r=>{ const A=sideOf(r.a), B=sideOf(r.b), n=dayDiff(r.dday), ims=pairImgs(r);
+    const pic=ims.length===1?`<span class="ddp one" style="${V.img[ims[0]]?`background-image:url('${V.img[ims[0]]}')`:''}"></span>`
+      :`<span class="ddp two">${ims.map((id,i)=>`<i style="${V.img[id]?`background-image:url('${V.img[id]}')`:''}">${V.img[id]?'':esc(([...((i?B:A).name||'?')][0])||'?')}</i>`).join('')}</span>`;
+    return `<a class="dd" href="vault.html#r=${esc(r.id)}" data-link>${pic}<span class="ddt"><b>${esc(r.name||(A.name+' × '+B.name))}</b><small>${esc(A.name||'?')} × ${esc(B.name||'?')}</small></span><span class="ddn"><b>${ddText(n)}</b><small>${esc(nextMark(r.dday))}</small></span></a>`; }).join('')}</div>`;
+  applyOpen();
+}
+function paintWidgets(){
+  paintSide(); paintDday();
+}
 async function copyText(t,msg){
   try{ await navigator.clipboard.writeText(t); toastH(msg); }
   catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toastH(msg); }catch(_){ toastH('복사하지 못했어요'); } ta.remove(); }
 }
+
 
 /* ---------- 전체 백업 ---------- */
 function studioKeys(){ const ks=[]; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(STUDIO_RE.test(k)) ks.push(k); } }catch(e){} return ks.sort(); }

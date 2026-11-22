@@ -190,9 +190,42 @@
   .btn.primary:hover,button.primary:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
   ::selection{background:#cfe6fb}
 </style>
+<!--studio-unify:start-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
+<style>
+  /* ---------- 스튜디오 공통 디자인 (홈과 통일) ---------- */
+  :root{--bg:#f7f9fc;--line:#e4ebf2;--accent:#5b9bd8;--accent-d:#3f80ba;--accent-soft:#e7f1fb}
+  html,body{background:#f7f9fc!important}
+  .topbar{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:1px solid #e4ebf2!important;box-shadow:none!important;min-height:56px;display:flex;align-items:center;gap:12px;padding-top:0;padding-bottom:0}
+  .topbar a.sl-home{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#1d2430!important;font-family:'Outfit','Noto Sans KR',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
+  .topbar a.sl-home:hover,a.sl-home:hover{color:#3f80ba!important}
+  a.sl-home{display:inline-flex;align-items:center;gap:10px;text-decoration:none!important;color:#1d2430!important;font-family:'Outfit','Noto Sans KR',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
+  .topbar .sl-sep{flex:none;width:1px;height:18px;background:#e4ebf2}
+  .topbar .sl-title{font-size:14px;font-weight:600;color:#5b6673;white-space:nowrap}
+  .sl-bub{position:relative;flex:none;display:inline-block;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 9%,rgba(255,255,255,.35) 20%,#bfe0fa 48%,#8cc4f0 78%,#6aa9e3 100%);box-shadow:inset -2px -3px 6px rgba(70,130,200,.25),inset 2px 2px 5px rgba(255,255,255,.7),0 3px 8px rgba(90,159,216,.25);margin-right:4px}
+  .sl-bub::after{content:"";position:absolute;width:9px;height:9px;right:-5px;bottom:-2px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,#d4ebfd 50%,#9fcdf3 100%)}
+  .view > header h1{font-size:24px;font-weight:700;letter-spacing:-.5px;color:#1d2430}
+  .view > header p{color:#7a8794}
+  .card{background:#fff!important;border:1px solid #e4ebf2!important;border-radius:20px!important;box-shadow:none!important}
+  .card h2{font-weight:700;color:#1d2430}
+  .step{background:#e7f1fb!important;color:#3f80ba!important;font-weight:700}
+  .btn.primary,button.primary{background:#4f8fd0!important;border-color:#4f8fd0!important;color:#fff!important}
+  .btn.primary:hover,button.primary:hover{background:#3f80ba!important;border-color:#3f80ba!important}
+  button,.btn{border-color:#dde6ef}
+  button:hover{border-color:#bcd8f2}
+  input[type=text],input[type=search],input[type=number],input[type=date],select,textarea{border-color:#e1e8ef!important;border-radius:10px!important}
+  input[type=text]:focus,input[type=search]:focus,select:focus,textarea:focus{border-color:#a9cdee!important;box-shadow:0 0 0 3px rgba(141,185,230,.18)!important;outline:none}
+  .seg{border-color:#dde6ef;border-radius:10px}
+  .seg button.on{background:#e7f1fb!important;color:#3f80ba!important}
+  ::selection{background:#d6e8f9}
+  body > header{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:1px solid #e4ebf2!important;min-height:56px}
+  .sl-brand{display:flex!important;align-items:center;gap:12px;flex-direction:row!important}
+  .sl-brand .sl-title{font-size:14px;font-weight:600;color:#5b6673}
+</style>
+<!--studio-unify:end-->
 </head>
 <body>
-<div class="topbar"><a href="./">← 스튜디오</a><b>💬 말풍선 만들기</b></div>
+<div class="topbar"><a class="sl-home" href="./"><span class="sl-bub" aria-hidden="true"></span>Log Studio</a><span class="sl-sep"></span><b class="sl-title">말풍선 만들기</b></div>
 <div class="main">
     <!-- ================= 말풍선 ================= -->
     <section class="view solo t-bubble" id="view-bubble">
@@ -263,9 +296,7 @@
             <div class="pal">
               <div class="pal-row"><span class="pal-lb">추천 색</span><span id="b-recSw" class="pal-sw"></span><button id="b-recApply">적용</button></div>
               <label class="chk" style="margin:2px 0 10px"><input type="checkbox" id="b-autoPal"> 프리셋을 바꾸면 추천 색 자동 적용</label>
-              <div class="pal-row"><span class="pal-lb">내 색조합</span><input type="text" id="b-palName" placeholder="이름 (예: 윤하·서준)" style="flex:1;min-width:0"><button id="b-palSave">현재 색 저장</button></div>
-              <div id="b-palList"></div>
-              <div class="pal-row" style="margin-top:12px"><span class="pal-lb">인물 세트</span><input type="text" id="b-setName" placeholder="이름 (예: 윤하 로그)" style="flex:1;min-width:0"><button id="b-setSave">현재 인물 저장</button></div>
+              <div class="pal-row" style="margin-top:4px"><span class="pal-lb">인물 세트</span><input type="text" id="b-setName" placeholder="이름 (예: 윤하 로그)" style="flex:1;min-width:0"><button id="b-setSave">현재 인물 저장</button></div>
               <div id="b-setList"></div>
             </div>
           </div>
@@ -290,7 +321,7 @@
           <div class="card">
             <h2><span class="step">＋</span>백업 <span style="font-weight:400;color:#8596a7;font-size:12px">로그·설정을 파일 하나로</span></h2>
             <div class="field"><button id="b-bkSave" class="primary">💾 백업 파일 저장</button><button id="b-bkLoad">📂 백업 불러오기</button><input type="file" id="b-bkFile" accept=".json,application/json" style="display:none"></div>
-            <p class="hint">로그, 제목·장면 정보, 등장인물, 내 색조합, 인물 세트, 디자인 설정이 모두 들어가요. 다른 컴퓨터나 브라우저에서 불러오면 그대로 이어서 쓸 수 있어요. 불러온 뒤에도 ↶ 실행 취소로 되돌릴 수 있어요.</p>
+            <p class="hint">로그, 제목·장면 정보, 등장인물, 인물 세트, 디자인 설정이 모두 들어가요. 다른 컴퓨터나 브라우저에서 불러오면 그대로 이어서 쓸 수 있어요. 불러온 뒤에도 ↶ 실행 취소로 되돌릴 수 있어요.</p>
             <details class="fr"><summary>파일 저장이 안 될 때 · 백업 코드로 옮기기</summary>
               <textarea id="b-bkCode" class="mono" placeholder="여기에 백업 코드를 붙여넣고 '코드로 불러오기'를 누르세요" style="min-height:90px;margin-top:6px"></textarea>
               <div class="field" style="margin-top:6px;justify-content:flex-end"><button id="b-bkCopy">백업 코드 복사</button><button id="b-bkPaste">코드로 불러오기</button></div>
@@ -1041,6 +1072,7 @@ function renderSets(){
     box.appendChild(r);
   });
 }
+if(S.palettes&&S.palettes.length){ S.sets=S.sets||[]; const have=new Set(S.sets.map(x=>x.name)); S.palettes.forEach(p=>{ if(!have.has(p.name)) S.sets.push({name:p.name, chars:(p.colors||[]).map(c=>({name:c.name||'',display:'',color:c.color}))}); }); S.palettes=[]; try{ renderSets(); }catch(e){} }
 $('setSave').onclick=()=>{
   const nm=$('setName').value.trim()||S.chars.map(c=>c.name).filter(Boolean).join('·')||'인물 세트';
   S.sets.unshift({name:nm, chars:S.chars.map(c=>({name:c.name,display:c.display||'',color:c.color}))});
@@ -1059,7 +1091,7 @@ function renderPal(){
   const rec=REC[S.preset]||[];
   $('recSw').innerHTML=rec.map(c=>`<span class="sw" style="background:${c}" title="${c}"></span>`).join('');
   $('autoPal').checked=!!S.autoPal;
-  const box=$('palList'); box.innerHTML='';
+  const box=$('palList'); if(!box) return; box.innerHTML='';
   (S.palettes||[]).forEach((p,i)=>{
     const r=document.createElement('div'); r.className='pal-item';
     r.innerHTML=`<span class="pal-sw" style="flex:none">${p.colors.map(c=>`<span class="sw" style="background:${c.color}" title="${esc(c.name||'')}"></span>`).join('')}</span><span class="nm">${esc(p.name)}</span><button>적용</button><button title="삭제">✕</button>`;
@@ -1070,7 +1102,7 @@ function renderPal(){
 }
 $('recApply').onclick=()=>{ applyColors(REC[S.preset]||[]); toast('추천 색을 적용했어요'); };
 $('autoPal').onchange=()=>{ S.autoPal=$('autoPal').checked; save(); };
-$('palSave').onclick=()=>{
+if($('palSave')) $('palSave').onclick=()=>{
   const nm=$('palName').value.trim()||S.chars.map(c=>c.name).filter(Boolean).join('·')||'내 색조합';
   S.palettes=S.palettes||[]; S.palettes.unshift({name:nm, colors:S.chars.map(c=>({name:c.name, color:c.color}))});
   $('palName').value=''; save(); renderPal(); toast('색조합을 저장했어요');

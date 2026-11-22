@@ -134,12 +134,45 @@
   .btn.primary:hover,button.primary:hover{background:linear-gradient(135deg,#5ea6e0,#3f80ba)}
   ::selection{background:#cfe6fb}
 </style>
+<!--studio-unify:start-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
+<style>
+  /* ---------- 스튜디오 공통 디자인 (홈과 통일) ---------- */
+  :root{--bg:#f7f9fc;--line:#e4ebf2;--accent:#5b9bd8;--accent-d:#3f80ba;--accent-soft:#e7f1fb}
+  html,body{background:#f7f9fc!important}
+  .topbar{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:1px solid #e4ebf2!important;box-shadow:none!important;min-height:56px;display:flex;align-items:center;gap:12px;padding-top:0;padding-bottom:0}
+  .topbar a.sl-home{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#1d2430!important;font-family:'Outfit','Noto Sans KR',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
+  .topbar a.sl-home:hover,a.sl-home:hover{color:#3f80ba!important}
+  a.sl-home{display:inline-flex;align-items:center;gap:10px;text-decoration:none!important;color:#1d2430!important;font-family:'Outfit','Noto Sans KR',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
+  .topbar .sl-sep{flex:none;width:1px;height:18px;background:#e4ebf2}
+  .topbar .sl-title{font-size:14px;font-weight:600;color:#5b6673;white-space:nowrap}
+  .sl-bub{position:relative;flex:none;display:inline-block;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 9%,rgba(255,255,255,.35) 20%,#bfe0fa 48%,#8cc4f0 78%,#6aa9e3 100%);box-shadow:inset -2px -3px 6px rgba(70,130,200,.25),inset 2px 2px 5px rgba(255,255,255,.7),0 3px 8px rgba(90,159,216,.25);margin-right:4px}
+  .sl-bub::after{content:"";position:absolute;width:9px;height:9px;right:-5px;bottom:-2px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,#d4ebfd 50%,#9fcdf3 100%)}
+  .view > header h1{font-size:24px;font-weight:700;letter-spacing:-.5px;color:#1d2430}
+  .view > header p{color:#7a8794}
+  .card{background:#fff!important;border:1px solid #e4ebf2!important;border-radius:20px!important;box-shadow:none!important}
+  .card h2{font-weight:700;color:#1d2430}
+  .step{background:#e7f1fb!important;color:#3f80ba!important;font-weight:700}
+  .btn.primary,button.primary{background:#4f8fd0!important;border-color:#4f8fd0!important;color:#fff!important}
+  .btn.primary:hover,button.primary:hover{background:#3f80ba!important;border-color:#3f80ba!important}
+  button,.btn{border-color:#dde6ef}
+  button:hover{border-color:#bcd8f2}
+  input[type=text],input[type=search],input[type=number],input[type=date],select,textarea{border-color:#e1e8ef!important;border-radius:10px!important}
+  input[type=text]:focus,input[type=search]:focus,select:focus,textarea:focus{border-color:#a9cdee!important;box-shadow:0 0 0 3px rgba(141,185,230,.18)!important;outline:none}
+  .seg{border-color:#dde6ef;border-radius:10px}
+  .seg button.on{background:#e7f1fb!important;color:#3f80ba!important}
+  ::selection{background:#d6e8f9}
+  body > header{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:1px solid #e4ebf2!important;min-height:56px}
+  .sl-brand{display:flex!important;align-items:center;gap:12px;flex-direction:row!important}
+  .sl-brand .sl-title{font-size:14px;font-weight:600;color:#5b6673}
+</style>
+<!--studio-unify:end-->
 </head>
 <body>
-<div class="topbar"><a href="./">← 스튜디오</a><b>🧽 EXIF 제거기</b></div>
+<div class="topbar"><a class="sl-home" href="./"><span class="sl-bub" aria-hidden="true"></span>Log Studio</a><span class="sl-sep"></span><b class="sl-title">EXIF 제거기</b></div>
 <div class="main">
     <section class="view solo t-exif" id="view-exif">
-      <header><h1>🧽 EXIF 제거기</h1><p>사진 속 위치정보·촬영 기기·촬영 시각, AI 그림의 프롬프트 같은 숨은 정보를 지워요. 사진은 이 브라우저 안에서만 처리되고 어디에도 올라가지 않아요.</p></header>
+      <header><h1>EXIF 제거기</h1><p>사진 속 위치정보·촬영 기기·촬영 시각, AI 그림의 프롬프트 같은 숨은 정보를 지워요. 사진은 이 브라우저 안에서만 처리되고 어디에도 올라가지 않아요.</p></header>
       <div class="x-wrap">
         <div class="x-drop" id="x-drop">
           <div class="plus">＋</div>

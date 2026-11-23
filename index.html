@@ -442,7 +442,7 @@
       <span class="lb">☁ GitHub 동기화</span>
       <div id="home-syncSetup" class="sync-setup">
         <p class="sync-d">내 GitHub <b>비공개 저장소</b>에 스튜디오 전체를 올리고, 다른 기기에서 받아와요. 열쇠(토큰)는 이 기기에만 저장되고 백업 파일에도 들어가지 않아요.</p>
-        <input type="text" id="home-syncRepo" placeholder="저장소 (예: doldol11/log-studio-data)" autocomplete="off" spellcheck="false">
+        <input type="text" id="home-syncRepo" placeholder="저장소 이름 (예: log-studio-data)" autocomplete="off" spellcheck="false">
         <input type="password" id="home-syncTok" placeholder="토큰 (github_pat_...)" autocomplete="off">
         <div class="sync-btns"><button type="button" class="pill blue" id="home-syncConn">연결하기</button><button type="button" class="pill" id="home-syncHelp">토큰 만드는 법</button></div>
         <ol class="sync-help" id="home-syncHelpBox" style="display:none">
@@ -773,11 +773,20 @@ function paintSync(){
 }
 async function syncConnect(){
   const repo=$h('syncRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/+$/,''), token=$h('syncTok').value.trim();
-  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ toastH('저장소를 "아이디/저장소이름" 형식으로 적어 주세요'); return; }
   if(!token){ toastH('토큰을 붙여넣어 주세요'); return; }
+  if(!repo){ toastH('저장소 이름을 적어 주세요'); return; }
   SY={repo,token,auto:true};
   try{
-    const r=await gh('GET',`https://api.github.com/repos/${repo}`); if(!r.ok){ toastH(ghErr(r)); SY={}; return; }
+    /* 저장소 이름만 적었으면 아이디를 알아서 붙인다 */
+    if(!repo.includes('/')){
+      let owner=(location.hostname.match(/^([\w-]+)\.github\.io$/i)||[])[1]||'';
+      try{ const u=await gh('GET','https://api.github.com/user'); if(u.ok){ const j=await u.json(); if(j.login) owner=j.login; } }catch(e){}
+      if(!owner){ SY={}; toastH('저장소를 "아이디/저장소이름" 형식으로 적어 주세요'); return; }
+      SY.repo=`${owner}/${repo}`;
+    }
+    if(!/^[\w.-]+\/[\w.-]+$/.test(SY.repo)){ const bad=SY.repo; SY={}; toastH(`저장소 이름이 이상해요: ${bad}`); return; }
+    const repoName=SY.repo;
+    const r=await gh('GET',`https://api.github.com/repos/${repoName}`); if(!r.ok){ toastH(r.status===404?`'${repoName}' 저장소를 찾지 못했어요. 이름(대소문자 포함)과 토큰의 저장소 선택을 확인해 주세요`:ghErr(r)); SY={}; return; }
     const j=await r.json(); if(!j.private&&!confirm('이 저장소는 공개(Public) 저장소예요. 누구나 백업 내용을 볼 수 있어요.\n그래도 연결할까요? (비공개 저장소를 추천해요)')){ SY={}; return; }
     if(j.permissions&&!j.permissions.push){ toastH('토큰에 쓰기 권한이 없어요. Contents를 Read and write로 해 주세요'); SY={}; return; }
     saveSY(); $h('syncTok').value=''; paintSync();

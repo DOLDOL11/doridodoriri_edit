@@ -243,6 +243,7 @@
   @media (max-width:860px){ .lk-comp textarea{min-height:64px} .lk-comp .cm{margin-bottom:6px} }
   .lk-site{width:100%;border-radius:12px;font-size:12.5px;padding:8px 10px;color:#3f80ba;background:#f4f8fc;border:1px dashed #bcd8f2}
   .lk-site:hover{background:#e7f1fb}
+  .tn-cmd{display:inline-block;margin:2px 0 12px;padding:4px 12px;border-radius:999px;background:#f1ecfd;color:#6a4fc8;font-size:12.5px;font-weight:600}
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -326,13 +327,27 @@ const chat=()=>S.chats.find(c=>c.id===UI.active)||null;
 /* ---------- 로그 나누기 · 해석 ---------- */
 function turnNoOf(raw){ const m=String(raw).match(/(\d+)\s*턴/); return m?parseInt(m[1],10):null; }
 /* 겹치는 턴 찾기: 공백 · 턴 번호 · 이미지 주소 차이는 무시하고 비교 */
-function norm(raw){ return String(raw||'').replace(/https?:\/\/\S+/g,'').replace(/[\[#(]*\s*\d+\s*턴\s*[\])]*/g,'').replace(/[​-‍﻿]/g,'').replace(/\s+/g,'').slice(0,4000); }
+function norm(raw){ return plain(raw).replace(/https?:\/\/\S+/g,'').replace(/[\[#(]*\s*\d+\s*턴\s*[\])]*/g,'').replace(/[​-‍﻿]/g,'').replace(/\s+/g,'').slice(0,4000); }
 /* 들어온 턴들 중 이미 있는 마지막 턴의 '바로 다음'부터만 골라낸다 */
 function newPart(c,parts){
   const have=(c.turns||[]).map(t=>norm(t.raw)); if(!have.length) return {fresh:parts,skip:0,found:false};
   const inc=parts.map(norm); const set=new Set(have);
   for(let j=have.length-1;j>=0;j--){ const k=inc.lastIndexOf(have[j]); if(k>=0){ const rest=parts.slice(k+1).filter((p,i)=>!set.has(inc[k+1+i])); return {fresh:rest,skip:parts.length-rest.length,found:true}; } }
   return {fresh:parts.filter((p,i)=>!set.has(inc[i])),skip:parts.filter((p,i)=>set.has(inc[i])).length,found:false};
+}
+/* 길어서 다음 메시지로 넘어간 답변(유저 입력 없이 이어진 캐릭터 턴)은 앞 턴에 합친다 */
+const hasUser=t=>/^\s*\[유저\]/.test(String(t));
+const CONT='<!--lk-cont-->';
+/* 새 답변처럼 시작하면(*서술*, "대사") 끊긴 조각이 아니라 자동진행 같은 새 턴으로 본다 */
+const looksFresh=t=>/^\s*(\[캐릭터\]\s*)?(\*|["“「『])/.test(String(t));
+const isCont=t=>!hasUser(t)&&!looksFresh(t);
+const joinCont=(a,b)=>String(a).replace(/\s+$/,'')+'\n\n'+CONT+'\n\n'+String(b).replace(/^\s+/,'');
+const plain=t=>String(t||'').split('\n\n'+CONT+'\n\n').join('\n\n').split(CONT).join('');
+/* 복사 · TXT용: 단축어만 있는 유저 입력(/자동진행 등)은 빼고 */
+const clean=t=>plain(t).replace(/^\s*\[유저\]\s*\n\s*\/\S+\s*\n+(\s*\[캐릭터\]\s*\n)?/,'');
+function mergeCont(parts){
+  if(!parts.some(hasUser)) return parts;
+  const out=[]; parts.forEach(p=>{ if(out.length&&isCont(p)) out[out.length-1]=joinCont(out[out.length-1],p); else out.push(p); }); return out;
 }
 function lastNo(c){ const ts=c.turns||[]; if(!ts.length) return -1; const t=ts[ts.length-1]; const n=effNo(c,t,ts.length-1); return isNaN(+n)?ts.length-1:+n; }
 function overlap(c,parts){ const have=new Set((c.turns||[]).map(t=>norm(t.raw))); let n=0; parts.forEach(p=>{ if(have.has(norm(p))) n++; }); return n; }
@@ -381,6 +396,7 @@ function textBlocks(t,blocks){
     if(/^\[(유저|user|나|USER)\]$/i.test(s)){ flush(); mode='user'; return; }
     if(/^\[(캐릭터|character|ai|봇|char|AI)\]$/i.test(s)){ flush(); mode='prose'; return; }
     if(/^[#\s]*\[?\s*\d+\s*턴\s*\]?\s*$/.test(s)) return; /* 턴 번호만 있는 줄은 숨김 */
+    if(s===CONT) return;
     buf.push(line);
   });
   flush();
@@ -409,6 +425,7 @@ let frameN=0;
 function renderBlocks(blocks){
   return blocks.map(b=>{
     if(b.k==='prose') return prose(b.text);
+    if(b.k==='user'&&/^\/\S+$/.test(b.text.trim())) return ''; /* /자동진행 같은 단축어는 보이지 않게 */
     if(b.k==='user') return `<div class="tn-user"><div class="who">USER</div>${prose(b.text)}</div>`;
     if(b.k==='status') return `<details class="st" open><summary>${esc(b.title)}</summary><div class="sb">${b.items.map(it=>it.t==='kv'?`<div class="kv"><b>${esc(it.k)}</b><span>${esc(it.v)}</span></div>`:it.t==='li'?`<div class="li">${esc(it.v)}</div>`:it.t==='sec'?`<div class="sec">${esc(it.v)}</div>`:`<div class="pl">${esc(it.v)}</div>`).join('')}</div></details>`;
     if(b.k==='html'){ const id='f'+(++frameN); return `<div class="st-html"><iframe sandbox="allow-scripts" data-fid="${id}" loading="lazy" srcdoc="${esc(frameDoc(b.src,id))}"></iframe></div>`; }
@@ -469,7 +486,7 @@ function renderMain(keepScroll){
       <div class="tt" id="lk-title" title="채팅 정보 바꾸기"><b>${esc((c.emoji||'💬')+' '+(c.title||'제목 없음'))}</b><small>${turns.length}턴 · ${ymd(c.updatedAt||c.createdAt||now())} 수정</small></div>
       <div class="acts"><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
     <div class="lk-sbar" id="lk-sbar"><input type="search" id="lk-sq" placeholder="이 채팅에서 찾기"><span class="cnt" id="lk-scnt"></span><button type="button" id="lk-sprev" title="이전">↑</button><button type="button" id="lk-snext" title="다음">↓</button><button type="button" id="lk-sx" title="닫기">✕</button></div>
-    <div class="lk-scroll" id="lk-scroll"><div class="lk-turns" style="${style}">${turns.length?turns.map((t,i)=>`<article class="tn" data-tid="${t.id}"><div class="tn-h"><span class="tn-no" data-no="${t.id}" title="턴 번호 바꾸기">${esc(effNo(c,t,i))}턴</span><span class="sp"></span><span class="tb"><button type="button" data-a="copy">복사</button><button type="button" data-a="edit">수정</button><button type="button" data-a="up" title="위로">↑</button><button type="button" data-a="down" title="아래로">↓</button><button type="button" data-a="del">삭제</button></span></div><div class="tn-body">${renderBlocks(parseTurn(t.raw))}</div></article>`).join(''):`<div class="lk-empty" style="padding:60px 10px"><div class="ic">✍️</div><h2>아직 턴이 없어요</h2><p>아래 칸에 로그를 붙여넣고 <b>추가하기</b>를 눌러 주세요.</p></div>`}</div></div>
+    <div class="lk-scroll" id="lk-scroll"><div class="lk-turns" style="${style}">${turns.length?turns.map((t,i)=>`<article class="tn" data-tid="${t.id}"><div class="tn-h"><span class="tn-no" data-no="${t.id}" title="턴 번호 바꾸기">${esc(effNo(c,t,i))}턴</span><span class="sp"></span><span class="tb"><button type="button" data-a="copy">복사</button><button type="button" data-a="edit">수정</button><button type="button" data-a="up" title="위로">↑</button><button type="button" data-a="down" title="아래로">↓</button><button type="button" data-a="merge" title="바로 위 턴에 합치기">↥ 합치기</button>${String(t.raw).includes(CONT)?'<button type="button" data-a="split" title="합쳐진 턴을 다시 나누기">↧ 나누기</button>':''}<button type="button" data-a="del">삭제</button></span></div><div class="tn-body">${renderBlocks(parseTurn(t.raw))}</div></article>`).join(''):`<div class="lk-empty" style="padding:60px 10px"><div class="ic">✍️</div><h2>아직 턴이 없어요</h2><p>아래 칸에 로그를 붙여넣고 <b>추가하기</b>를 눌러 주세요.</p></div>`}</div></div>
     <div class="lk-comp${UI.min?' min':''}" id="lk-comp"><div class="in">
       <div class="cm"><div class="seg" id="lk-mode"><button type="button" data-m="one">턴 하나 추가</button><button type="button" data-m="bulk">통째로 붙여넣기</button></div>
         <label id="lk-zeroL" style="${UI.mode==='bulk'?'':'display:none'}"><input type="checkbox" id="lk-zero" ${UI.zero?'checked':''}> 턴 번호 무시하고 0부터</label><span class="sp"></span><button type="button" class="fold" id="lk-fold">${UI.min?'▴ 입력창 열기':'▾ 접기'}</button></div>
@@ -501,7 +518,7 @@ function addTurns(){
   let n=0;
   let skip=0;
   if(UI.mode==='bulk'){
-    const all=splitBulk(raw); const r=newPart(c,all); const parts=r.fresh; skip=r.skip;
+    const all=mergeCont(splitBulk(raw)); const r=newPart(c,all); const parts=r.fresh; skip=r.skip;
     const base=UI.zero?lastNo(c)+1:null;
     parts.forEach((p,i)=>{ c.turns.push(UI.zero?{id:uid(),raw:p,createdAt:now(),turnNo:base+i,turnNoManual:true}:{id:uid(),raw:p,createdAt:now(),turnNo:turnNoOf(p)}); n++; });
     if(!n){ $('in').value=''; toast('이미 다 있는 턴이에요. 새로 붙일 게 없어요'); return; }
@@ -510,13 +527,15 @@ function addTurns(){
 }
 function turnAction(c,t,a){
   const i=c.turns.indexOf(t);
-  if(a==='copy') return copyText(t.raw,'이 턴을 복사했어요');
+  if(a==='copy') return copyText(clean(t.raw),'이 턴을 복사했어요');
   if(a==='edit') return editModal(c,t);
   if(a==='del') return confirmModal('이 턴을 삭제할까요?','','삭제',()=>{ c.turns.splice(i,1); c.updatedAt=now(); save(); renderAll(true); toast('삭제했어요'); });
+  if(a==='split'){ const ps=String(t.raw).split(CONT).map(x=>x.trim()).filter(Boolean); if(ps.length<2) return; const base=+effNo(c,t,i); const nt=ps.slice(1).map((r,k)=>({id:uid(),raw:r,createdAt:now(),turnNo:isNaN(base)?null:base+k+1,turnNoManual:!isNaN(base)})); t.raw=ps[0]; c.turns.splice(i+1,0,...nt); c.updatedAt=now(); save(); renderMain(true); toast(`${ps.length}개 턴으로 다시 나눴어요`); return; }
+  if(a==='merge'&&i>0){ const pv=c.turns[i-1]; pv.raw=joinCont(pv.raw,t.raw); c.turns.splice(i,1); c.updatedAt=now(); save(); renderMain(true); toast('위 턴과 합쳤어요'); return; }
   if(a==='up'&&i>0){ [c.turns[i-1],c.turns[i]]=[c.turns[i],c.turns[i-1]]; save(); renderMain(true); }
   if(a==='down'&&i<c.turns.length-1){ [c.turns[i+1],c.turns[i]]=[c.turns[i],c.turns[i+1]]; save(); renderMain(true); }
 }
-function chatTxt(c){ return [`${c.emoji||''} ${c.title||''}`.trim(),''].concat((c.turns||[]).map((t,i)=>`──── ${effNo(c,t,i)}턴 ────\n${t.raw}`)).join('\n\n'); }
+function chatTxt(c){ return [`${c.emoji||''} ${c.title||''}`.trim(),''].concat((c.turns||[]).map((t,i)=>`──── ${effNo(c,t,i)}턴 ────\n${clean(t.raw)}`)).join('\n\n'); }
 const fileName=s=>String(s||'로그').replace(/[\\/:*?"<>|]/g,'_').slice(0,60);
 
 /* ---------- 찾기 ---------- */
@@ -552,8 +571,12 @@ function chatModal(c0){
     <div class="f two"><div><label>이모지</label><input type="text" id="lk-me" value="${esc(c.emoji||'')}" maxlength="4"></div><div><label>제목</label><input type="text" id="lk-mt" value="${esc(c.title||'')}" placeholder="예: 백청남고 · 성요한"></div></div>
     <div class="f"><label>폴더</label><select id="lk-mf"><option value="">폴더 없음</option>${S.folders.map(f=>`<option value="${f.id}" ${f.id===c.folderId?'selected':''}>${esc((f.emoji?f.emoji+' ':'')+f.name)}</option>`).join('')}</select></div>
     ${isNew?'':`<div class="f"><label>대사 색</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="lk-mcol" value="${esc(c.dialogueColor||'#1f3f7a')}" style="width:46px;height:34px;padding:2px"><button type="button" id="lk-mcr" style="font-size:12px">기본으로</button><span style="font-size:12px;color:#8a97a4">따옴표 대사 · * 밖의 글자 색이에요</span></div></div>`}
+    ${isNew?'':`<div class="f"><label>끊긴 턴 정리</label><button type="button" id="lk-mfix" style="font-size:12.5px">↥ 끊겨서 넘어간 턴을 앞 턴에 합치기</button><p class="desc" style="margin:6px 0 0">상태창이 길어서 다음 메시지로 넘어가 따로 나뉜 턴을 한 번에 붙여요. *서술*이나 "대사"로 시작하는 턴(자동진행 등)은 그대로 둬요.</p></div>`}
     <div class="ft"><span class="sp"></span><button type="button" id="lk-mc">취소</button><button type="button" class="primary" id="lk-mo">${isNew?'만들기':'저장'}</button></div>`);
   let col=c.dialogueColor||'';
+  if(!isNew) $('mfix').onclick=()=>{ const ts=c0.turns||[]; if(!ts.some(t=>hasUser(t.raw))){ toast('[유저] 표시가 있는 로그에서만 쓸 수 있어요'); return; }
+    const before=ts.length; const out=[]; ts.forEach(t=>{ if(out.length&&isCont(t.raw)){ const pv=out[out.length-1]; pv.raw=joinCont(pv.raw,t.raw); } else out.push(t); });
+    c0.turns=out; c0.updatedAt=now(); save(); closeModal(); renderAll(true); toast(before-out.length?`끊긴 턴 ${before-out.length}개를 앞 턴에 합쳤어요`:'합칠 턴이 없어요'); };
   if(!isNew){ $('mcol').oninput=()=>{ col=$('mcol').value; }; $('mcr').onclick=()=>{ col=''; $('mcol').value='#1f3f7a'; toast('저장하면 기본 색으로 돌아가요'); }; }
   $('mc').onclick=closeModal;
   const ok=()=>{ const title=$('mt').value.trim()||'새 채팅', emoji=$('me').value.trim()||'💬', fid=$('mf').value||null;
@@ -619,7 +642,7 @@ function importFromSite(p){
   const text=String(p.text||'').replace(/\r\n/g,'\n').trim(); if(!text) return 0;
   const pid=String(p.id||''); const site=pid.startsWith('cr')?'크랙':pid.startsWith('rf')?'로판':pid.startsWith('tp')?'티팟':'케이브덕';
   const title=String(p.title||'').trim()||site+' 로그';
-  const parts=p.mode==='bulk'?splitBulk(text):[text];
+  const parts=p.mode==='bulk'?mergeCont(splitBulk(text)):[text];
   /* 이미 받아둔 같은 채팅이 있으면 이어 붙이기 */
   let best=null, bs=0;
   S.chats.forEach(c=>{ const o=overlap(c,parts); const sc=o*2+(c.title===title?1:0); if(o>0&&sc>bs){ best=c; bs=sc; } });

@@ -801,17 +801,50 @@ async function syncConnect(){ syncMsg('');
 }
 /* 큰 백업도 올라가도록 Git 데이터 API로 커밋한다 (blob → tree → commit → ref) */
 async function ghJson(method,path,body){ const r=await gh(method,'https://api.github.com/repos/'+SY.repo+path,body); let j=null; try{ j=await r.json(); }catch(e){} if(!r.ok){ const err=new Error((j&&j.message)||('HTTP '+r.status)); err.status=r.status; throw err; } return j; }
-async function pushFile(txt,message){
+const PART_DIR='studio-backup.parts';
+const PART_SIZE=2*1024*1024;   /* GitHub가 한 번에 받는 크기 제한을 피해 2MB씩 나눠 올린다 */
+function b64bytes(u){ let s=''; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000)); return btoa(s); }
+async function gzipBytes(str){ const u=new TextEncoder().encode(str); if(!window.CompressionStream) return {u,gz:false}; const st=new Blob([u]).stream().pipeThrough(new CompressionStream('gzip')); return {u:new Uint8Array(await new Response(st).arrayBuffer()),gz:true}; }
+async function gunzipText(u,gz){ if(!gz) return new TextDecoder().decode(u); const st=new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip')); return await new Response(st).text(); }
+async function pushFile(txt,message,prog){
   const repo=await ghJson('GET',''); const br=repo.default_branch||'main';
-  let head=null, baseTree=null;
-  try{ const ref=await ghJson('GET','/git/ref/heads/'+encodeURIComponent(br)); head=ref.object.sha; const cm=await ghJson('GET','/git/commits/'+head); baseTree=cm.tree.sha; }
+  let head=null, baseTree=null, oldParts=[];
+  try{ const ref=await ghJson('GET','/git/ref/heads/'+encodeURIComponent(br)); head=ref.object.sha; const cm=await ghJson('GET','/git/commits/'+head); baseTree=cm.tree.sha;
+    try{ const t=await ghJson('GET','/git/trees/'+baseTree+'?recursive=1'); oldParts=(t.tree||[]).filter(x=>x.type==='blob'&&x.path.startsWith(PART_DIR+'/')).map(x=>x.path); }catch(e){} }
   catch(e){ if(e.status!==404&&e.status!==409) throw e; }
-  const blob=await ghJson('POST','/git/blobs',{content:b64utf8(txt),encoding:'base64'});
-  const tree=await ghJson('POST','/git/trees',{...(baseTree?{base_tree:baseTree}:{}),tree:[{path:SYNC_PATH,mode:'100644',type:'blob',sha:blob.sha}]});
+  const {u,gz}=await gzipBytes(txt);
+  const n=Math.max(1,Math.ceil(u.length/PART_SIZE)); const entries=[]; const paths=[];
+  for(let i=0;i<n;i++){
+    prog&&prog(i+1,n);
+    const part=u.subarray(i*PART_SIZE,(i+1)*PART_SIZE);
+    const bl=await ghJson('POST','/git/blobs',{content:b64bytes(part),encoding:'base64'});
+    const path=`${PART_DIR}/${String(i).padStart(3,'0')}.bin`; paths.push(path);
+    entries.push({path,mode:'100644',type:'blob',sha:bl.sha});
+  }
+  oldParts.filter(x=>!paths.includes(x)).forEach(x=>entries.push({path:x,mode:'100644',type:'blob',sha:null}));
+  const manifest=JSON.stringify({app:'log-studio-sync',v:2,gz,parts:paths,bytes:u.length,textLength:txt.length,saved:new Date().toISOString()});
+  const mb=await ghJson('POST','/git/blobs',{content:b64utf8(manifest),encoding:'base64'});
+  entries.push({path:SYNC_PATH,mode:'100644',type:'blob',sha:mb.sha});
+  const tree=await ghJson('POST','/git/trees',{...(baseTree?{base_tree:baseTree}:{}),tree:entries});
   const commit=await ghJson('POST','/git/commits',{message,tree:tree.sha,parents:head?[head]:[]});
   if(head) await ghJson('PATCH','/git/refs/heads/'+encodeURIComponent(br),{sha:commit.sha});
   else await ghJson('POST','/git/refs',{ref:'refs/heads/'+br,sha:commit.sha});
-  return blob.sha;
+  return {sha:mb.sha,bytes:u.length};
+}
+async function pullText(prog){
+  const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.raw+json');
+  if(!r.ok){ let d=''; try{ d=(await r.clone().json()).message||''; }catch(e){} const e=new Error(d||('HTTP '+r.status)); e.status=r.status; throw e; }
+  const head=await r.text(); let man=null; try{ man=JSON.parse(head); }catch(e){}
+  if(!man||man.app!=='log-studio-sync') return head;   /* 예전 방식(파일 하나) */
+  const bufs=[]; let tot=0;
+  for(let i=0;i<man.parts.length;i++){
+    prog&&prog(i+1,man.parts.length);
+    const pr=await gh('GET',`https://api.github.com/repos/${SY.repo}/contents/${man.parts[i]}?t=${Date.now()}`,null,'application/vnd.github.raw+json');
+    if(!pr.ok){ const e=new Error('조각 '+(i+1)+'을 받지 못했어요'); e.status=pr.status; throw e; }
+    const u=new Uint8Array(await pr.arrayBuffer()); bufs.push(u); tot+=u.length;
+  }
+  const all=new Uint8Array(tot); let o=0; bufs.forEach(u=>{ all.set(u,o); o+=u.length; });
+  return await gunzipText(all,man.gz);
 }
 function errText(e){ const st=e&&e.status; const base=st?ghErr({status:st}):'인터넷 연결을 확인해 주세요'; return base+(e&&e.message?` · ${e.message}`:''); }
 async function syncUp(){
@@ -821,10 +854,10 @@ async function syncUp(){
     if(m&&SY.sha&&m.sha!==SY.sha&&!confirm('다른 기기에서 더 최근에 올린 백업이 있어요.\n지금 기기 내용으로 덮어쓸까요? (먼저 받아오기를 하는 게 안전해요)')) return;
     if(m&&!SY.sha&&!confirm('저장소에 이미 백업이 있어요. 이 기기 내용으로 덮어쓸까요?')) return;
     const txt=await backupText();
-    const sha=await pushFile(txt,`스튜디오 백업 ${new Date().toLocaleString('ko-KR')} (${/Mobi|Android|iPhone/i.test(navigator.userAgent)?'폰':'PC'})`);
-    SY.sha=sha; SY.upAt=Date.now(); saveSY(); paintSync();
+    const res=await pushFile(txt,`스튜디오 백업 ${new Date().toLocaleString('ko-KR')} (${/Mobi|Android|iPhone/i.test(navigator.userAgent)?'폰':'PC'})`,(i,n)=>{ btn.textContent=n>1?`올리는 중 ${i}/${n}…`:'올리는 중…'; });
+    SY.sha=res.sha; SY.upAt=Date.now(); saveSY(); paintSync();
     try{ localStorage.setItem('studio-home-lastBackup',String(Date.now())); }catch(e){} paintLast();
-    toastH(`올렸어요 (${fmtB(txt.length)})`);
+    toastH(`올렸어요 (${fmtB(txt.length)} → 압축 ${fmtB(res.bytes)})`);
   }catch(e){ const t=errText(e); syncMsg('올리기 실패: '+t); toastH('올리지 못했어요'); }
   finally{ btn.disabled=false; btn.textContent='☁ 올리기'; }
 }
@@ -832,8 +865,7 @@ async function syncDown(){
   const btn=$h('syncDown'); if(btn&&btn.disabled) return; if(btn){ btn.disabled=true; btn.textContent='받는 중…'; }
   try{
     const m=await remoteMeta(); if(!m){ toastH('저장소에 아직 올린 백업이 없어요'); return; }
-    const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.raw+json'); if(!r.ok){ let d=''; try{ d=(await r.clone().json()).message||''; }catch(e){} syncMsg(`받아오기 실패: [${r.status}] ${d}`); toastH(ghErr(r)); return; }
-    const txt=await r.text();
+    const txt=await pullText((i,n)=>{ if(btn) btn.textContent=n>1?`받는 중 ${i}/${n}…`:'받는 중…'; });
     if(await restore(txt)){ SY.sha=m.sha; SY.downAt=Date.now(); saveSY(); paintSync(); if($h('syncBanner')) $h('syncBanner').style.display='none'; setDot(false); }
   }catch(e){ syncMsg('받아오기 실패: '+errText(e)); toastH('받아오지 못했어요'); }
   finally{ if(btn){ btn.disabled=false; btn.textContent='☁ 받아오기'; } }

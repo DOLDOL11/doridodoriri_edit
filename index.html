@@ -397,6 +397,7 @@
           <a class="sc" data-ed="excerpt" data-grp="create" data-nm="발췌기 정리" href="excerpt.html"><svg viewBox="0 0 24 24"><path d="M17 6H3M21 12H8M21 18H8M3 12v6"/></svg><span>발췌기 정리</span></a>
           <a class="sc" data-ed="status" data-grp="create" data-nm="상태창 메이커" href="status.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18M9 21V9"/></svg><span>상태창</span></a>
           <a class="sc" data-ed="report" data-grp="create" data-nm="보고서 정리" href="report.html"><svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg><span>보고서</span></a>
+          <a class="sc" data-ed="logs" data-grp="archive" data-nm="로그 보관함" href="logs.html"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5M8 12h8M8 16h5"/></svg><span>로그 보관함</span></a>
           <a class="sc" data-ed="vault" data-grp="archive" data-nm="보관함" href="vault.html"><svg viewBox="0 0 24 24"><rect x="2.5" y="3.5" width="19" height="5" rx="1.2"/><path d="M4.5 8.5V19a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8.5M10 12.5h4"/></svg><span>보관함</span></a>
           <a class="sc" data-ed="collage" data-grp="tools" data-nm="콜라주 · 스티커" href="collage.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>콜라주</span></a>
           <a class="sc" data-ed="exif" data-grp="tools" data-nm="EXIF 제거기" href="exif.html"><svg viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21M22 21H7M5 11l9 9"/></svg><span>EXIF 제거</span></a>
@@ -431,7 +432,7 @@
         <input type="file" id="home-file" accept=".json,application/json" style="display:none">
       </div>
       <ul>
-        <li>말풍선·발췌기·보고서 작업 내용, 상태창 슬롯, 보관함(사진 포함), 홈 설정까지 파일 하나에 담겨요.</li>
+        <li>말풍선·발췌기·보고서 작업 내용, 상태창 슬롯, 보관함(사진 포함), 로그 보관함, 홈 설정까지 파일 하나에 담겨요.</li>
         <li>다른 기기에서 <b>불러오기</b>로 열면 스튜디오 전체가 그대로 옮겨져요.</li>
         <li>브라우저 기록을 지우면 내용이 사라질 수 있으니 가끔 받아두세요.</li>
       </ul>
@@ -481,7 +482,7 @@ function paintSide(){
     if(g==='archive'){ const vh=(its[0]||{getAttribute:()=>'vault.html'}).getAttribute('href').split('#')[0];
       const n=x=>x?`<span class="n">${x}</span>`:'';
       return `<div class="lbl">${l}</div>`+[['persona','캐릭터',V.personas.length],['pair','페어',V.pairs.length],['prompt','프롬프트',V.prompts.length]]
-        .map(([t,nm,c])=>`<a class="it" data-ed="vault" href="${vh}#tab=${t}">${nm}${n(c)}</a>`).join(''); }
+        .map(([t,nm,c])=>`<a class="it" data-ed="vault" href="${vh}#tab=${t}">${nm}${n(c)}</a>`).join('')+`<a class="it" data-ed="logs" href="logs.html">로그${n((json('logs-summary')||{}).c||0)}</a>`; }
     return `<div class="lbl">${l}</div>`+its.map(a=>{
       const n=a.dataset.ed==='vault'&&V.personas.length?`<span class="n">${V.personas.length}</span>`:'';
       return `<a class="it" data-ed="${a.dataset.ed}" href="${a.getAttribute('href')}">${esc(a.dataset.nm)}${n}</a>`;
@@ -651,7 +652,17 @@ async function vaultLoad(v){
     t.oncomplete=()=>{ d.close(); res(); }; t.onerror=()=>{ d.close(); rej(t.error); }; });
   try{ const dd=v&&v.data; localStorage.setItem('vault-summary',JSON.stringify({p:dd?(dd.personas||[]).length:0,q:dd?(dd.prompts||[]).length:0})); }catch(e){}
 }
-async function backupText(){ const data={}; studioKeys().forEach(k=>data[k]=get(k)); const vault=await vaultDump().catch(()=>null); return JSON.stringify({app:'log-studio-all', v:1, saved:new Date().toISOString(), data, vault}); }
+/* 로그 보관함 (큰 저장소) */
+function ldb(){ return new Promise(res=>{ if(!window.indexedDB){ res(null); return; } const r=indexedDB.open('studio-logs',1);
+  r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }); }
+async function logsDump(){ const d=await ldb(); if(!d) return null;
+  return new Promise(res=>{ const t=d.transaction('kv','readonly'); const g=t.objectStore('kv').get('state'); let v=null; g.onsuccess=()=>{ v=g.result||null; };
+    t.oncomplete=()=>{ d.close(); res(v); }; t.onerror=()=>{ d.close(); res(null); }; }); }
+async function logsLoad(v){ const d=await ldb(); if(!d) return;
+  await new Promise((res,rej)=>{ const t=d.transaction('kv','readwrite'); const kv=t.objectStore('kv'); if(v) kv.put(v,'state'); else kv.delete('state');
+    t.oncomplete=()=>{ d.close(); res(); }; t.onerror=()=>{ d.close(); rej(t.error); }; }); }
+async function backupText(){ const data={}; studioKeys().forEach(k=>data[k]=get(k)); const vault=await vaultDump().catch(()=>null); const logs=await logsDump().catch(()=>null); return JSON.stringify({app:'log-studio-all', v:1, saved:new Date().toISOString(), data, vault, logs}); }
 let undoSnap=null;
 async function restore(txt){
   let o; try{ o=JSON.parse(txt); }catch(e){ toastH('백업 파일을 읽지 못했어요'); return false; }
@@ -660,7 +671,7 @@ async function restore(txt){
   const when=o.saved?new Date(o.saved).toLocaleString('ko-KR'):'';
   if(!confirm(`${when?when+'에 만든 ':''}백업(${keys.length}개 항목)으로 바꿀까요?\n지금 스튜디오에 저장된 내용은 이 백업 내용으로 덮어써져요.`)) return false;
   const before={}; studioKeys().forEach(k=>before[k]=get(k));
-  const beforeVault=await vaultDump().catch(()=>null);
+  const beforeVault=await vaultDump().catch(()=>null); const beforeLogs=await logsDump().catch(()=>null);
   try{
     studioKeys().forEach(k=>localStorage.removeItem(k));
     keys.forEach(k=>{ if(typeof o.data[k]==='string') localStorage.setItem(k,o.data[k]); });
@@ -669,7 +680,8 @@ async function restore(txt){
     toastH('저장 공간이 부족해서 불러오지 못했어요'); return false;
   }
   if('vault' in o){ try{ await vaultLoad(o.vault); }catch(e){ toastH('보관함을 불러오지 못했어요'); } }
-  undoSnap={ls:before, vault:beforeVault, hadVault:('vault' in o)}; if($h('undo')) $h('undo').style.display='';
+  if('logs' in o){ try{ await logsLoad(o.logs); }catch(e){ toastH('로그 보관함을 불러오지 못했어요'); } }
+  undoSnap={ls:before, vault:beforeVault, hadVault:('vault' in o), logs:beforeLogs, hadLogs:('logs' in o)}; if($h('undo')) $h('undo').style.display='';
   refresh(); toastH('백업을 불러왔어요. 에디터를 새로 열면 백업 내용이 보여요'); return true;
 }
 function toastH(m){ const t=document.getElementById('toast'); if(!t){ alert(m); return; } t.textContent=m; t.classList.add('show'); clearTimeout(toastH.h); toastH.h=setTimeout(()=>t.classList.remove('show'),2400); }
@@ -693,7 +705,7 @@ if($h('copy')) $h('copy').onclick=async()=>{ const t=await backupText(); const t
 if($h('paste')) $h('paste').onclick=async()=>{ const t=$h('code').value.trim(); if(!t){ toastH('백업 코드를 먼저 붙여넣어 주세요'); return; } if(await restore(t)) $h('code').value=''; };
 if($h('undo')) $h('undo').onclick=async()=>{
   if(!undoSnap) return;
-  try{ studioKeys().forEach(k=>localStorage.removeItem(k)); Object.keys(undoSnap.ls).forEach(k=>localStorage.setItem(k,undoSnap.ls[k])); if(undoSnap.hadVault) await vaultLoad(undoSnap.vault); }catch(e){ toastH('되돌리지 못했어요'); return; }
+  try{ studioKeys().forEach(k=>localStorage.removeItem(k)); Object.keys(undoSnap.ls).forEach(k=>localStorage.setItem(k,undoSnap.ls[k])); if(undoSnap.hadVault) await vaultLoad(undoSnap.vault); if(undoSnap.hadLogs) await logsLoad(undoSnap.logs); }catch(e){ toastH('되돌리지 못했어요'); return; }
   undoSnap=null; $h('undo').style.display='none'; refresh(); toastH('불러오기 전으로 되돌렸어요');
 };
 function paintLast(){ const el=$h('last'); if(!el) return; const t=+get('studio-home-lastBackup'); el.textContent=t?`마지막 전체 백업: ${ago(t)}`:'아직 전체 백업을 받은 적이 없어요'; }

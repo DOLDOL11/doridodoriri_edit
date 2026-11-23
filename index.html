@@ -443,11 +443,11 @@
     <div class="set-row" id="home-openRow"><span class="lb">열기</span><div class="home-seg" id="home-open"></div></div>
     <div class="set-row sync-row" style="display:block" id="home-syncRow">
       <span class="lb">☁ GitHub 동기화</span>
+      <div class="sync-msg" id="home-syncMsg" style="display:none;margin-top:8px"></div>
       <div id="home-syncSetup" class="sync-setup">
         <p class="sync-d">내 GitHub <b>비공개 저장소</b>에 스튜디오 전체를 올리고, 다른 기기에서 받아와요. 열쇠(토큰)는 이 기기에만 저장되고 백업 파일에도 들어가지 않아요.</p>
         <input type="text" id="home-syncRepo" placeholder="저장소 이름 (예: log-studio-data)" autocomplete="off" spellcheck="false">
         <input type="password" id="home-syncTok" placeholder="토큰 (github_pat_...)" autocomplete="off">
-        <div class="sync-msg" id="home-syncMsg" style="display:none"></div>
         <div class="sync-btns"><button type="button" class="pill blue" id="home-syncConn">연결하기</button><button type="button" class="pill" id="home-syncHelp">토큰 만드는 법</button></div>
         <ol class="sync-help" id="home-syncHelpBox" style="display:none">
           <li>GitHub에서 <b>New repository</b> → 이름(예: log-studio-data) → <b>Private</b> 선택 → <b>Add a README</b> 체크 → 만들기</li>
@@ -763,7 +763,7 @@ async function gh(method,url,body,accept){
   const r=await fetch(url,{method,headers:{'Authorization':'Bearer '+SY.token,'Accept':accept||'application/vnd.github+json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});
   return r;
 }
-function ghErr(r){ return r.status===401?'토큰이 맞지 않거나 만료됐어요':r.status===403?'토큰에 Contents 쓰기 권한이 없어요':r.status===404?'저장소를 찾지 못했어요. 이름과 토큰의 저장소 선택을 확인해 주세요':r.status===409?'저장소가 비어 있어요. README를 하나 만들어 주세요':r.status===422?'올리는 중 충돌이 났어요. 다시 시도해 주세요':`GitHub 오류 (${r.status})`; }
+function ghErr(r){ return r.status===401?'토큰이 맞지 않거나 만료됐어요':r.status===403?'토큰에 Contents 쓰기 권한이 없어요':r.status===404?'저장소를 찾지 못했어요. 이름과 토큰의 저장소 선택을 확인해 주세요':r.status===409?'저장소가 비어 있어요. README를 하나 만들어 주세요':r.status===422?'GitHub가 요청을 거절했어요':`GitHub 오류 (${r.status})`; }
 function b64utf8(str){ const u=new TextEncoder().encode(str); let s=''; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000)); return btoa(s); }
 async function remoteMeta(){ const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.object'); if(r.status===404) return null; if(!r.ok) throw r; const j=await r.json(); return {sha:j.sha,size:j.size}; }
 function paintSync(){
@@ -799,30 +799,43 @@ async function syncConnect(){ syncMsg('');
     toastH(m?'연결됐어요. 저장소에 백업이 있어요. 받아오기를 눌러 보세요':'연결됐어요. 올리기를 눌러 첫 백업을 올려 보세요');
   }catch(e){ SY={}; syncMsg('네트워크 오류: '+(e&&e.message||e)); toastH('GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요'); }
 }
+/* 큰 백업도 올라가도록 Git 데이터 API로 커밋한다 (blob → tree → commit → ref) */
+async function ghJson(method,path,body){ const r=await gh(method,'https://api.github.com/repos/'+SY.repo+path,body); let j=null; try{ j=await r.json(); }catch(e){} if(!r.ok){ const err=new Error((j&&j.message)||('HTTP '+r.status)); err.status=r.status; throw err; } return j; }
+async function pushFile(txt,message){
+  const repo=await ghJson('GET',''); const br=repo.default_branch||'main';
+  let head=null, baseTree=null;
+  try{ const ref=await ghJson('GET','/git/ref/heads/'+encodeURIComponent(br)); head=ref.object.sha; const cm=await ghJson('GET','/git/commits/'+head); baseTree=cm.tree.sha; }
+  catch(e){ if(e.status!==404&&e.status!==409) throw e; }
+  const blob=await ghJson('POST','/git/blobs',{content:b64utf8(txt),encoding:'base64'});
+  const tree=await ghJson('POST','/git/trees',{...(baseTree?{base_tree:baseTree}:{}),tree:[{path:SYNC_PATH,mode:'100644',type:'blob',sha:blob.sha}]});
+  const commit=await ghJson('POST','/git/commits',{message,tree:tree.sha,parents:head?[head]:[]});
+  if(head) await ghJson('PATCH','/git/refs/heads/'+encodeURIComponent(br),{sha:commit.sha});
+  else await ghJson('POST','/git/refs',{ref:'refs/heads/'+br,sha:commit.sha});
+  return blob.sha;
+}
+function errText(e){ const st=e&&e.status; const base=st?ghErr({status:st}):'인터넷 연결을 확인해 주세요'; return base+(e&&e.message?` · ${e.message}`:''); }
 async function syncUp(){
-  const btn=$h('syncUp'); if(btn.disabled) return; btn.disabled=true; btn.textContent='올리는 중…';
+  const btn=$h('syncUp'); if(btn.disabled) return; btn.disabled=true; btn.textContent='올리는 중…'; syncMsg('');
   try{
     const m=await remoteMeta();
     if(m&&SY.sha&&m.sha!==SY.sha&&!confirm('다른 기기에서 더 최근에 올린 백업이 있어요.\n지금 기기 내용으로 덮어쓸까요? (먼저 받아오기를 하는 게 안전해요)')) return;
     if(m&&!SY.sha&&!confirm('저장소에 이미 백업이 있어요. 이 기기 내용으로 덮어쓸까요?')) return;
     const txt=await backupText();
-    const d=new Date();
-    const r=await gh('PUT',ghUrl(),{message:`스튜디오 백업 ${d.toLocaleString('ko-KR')} (${/Mobi|Android|iPhone/i.test(navigator.userAgent)?'폰':'PC'})`,content:b64utf8(txt),...(m?{sha:m.sha}:{})});
-    if(!r.ok){ toastH(ghErr(r)); return; }
-    const j=await r.json(); SY.sha=j.content&&j.content.sha; SY.upAt=Date.now(); saveSY(); paintSync();
+    const sha=await pushFile(txt,`스튜디오 백업 ${new Date().toLocaleString('ko-KR')} (${/Mobi|Android|iPhone/i.test(navigator.userAgent)?'폰':'PC'})`);
+    SY.sha=sha; SY.upAt=Date.now(); saveSY(); paintSync();
     try{ localStorage.setItem('studio-home-lastBackup',String(Date.now())); }catch(e){} paintLast();
     toastH(`올렸어요 (${fmtB(txt.length)})`);
-  }catch(e){ toastH(e&&e.status?ghErr(e):'올리지 못했어요. 인터넷 연결을 확인해 주세요'); }
+  }catch(e){ const t=errText(e); syncMsg('올리기 실패: '+t); toastH('올리지 못했어요'); }
   finally{ btn.disabled=false; btn.textContent='☁ 올리기'; }
 }
 async function syncDown(){
   const btn=$h('syncDown'); if(btn&&btn.disabled) return; if(btn){ btn.disabled=true; btn.textContent='받는 중…'; }
   try{
     const m=await remoteMeta(); if(!m){ toastH('저장소에 아직 올린 백업이 없어요'); return; }
-    const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.raw+json'); if(!r.ok){ toastH(ghErr(r)); return; }
+    const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.raw+json'); if(!r.ok){ let d=''; try{ d=(await r.clone().json()).message||''; }catch(e){} syncMsg(`받아오기 실패: [${r.status}] ${d}`); toastH(ghErr(r)); return; }
     const txt=await r.text();
     if(await restore(txt)){ SY.sha=m.sha; SY.downAt=Date.now(); saveSY(); paintSync(); if($h('syncBanner')) $h('syncBanner').style.display='none'; setDot(false); }
-  }catch(e){ toastH(e&&e.status?ghErr(e):'받아오지 못했어요. 인터넷 연결을 확인해 주세요'); }
+  }catch(e){ syncMsg('받아오기 실패: '+errText(e)); toastH('받아오지 못했어요'); }
   finally{ if(btn){ btn.disabled=false; btn.textContent='☁ 받아오기'; } }
 }
 function setDot(on){ const d=$h('cdot'); if(d) d.style.display=on?'block':'none'; }

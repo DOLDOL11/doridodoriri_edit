@@ -241,6 +241,8 @@
   .lk-sf span:first-child{white-space:nowrap}
   .lk-sf button{white-space:nowrap}
   @media (max-width:860px){ .lk-comp textarea{min-height:64px} .lk-comp .cm{margin-bottom:6px} }
+  .lk-site{width:100%;border-radius:12px;font-size:12.5px;padding:8px 10px;color:#3f80ba;background:#f4f8fc;border:1px dashed #bcd8f2}
+  .lk-site:hover{background:#e7f1fb}
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -283,6 +285,7 @@
     <div class="lk-sh">
       <div class="row"><button type="button" class="primary" id="lk-newChat">＋ 새 채팅 만들기</button><button type="button" class="ib" id="lk-newFolder" title="새 폴더">📁</button></div>
       <input type="search" id="lk-q" placeholder="채팅 제목 검색">
+      <button type="button" id="lk-site" class="lk-site">🔗 사이트에서 바로 가져오기</button>
     </div>
     <div class="lk-list" id="lk-list"></div>
     <div class="lk-sf"><span>이 브라우저에만 저장</span><span class="sp"></span><button type="button" id="lk-export" title="로그 보관함 백업 파일 저장">백업</button><button type="button" id="lk-import" title="백업 파일 불러오기">불러오기</button><input type="file" id="lk-file" accept=".json,application/json" style="display:none"></div>
@@ -322,6 +325,17 @@ const chat=()=>S.chats.find(c=>c.id===UI.active)||null;
 
 /* ---------- 로그 나누기 · 해석 ---------- */
 function turnNoOf(raw){ const m=String(raw).match(/(\d+)\s*턴/); return m?parseInt(m[1],10):null; }
+/* 겹치는 턴 찾기: 공백 · 턴 번호 · 이미지 주소 차이는 무시하고 비교 */
+function norm(raw){ return String(raw||'').replace(/https?:\/\/\S+/g,'').replace(/[\[#(]*\s*\d+\s*턴\s*[\])]*/g,'').replace(/[​-‍﻿]/g,'').replace(/\s+/g,'').slice(0,4000); }
+/* 들어온 턴들 중 이미 있는 마지막 턴의 '바로 다음'부터만 골라낸다 */
+function newPart(c,parts){
+  const have=(c.turns||[]).map(t=>norm(t.raw)); if(!have.length) return {fresh:parts,skip:0,found:false};
+  const inc=parts.map(norm); const set=new Set(have);
+  for(let j=have.length-1;j>=0;j--){ const k=inc.lastIndexOf(have[j]); if(k>=0){ const rest=parts.slice(k+1).filter((p,i)=>!set.has(inc[k+1+i])); return {fresh:rest,skip:parts.length-rest.length,found:true}; } }
+  return {fresh:parts.filter((p,i)=>!set.has(inc[i])),skip:parts.filter((p,i)=>set.has(inc[i])).length,found:false};
+}
+function lastNo(c){ const ts=c.turns||[]; if(!ts.length) return -1; const t=ts[ts.length-1]; const n=effNo(c,t,ts.length-1); return isNaN(+n)?ts.length-1:+n; }
+function overlap(c,parts){ const have=new Set((c.turns||[]).map(t=>norm(t.raw))); let n=0; parts.forEach(p=>{ if(have.has(norm(p))) n++; }); return n; }
 function guardDetails(text,fn){ const g=[]; const t=text.replace(/<details[\s\S]*?<\/details>|```[\s\S]*?```|\[\[(HTML|JSX)\]\][\s\S]*?\[\[\/\1\]\]/gi,m=>{ g.push(m); return '\u0000'+(g.length-1)+'\u0000'; }); return fn(t).map(p=>p.replace(/\u0000(\d+)\u0000/g,(m,i)=>g[+i])); }
 function splitBulk(text){
   text=String(text).replace(/\r\n/g,'\n');
@@ -485,11 +499,14 @@ function open(id){ UI.active=id; saveUI(); renderAll(); const s=$('scroll'); if(
 function addTurns(){
   const c=chat(); if(!c) return; const raw=$('in').value.replace(/\r\n/g,'\n').trim(); if(!raw){ $('in').focus(); return; }
   let n=0;
+  let skip=0;
   if(UI.mode==='bulk'){
-    const parts=splitBulk(raw); const base=UI.zero?(c.turns||[]).length:null;
+    const all=splitBulk(raw); const r=newPart(c,all); const parts=r.fresh; skip=r.skip;
+    const base=UI.zero?lastNo(c)+1:null;
     parts.forEach((p,i)=>{ c.turns.push(UI.zero?{id:uid(),raw:p,createdAt:now(),turnNo:base+i,turnNoManual:true}:{id:uid(),raw:p,createdAt:now(),turnNo:turnNoOf(p)}); n++; });
+    if(!n){ $('in').value=''; toast('이미 다 있는 턴이에요. 새로 붙일 게 없어요'); return; }
   } else { c.turns.push({id:uid(),raw,createdAt:now(),turnNo:turnNoOf(raw)}); n=1; }
-  c.updatedAt=now(); save(); $('in').value=''; renderAll(); const s=$('scroll'); if(s) s.scrollTop=s.scrollHeight; toast(n>1?`${n}개 턴을 추가했어요`:'턴을 추가했어요');
+  c.updatedAt=now(); save(); $('in').value=''; renderAll(); const s=$('scroll'); if(s) s.scrollTop=s.scrollHeight; toast((n>1?`${n}개 턴을 추가했어요`:'턴을 추가했어요')+(skip?` (이미 있던 ${skip}개는 건너뜀)`:''));
 }
 function turnAction(c,t,a){
   const i=c.turns.indexOf(t);
@@ -594,6 +611,82 @@ $('file').onchange=()=>{ const f=$('file').files[0]; $('file').value=''; if(!f) 
   $('mrep').onclick=()=>confirmModal('지금 보관함을 전부 바꿀까요?','지금 있는 채팅은 사라지고 백업 내용으로 바뀌어요.','바꾸기',()=>{ S={v:1,chats:d.chats,folders:d.folders||[]}; UI.active=S.chats[0]?S.chats[0].id:null; saveUI(); save(); renderAll(); toast('백업으로 바꿨어요'); });
 }; r.readAsText(f); };
 
+/* ---------- 사이트에서 바로 가져오기 (북마클릿 → ?lkimport=1) ---------- */
+const SITE_RE=/^https:\/\/([a-z0-9-]+\.)*(caveduck\.io|teapotchat\.com|fairytale\.ai\.kr|wrtn\.ai|rofan\.ai)$/i;
+const SITE_ORIGINS=['https://crack.wrtn.ai','https://wrtn.ai','https://www.wrtn.ai','https://caveduck.io','https://www.caveduck.io','https://teapotchat.com','https://www.teapotchat.com','https://fairytale.ai.kr','https://www.fairytale.ai.kr','https://rofan.ai','https://www.rofan.ai'];
+let LOADED=false;
+function importFromSite(p){
+  const text=String(p.text||'').replace(/\r\n/g,'\n').trim(); if(!text) return 0;
+  const pid=String(p.id||''); const site=pid.startsWith('cr')?'크랙':pid.startsWith('rf')?'로판':pid.startsWith('tp')?'티팟':'케이브덕';
+  const title=String(p.title||'').trim()||site+' 로그';
+  const parts=p.mode==='bulk'?splitBulk(text):[text];
+  /* 이미 받아둔 같은 채팅이 있으면 이어 붙이기 */
+  let best=null, bs=0;
+  S.chats.forEach(c=>{ const o=overlap(c,parts); const sc=o*2+(c.title===title?1:0); if(o>0&&sc>bs){ best=c; bs=sc; } });
+  if(best){
+    const r=newPart(best,parts); const base=lastNo(best)+1;
+    r.fresh.forEach((raw,i)=>best.turns.push({id:uid(),raw,createdAt:now(),turnNo:base+i,turnNoManual:true}));
+    if(r.fresh.length) best.updatedAt=now();
+    UI.active=best.id; saveUI(); clearTimeout(_st); doSave(); renderAll();
+    const sc=$('scroll'); if(sc) sc.scrollTop=sc.scrollHeight;
+    afterAppend(best,r.fresh.length,r.skip,parts,site,title,p.emoji);
+    return r.fresh.length;
+  }
+  return newChatFrom(parts,site,title,p.emoji,p.mode==='bulk');
+}
+function newChatFrom(parts,site,title,emoji,bulk){
+  const c={id:uid(),title,emoji:String(emoji||'').trim()||({'크랙':'🍪','로판':'🌹','티팟':'🫖'}[site]||'🦆'),createdAt:now(),updatedAt:now(),turns:[]};
+  parts.forEach((r,i)=>c.turns.push({id:uid(),raw:r,createdAt:now(),turnNo:bulk?i:turnNoOf(r),turnNoManual:!!bulk}));
+  S.chats.push(c); UI.active=c.id; saveUI(); clearTimeout(_st); doSave(); renderAll(); const sc=$('scroll'); if(sc) sc.scrollTop=0;
+  toast(`${site}에서 ${c.turns.length}개 턴을 받아 '${c.title}'에 담았어요`);
+  return c.turns.length;
+}
+function afterAppend(c,added,skip,parts,site,title,emoji){
+  modal(`<h3>${added?'🍪 새 턴만 이어 붙였어요':'새로운 턴이 없어요'}</h3>
+    <p class="desc">'${esc(c.title)}'에 이미 있던 로그와 비교했어요.<br>${added?`마지막으로 받은 턴 <b>바로 다음부터 ${added}개</b>를 붙였어요.`:'보관함에 이미 마지막 턴까지 다 있어요.'}${skip?` (겹친 턴 ${skip}개는 건너뛰었어요)`:''}</p>
+    <div class="ft">${added?'<button type="button" id="lk-mundo">따로 새 채팅으로 만들기</button>':''}<span class="sp"></span><button type="button" class="primary" id="lk-mc">확인</button></div>`);
+  $('mc').onclick=closeModal;
+  if(added) $('mundo').onclick=()=>{ c.turns.splice(c.turns.length-added,added); save(); closeModal(); newChatFrom(parts,site,title,emoji,true); };
+}
+if(new URLSearchParams(location.search).get('lkimport')==='1'){
+  const done={};
+  window.addEventListener('message',ev=>{
+    if(!SITE_RE.test(ev.origin)) return; const d=ev.data; if(!d||typeof d!=='object'||d.type!=='lk-import') return;
+    const reply=n=>{ try{ ev.source.postMessage({type:'lk-imported',id:d.id,count:n},ev.origin); }catch(e){} };
+    if(done[d.id]!=null){ reply(done[d.id]); return; }
+    done[d.id]=0;
+    const go=()=>{ if(!LOADED){ setTimeout(go,60); return; } let n=0; try{ n=importFromSite(d); }catch(e){ console.warn(e); } done[d.id]=n; reply(n); };
+    go();
+  });
+  let k=0; const hello=()=>{ if(window.opener) SITE_ORIGINS.forEach(o=>{ try{ window.opener.postMessage({type:'lk-ready'},o); }catch(e){} }); };
+  const iv=setInterval(()=>{ if(LOADED) hello(); if(++k>24) clearInterval(iv); },500);
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+}
+/* 기존 로그 추출 북마클릿을 이 보관함으로 보내도록 바꿔 주기 */
+function siteModal(){
+  const here=location.origin+location.pathname;
+  modal(`<h3>🔗 사이트에서 바로 가져오기</h3>
+    <p class="desc">크랙 · 케이브덕 · 티팟 · 로판에서 쓰던 <b>로그 추출 즐겨찾기(북마클릿)</b>를 이 보관함으로 보내도록 바꿔 드려요.<br>예전 로그보관함의 로그 추출 메뉴에서 북마클릿 코드를 복사해 아래에 붙여넣으세요.</p>
+    <div class="f"><textarea id="lk-bmIn" style="min-height:120px;font:12px/1.5 ui-monospace,monospace" placeholder="javascript:(async()=>{ ... })()"></textarea></div>
+    <div class="f" id="lk-bmOut" style="display:none"></div>
+    <p class="desc" style="margin-top:10px">보낼 주소: <code style="font-size:11.5px">${esc(here)}</code></p>
+    <div class="ft"><span class="sp"></span><button type="button" id="lk-mc">닫기</button><button type="button" class="primary" id="lk-bmGo">바꾸기</button></div>`);
+  $('mc').onclick=closeModal;
+  $('bmGo').onclick=()=>{
+    let code=$('bmIn').value.trim(); if(!code){ toast('북마클릿 코드를 붙여넣어 주세요'); return; }
+    if(!/^javascript:/i.test(code)){ toast('javascript: 로 시작하는 북마클릿 코드가 아니에요'); return; }
+    const m=code.match(/"(https:\/\/[a-z0-9.-]+)"\s*,\s*([a-zA-Z_$][\w$]*)\s*=\s*[a-zA-Z_$][\w$]*\s*\+\s*"(\/[^"]*\?lkimport=1)"/);
+    if(!m){ toast('보내는 주소를 찾지 못했어요. 로그 추출 북마클릿이 맞는지 확인해 주세요'); return; }
+    const out=code.split('"'+m[1]+'"').join('"'+location.origin+'"').split('"'+m[3]+'"').join('"'+location.pathname+'?lkimport=1"');
+    const site=/cr-ov|크랙/.test(out)?'🍪 크랙':/rf-ov|로판/.test(out)?'🌹 로판':/tp-ov|티팟/.test(out)?'🫖 티팟':/케이브덕|cd-/.test(out)?'🦆 케이브덕':'로그';
+    const box=$('bmOut'); box.style.display='';
+    box.innerHTML=`<label>바뀐 즐겨찾기</label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><a id="lk-bmLink" draggable="true" style="display:inline-block;padding:9px 16px;border-radius:999px;background:#e7f1fb;color:#2f5f96;font-weight:700;text-decoration:none;cursor:grab">${esc(site)} → Log Studio</a><button type="button" id="lk-bmCopy">코드 복사</button></div>
+      <p class="desc" style="margin:10px 0 0">위 버튼을 <b>브라우저 즐겨찾기 막대로 끌어다 놓거나</b>, 코드를 복사해 새 즐겨찾기의 주소(URL) 칸에 붙여넣으세요.<br>그다음 ${esc(site.slice(2))} 채팅방에서 즐겨찾기를 누르고, 추출 창의 <b>보관함으로 보내기</b>를 누르면 이 보관함에 새 채팅으로 담겨요.</p>`;
+    $('bmLink').setAttribute('href',out); $('bmLink').onclick=e=>{ e.preventDefault(); toast('클릭 말고 즐겨찾기 막대로 끌어다 놓아 주세요'); };
+    $('bmCopy').onclick=()=>copyText(out,'바뀐 북마클릿 코드를 복사했어요');
+  };
+}
+
 /* ---------- 시작 ---------- */
 $('newChat').onclick=()=>chatModal(null);
 $('newFolder').onclick=()=>folderModal(null);
@@ -602,8 +695,10 @@ $('q').oninput=()=>{ UI.q=$('q').value; renderSide(); };
   await load();
   if(!chat()) UI.active=S.chats[0]?S.chats[0].id:null;
   const hm=(location.hash||'').match(/^#c=([\w-]+)$/); if(hm&&S.chats.some(c=>c.id===hm[1])) UI.active=hm[1];
+  LOADED=true;
   renderAll();
 })();
+$('site').onclick=siteModal;
 })();
 </script>
 </body>

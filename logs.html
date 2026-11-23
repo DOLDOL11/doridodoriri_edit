@@ -265,6 +265,16 @@
   .st{margin:8px 0}
   .st .sb{font-size:12.5px}
   @media (max-width:860px){ .tn-body{font-size:13.5px} .st-inline img{max-height:280px} }
+  .nm-tag{font-weight:700;color:#3f5f86}
+  .nm-bar{color:#c3ccd6}
+  .tn-user .dlg{color:var(--udlg,#2d3440)!important;font-weight:500}
+  .tn-user .nar{color:#9aa3ae!important}
+  .nc-list{display:flex;flex-wrap:wrap;gap:8px}
+  .nc{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:1px solid #e4ebf2;border-radius:999px;font-size:13px;font-weight:600;color:#3a4450;cursor:pointer}
+  .nc input[type=color]{width:26px;height:26px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+  .nc input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  .nc input[type=color]::-webkit-color-swatch{border:0;border-radius:50%}
+  .nc small{font-size:10.5px;color:#a3b0bd;font-weight:500}
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -423,36 +433,42 @@ function textBlocks(t,blocks){
   });
   flush();
 }
-function inline(line){
+/* 이름표: "성준언 | "대사"" 처럼 줄 앞의 이름 */
+const NAME_RE=/^([^\s|:："'“”「『*\[\]()0-9][^|:："'“”「『*\[\]()]{0,14}?)\s*\|\s*/;
+let NC={};  /* 지금 채팅의 인물 색 */
+function nameTag(line){ const m=line.match(NAME_RE); if(!m) return null; const nm=m[1].trim(); if(!nm||nm.length>15) return null; const col=NC[nm]; return {html:`<span class="nm-tag"${col?` style="color:${esc(col)}"`:''}>${esc(nm)}</span><span class="nm-bar"> | </span>`, rest:line.slice(m[0].length)}; }
+function inline(line,isUser){
   const qre=/(["“][^"”]*["”]|「[^」]*」|『[^』]*』)/g;
+  if(isUser&&!qre.test(line)) return `<span class="dlg">${esc(line)}</span>`; /* 유저: 별표 밖 = 대사 */
+  qre.lastIndex=0;
   if(qre.test(line)){ return line.split(qre).map((seg,i)=>i%2?`<span class="dlg">${esc(seg)}</span>`:(seg.trim()?`<span class="nar">${esc(seg)}</span>`:esc(seg))).join(''); }
   return `<span class="nar">${esc(line)}</span>`;
 }
 /* *별표* 서술이 여러 줄에 걸쳐 있어도 한 덩어리로 보고, 그 안의 줄바꿈은 이어 붙인다 */
-function prose(text){
+function prose(text,isUser){
   const hasStar=/\*[^*]+\*/.test(text);
   const isMsg=l=>/^\[[\s\S]*\]$/.test(l);
   let html='';
+  const lineOut=(segs)=>{ /* segs: [{n:서술여부, t}] */
+    const raw=segs.map(x=>x.t).join('').trim(); if(!raw) return '';
+    let pre=''; if(segs.length&&!segs[0].n){ const tg=nameTag(segs[0].t.replace(/^\s+/,'')); if(tg){ pre=tg.html; segs=[{n:false,t:tg.rest},...segs.slice(1)]; } }
+    return `<p>${pre}${segs.map(x=>x.n?`<span class="nar">${esc(x.t)}</span>`:(x.t.trim()?inline(x.t,isUser):esc(x.t))).join('')}</p>`;
+  };
   if(hasStar){
-    /* 별표 기준으로 서술/대사 조각을 먼저 나누고, 조각을 줄 단위로 내보낸다 */
     const toks=[]; let i=0, inN=false, buf='';
     while(i<text.length){ const ch=text[i]; if(ch==='*'){ const close=inN?true:text.indexOf('*',i+1)>i; if(close){ toks.push({n:inN,t:buf}); buf=''; inN=!inN; i++; continue; } } buf+=ch; i++; }
     toks.push({n:inN,t:buf});
-    /* 줄 만들기: 서술 조각 안의 줄바꿈은 공백으로, 바깥의 줄바꿈은 줄 나눔 */
-    let lines=[[]];
-    toks.forEach(tk=>{
-      const t=tk.n?tk.t.replace(/\s*\n+\s*/g,' '):tk.t;
-      const parts=t.split('\n');
-      parts.forEach((pt,k)=>{ if(k>0) lines.push([]); if(pt) lines[lines.length-1].push({n:tk.n,t:pt}); });
-    });
-    lines.forEach(ln=>{ const raw=ln.map(x=>x.t).join('').trim(); if(!raw) return;
-      html+=`<p>${ln.map(x=>x.n?`<span class="nar">${esc(x.t)}</span>`:(x.t.trim()?inline(x.t):esc(x.t))).join('')}</p>`; });
+    const lines=[[]];
+    toks.forEach(tk=>{ const t=tk.n?tk.t.replace(/\s*\n+\s*/g,' '):tk.t; t.split('\n').forEach((pt,k)=>{ if(k>0) lines.push([]); if(pt) lines[lines.length-1].push({n:tk.n,t:pt}); }); });
+    lines.forEach(ln=>{ html+=lineOut(ln); });
     return html;
   }
   const lines=text.split('\n');
-  lines.forEach((l,i)=>{ const s=l.trim(); if(!s) return; const nx=(lines[i+1]||'').trim(); html+=`<p${isMsg(s)&&isMsg(nx)?' class="tight"':''}>${inline(s)}</p>`; });
+  lines.forEach((l,i)=>{ const s=l.trim(); if(!s) return; const nx=(lines[i+1]||'').trim(); const o=lineOut([{n:false,t:s}]); html+=isMsg(s)&&isMsg(nx)?o.replace('<p>','<p class="tight">'):o; });
   return html;
 }
+/* 인물 이름 모으기 (색 지정용) */
+function speakers(c){ const cnt={}; (c.turns||[]).forEach(t=>{ String(t.raw).split('\n').forEach(l=>{ const s=l.replace(/^\s*\*?/,'').trim(); if(isStatusStart(s)) return; const m=s.match(NAME_RE); if(m&&/["“「『']/.test(s.slice(m[0].length,m[0].length+3))){ const n=m[1].trim(); cnt[n]=(cnt[n]||0)+1; } }); }); return Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,16); }
 /* 상태창 시작 줄(T: 18 | 서울 | 38.01.03 … 같은) 찾기 */
 const isStatusStart=l=>{ const s=String(l).trim(); return /^T\s*[:：]\s*\d+\s*\|/.test(s) || ((s.match(/\|/g)||[]).length>=3 && /\d{1,2}[.:]\d{2}/.test(s) && s.length<160); };
 function splitStatus(text){ const ls=text.split('\n'); const k=ls.findIndex(isStatusStart); if(k<=0&&k!==0) return null; return {body:ls.slice(0,k).join('\n'), tail:ls.slice(k).join('\n')}; }
@@ -462,7 +478,7 @@ function renderBlocks(blocks){
   return blocks.map(b=>{
     if(b.k==='prose'){ const sp=splitStatus(b.text); if(sp) return prose(sp.body)+`<div class="st-tail">${statusProse(sp.tail)}</div>`; return prose(b.text); }
     if(b.k==='user'&&isCmd(b.text)) return ''; /* /자동진행 같은 단축어는 보이지 않게 */
-    if(b.k==='user') return `<div class="tn-user"><div class="who">USER</div>${prose(b.text)}</div>`;
+    if(b.k==='user') return `<div class="tn-user"><div class="who">USER</div>${prose(b.text,true)}</div>`;
     if(b.k==='status') return `<details class="st" open><summary>${esc(b.title)}</summary><div class="sb">${b.items.map(it=>it.t==='kv'?`<div class="kv"><b>${esc(it.k)}</b><span>${esc(it.v)}</span></div>`:it.t==='li'?`<div class="li">${esc(it.v)}</div>`:it.t==='sec'?`<div class="sec">${esc(it.v)}</div>`:`<div class="pl">${esc(it.v)}</div>`).join('')}</div></details>`;
     if(b.k==='html'&&!/<script|<style|<html|<body/i.test(b.src)) return `<div class="st-inline">${sanitize(b.src)}</div>`;
     if(b.k==='html'){ const id='f'+(++frameN); return `<div class="st-html"><iframe sandbox="allow-scripts" scrolling="no" data-fid="${id}" loading="lazy" srcdoc="${esc(frameDoc(b.src,id))}"></iframe></div>`; }
@@ -524,7 +540,8 @@ function renderMain(keepScroll){
     $('menu').onclick=openSide; return; }
   const sc=keepScroll?$('scroll')&&$('scroll').scrollTop:null;
   const turns=c.turns||[];
-  const style=(c.dialogueColor?`--dlg:${c.dialogueColor};`:'');
+  NC=c.nameColors||{};
+  const style=(c.dialogueColor?`--dlg:${c.dialogueColor};`:'')+(c.userColor?`--udlg:${c.userColor};`:'');
   M.innerHTML=`<div class="lk-head"><button type="button" class="menu" id="lk-menu" title="채팅 목록">☰</button>
       <div class="tt" id="lk-title" title="채팅 정보 바꾸기"><b>${esc((c.emoji||'💬')+' '+(c.title||'제목 없음'))}</b><small>${turns.length}턴 · ${ymd(c.updatedAt||c.createdAt||now())} 수정</small></div>
       <div class="acts"><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
@@ -614,17 +631,22 @@ function chatModal(c0){
     <div class="f two"><div><label>이모지</label><input type="text" id="lk-me" value="${esc(c.emoji||'')}" maxlength="4"></div><div><label>제목</label><input type="text" id="lk-mt" value="${esc(c.title||'')}" placeholder="예: 백청남고 · 성요한"></div></div>
     <div class="f"><label>폴더</label><select id="lk-mf"><option value="">폴더 없음</option>${S.folders.map(f=>`<option value="${f.id}" ${f.id===c.folderId?'selected':''}>${esc((f.emoji?f.emoji+' ':'')+f.name)}</option>`).join('')}</select></div>
     ${isNew?'':`<div class="f"><label>대사 색</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="lk-mcol" value="${esc(c.dialogueColor||'#1f3f7a')}" style="width:46px;height:34px;padding:2px"><button type="button" id="lk-mcr" style="font-size:12px">기본으로</button><span style="font-size:12px;color:#8a97a4">따옴표 대사 · * 밖의 글자 색이에요</span></div></div>`}
+    ${isNew?'':`<div class="f"><label>인물 이름 색</label><div class="nc-list" id="lk-ncl">${(()=>{ const ns=speakers(c); const nc=c.nameColors||{}; return (ns.length?ns.map(n=>`<label class="nc"><input type="color" data-nm="${esc(n)}" value="${esc(nc[n]||'#3f5f86')}"><span>${esc(n)}</span>${nc[n]?'':'<small>기본</small>'}</label>`).join(''):'<span class="desc" style="margin:0">로그에서 "이름 | 대사" 줄을 찾지 못했어요.</span>'); })()}</div></div>
+    <div class="f"><label>유저 대사 색</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="lk-mucol" value="${esc(c.userColor||'#2d3440')}" style="width:46px;height:34px;padding:2px"><button type="button" id="lk-mucr" style="font-size:12px">기본으로</button><span style="font-size:12px;color:#8a97a4">*별표* 행동·생각 지문은 흐리게, 나머지는 이 색으로 나와요</span></div></div>`}
     ${isNew?'':`<div class="f"><label>끊긴 턴 정리</label><button type="button" id="lk-mfix" style="font-size:12.5px">↥ 끊겨서 넘어간 턴을 앞 턴에 합치기</button><p class="desc" style="margin:6px 0 0">상태창이 길어서 다음 메시지로 넘어가 따로 나뉜 턴을 한 번에 붙여요. *서술*이나 "대사"로 시작하는 턴(자동진행 등)은 그대로 둬요.</p></div>`}
     <div class="ft"><span class="sp"></span><button type="button" id="lk-mc">취소</button><button type="button" class="primary" id="lk-mo">${isNew?'만들기':'저장'}</button></div>`);
   let col=c.dialogueColor||'';
   if(!isNew) $('mfix').onclick=()=>{ const ts=c0.turns||[]; if(!ts.some(t=>hasUser(t.raw))){ toast('[유저] 표시가 있는 로그에서만 쓸 수 있어요'); return; }
     const before=ts.length; const out=[]; ts.forEach(t=>{ if(out.length&&isCont(t.raw)){ const pv=out[out.length-1]; pv.raw=joinCont(pv.raw,t.raw); } else out.push(t); });
     c0.turns=out; c0.updatedAt=now(); save(); closeModal(); renderAll(true); toast(before-out.length?`끊긴 턴 ${before-out.length}개를 앞 턴에 합쳤어요`:'합칠 턴이 없어요'); };
+  let ucol=c.userColor||''; const NCx=Object.assign({},c.nameColors||{});
+  if(!isNew){ $('mucol').oninput=()=>{ ucol=$('mucol').value; }; $('mucr').onclick=()=>{ ucol=''; $('mucol').value='#2d3440'; toast('저장하면 기본 색으로 돌아가요'); };
+    $('ncl').querySelectorAll('input[type=color]').forEach(inp=>inp.oninput=()=>{ NCx[inp.dataset.nm]=inp.value; const sm=inp.parentNode.querySelector('small'); if(sm) sm.remove(); }); }
   if(!isNew){ $('mcol').oninput=()=>{ col=$('mcol').value; }; $('mcr').onclick=()=>{ col=''; $('mcol').value='#1f3f7a'; toast('저장하면 기본 색으로 돌아가요'); }; }
   $('mc').onclick=closeModal;
   const ok=()=>{ const title=$('mt').value.trim()||'새 채팅', emoji=$('me').value.trim()||'💬', fid=$('mf').value||null;
     if(isNew){ const n={id:uid(),title,emoji,folderId:fid,createdAt:now(),updatedAt:now(),turns:[]}; S.chats.push(n); UI.active=n.id; saveUI(); }
-    else { Object.assign(c0,{title,emoji,folderId:fid,dialogueColor:col||undefined}); c0.updatedAt=now(); }
+    else { Object.assign(c0,{title,emoji,folderId:fid,dialogueColor:col||undefined,userColor:ucol||undefined,nameColors:NCx}); c0.updatedAt=now(); }
     save(); closeModal(); renderAll(); if(isNew){ const t=$('in'); if(t) t.focus(); } };
   $('mo').onclick=ok; $('mt').onkeydown=e=>{ if(e.key==='Enter') ok(); };
 }

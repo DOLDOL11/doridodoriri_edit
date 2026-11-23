@@ -382,6 +382,9 @@
   .rbtn{position:relative}
   .cdot{display:none;position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#e2655f;border:2px solid #fff}
 </style>
+<style>
+  .sync-msg{font-size:12px;color:#b4423c;background:#fdf1f0;border-radius:10px;padding:8px 10px;margin:0 0 8px;word-break:break-all;font-family:ui-monospace,Menlo,monospace}
+</style>
 </head>
 <body>
 <div class="main">
@@ -444,6 +447,7 @@
         <p class="sync-d">내 GitHub <b>비공개 저장소</b>에 스튜디오 전체를 올리고, 다른 기기에서 받아와요. 열쇠(토큰)는 이 기기에만 저장되고 백업 파일에도 들어가지 않아요.</p>
         <input type="text" id="home-syncRepo" placeholder="저장소 이름 (예: log-studio-data)" autocomplete="off" spellcheck="false">
         <input type="password" id="home-syncTok" placeholder="토큰 (github_pat_...)" autocomplete="off">
+        <div class="sync-msg" id="home-syncMsg" style="display:none"></div>
         <div class="sync-btns"><button type="button" class="pill blue" id="home-syncConn">연결하기</button><button type="button" class="pill" id="home-syncHelp">토큰 만드는 법</button></div>
         <ol class="sync-help" id="home-syncHelpBox" style="display:none">
           <li>GitHub에서 <b>New repository</b> → 이름(예: log-studio-data) → <b>Private</b> 선택 → <b>Add a README</b> 체크 → 만들기</li>
@@ -756,7 +760,7 @@ let SY={}; try{ SY=JSON.parse(localStorage.getItem(SYNC_KEY)||'{}'); }catch(e){}
 const saveSY=()=>{ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(SY)); }catch(e){} };
 const ghUrl=()=>`https://api.github.com/repos/${SY.repo}/contents/${SYNC_PATH}`;
 async function gh(method,url,body,accept){
-  const r=await fetch(url,{method,headers:{'Authorization':'Bearer '+SY.token,'Accept':accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  const r=await fetch(url,{method,headers:{'Authorization':'Bearer '+SY.token,'Accept':accept||'application/vnd.github+json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});
   return r;
 }
 function ghErr(r){ return r.status===401?'토큰이 맞지 않거나 만료됐어요':r.status===403?'토큰에 Contents 쓰기 권한이 없어요':r.status===404?'저장소를 찾지 못했어요. 이름과 토큰의 저장소 선택을 확인해 주세요':r.status===409?'저장소가 비어 있어요. README를 하나 만들어 주세요':r.status===422?'올리는 중 충돌이 났어요. 다시 시도해 주세요':`GitHub 오류 (${r.status})`; }
@@ -771,7 +775,8 @@ function paintSync(){
   $h('syncAuto').checked=SY.auto!==false;
   $h('syncSt').innerHTML=`<b>${esc(SY.repo)}</b> 에 연결됨<br>${SY.upAt?`마지막으로 올림: ${ago(SY.upAt)}`:'아직 올린 적 없음'} · ${SY.downAt?`마지막으로 받음: ${ago(SY.downAt)}`:'아직 받은 적 없음'}`;
 }
-async function syncConnect(){
+function syncMsg(t,ok){ const el=$h('syncMsg'); if(!el) return; el.style.display=t?'':'none'; el.className='sync-msg'+(ok?' ok':''); el.textContent=t||''; }
+async function syncConnect(){ syncMsg('');
   const repo=$h('syncRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/+$/,''), token=$h('syncTok').value.trim();
   if(!token){ toastH('토큰을 붙여넣어 주세요'); return; }
   if(!repo){ toastH('저장소 이름을 적어 주세요'); return; }
@@ -786,13 +791,13 @@ async function syncConnect(){
     }
     if(!/^[\w.-]+\/[\w.-]+$/.test(SY.repo)){ const bad=SY.repo; SY={}; toastH(`저장소 이름이 이상해요: ${bad}`); return; }
     const repoName=SY.repo;
-    const r=await gh('GET',`https://api.github.com/repos/${repoName}`); if(!r.ok){ toastH(r.status===404?`'${repoName}' 저장소를 찾지 못했어요. 이름(대소문자 포함)과 토큰의 저장소 선택을 확인해 주세요`:ghErr(r)); SY={}; return; }
+    const r=await gh('GET',`https://api.github.com/repos/${repoName}`); if(!r.ok){ let det=''; try{ det=(await r.clone().json()).message||''; }catch(e){} syncMsg(`[${r.status}] ${repoName} · ${det}`); toastH(r.status===404?`'${repoName}' 저장소를 찾지 못했어요. 이름(대소문자 포함)과 토큰의 저장소 선택을 확인해 주세요`:ghErr(r)); SY={}; return; }
     const j=await r.json(); if(!j.private&&!confirm('이 저장소는 공개(Public) 저장소예요. 누구나 백업 내용을 볼 수 있어요.\n그래도 연결할까요? (비공개 저장소를 추천해요)')){ SY={}; return; }
     if(j.permissions&&!j.permissions.push){ toastH('토큰에 쓰기 권한이 없어요. Contents를 Read and write로 해 주세요'); SY={}; return; }
     saveSY(); $h('syncTok').value=''; paintSync();
     const m=await remoteMeta().catch(()=>null);
     toastH(m?'연결됐어요. 저장소에 백업이 있어요. 받아오기를 눌러 보세요':'연결됐어요. 올리기를 눌러 첫 백업을 올려 보세요');
-  }catch(e){ SY={}; toastH('GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요'); }
+  }catch(e){ SY={}; syncMsg('네트워크 오류: '+(e&&e.message||e)); toastH('GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요'); }
 }
 async function syncUp(){
   const btn=$h('syncUp'); if(btn.disabled) return; btn.disabled=true; btn.textContent='올리는 중…';

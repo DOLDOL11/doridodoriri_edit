@@ -323,8 +323,8 @@
   .st-tog.on .sw{background:#5b9bd8}
   .st-tog.on .sw::after{left:14px}
   .st-chip{display:none}
-  .hide-st .st-tail,.hide-st .st,.hide-st .st-inline.code{display:none}
-  .hide-st .tn.show-st .st-tail,.hide-st .tn.show-st .st,.hide-st .tn.show-st .st-inline.code{display:block}
+  .hide-st .st-tail,.hide-st .st{display:none}
+  .hide-st .tn.show-st .st-tail,.hide-st .tn.show-st .st{display:block}
   .hide-st .st-chip{display:inline-flex;align-items:center;margin-top:8px;padding:3px 11px;border-radius:999px;font-size:11.5px;color:#5b7a99;background:#f2f6fa;border:1px solid #e1e9f1}
   .hide-st .st-chip:hover{background:#e7f1fb;color:#2f5f96}
   @media (max-width:860px){ .st-tog{height:32px;padding:0 8px 0 6px;font-size:0;gap:0} .st-tog .sw{margin:0} }
@@ -417,7 +417,7 @@ const chat=()=>S.chats.find(c=>c.id===UI.active)||null;
 /* ---------- 로그 나누기 · 해석 ---------- */
 function turnNoOf(raw){ const m=String(raw).match(/(\d+)\s*턴/); return m?parseInt(m[1],10):null; }
 /* 겹치는 턴 찾기: 공백 · 턴 번호 · 이미지 주소 차이는 무시하고 비교 */
-function norm(raw){ return plain(raw).replace(/https?:\/\/\S+/g,'').replace(/[\[#(]*\s*\d+\s*턴\s*[\])]*/g,'').replace(/[​-‍﻿]/g,'').replace(/\s+/g,'').slice(0,4000); }
+function norm(raw){ return stripComments(plain(raw)).replace(/https?:\/\/\S+/g,'').replace(/[\[#(]*\s*\d+\s*턴\s*[\])]*/g,'').replace(/[​-‍﻿]/g,'').replace(/\s+/g,'').slice(0,4000); }
 /* 들어온 턴들 중 이미 있는 마지막 턴의 '바로 다음'부터만 골라낸다 */
 function newPart(c,parts){
   const have=(c.turns||[]).map(t=>norm(t.raw)); if(!have.length) return {fresh:parts,skip:0,found:false};
@@ -426,6 +426,8 @@ function newPart(c,parts){
   return {fresh:parts.filter((p,i)=>!set.has(inc[i])),skip:parts.filter((p,i)=>set.has(inc[i])).length,found:false};
 }
 /* 길어서 다음 메시지로 넘어간 답변(유저 입력 없이 이어진 캐릭터 턴)은 앞 턴에 합친다 */
+const isMdComment=l=>/^\s*\[\/\/\]\s*:\s*#/.test(l);
+const stripComments=t=>String(t||'').split('\n').filter(l=>!isMdComment(l)).join('\n');
 const isCmd=t=>{ t=String(t||'').trim(); return /^\/\S+$/.test(t)||/^\(shortcut:[^)]*\)$/i.test(t); };
 const hasUser=t=>/^\s*\[유저\]/.test(String(t));
 const CONT='<!--lk-cont-->';
@@ -435,7 +437,7 @@ const isCont=t=>!hasUser(t)&&!looksFresh(t);
 const joinCont=(a,b)=>String(a).replace(/\s+$/,'')+'\n\n'+CONT+'\n\n'+String(b).replace(/^\s+/,'');
 const plain=t=>String(t||'').split('\n\n'+CONT+'\n\n').join('\n\n').split(CONT).join('');
 /* 복사 · TXT용: 단축어만 있는 유저 입력(/자동진행 등)은 빼고 */
-const clean=t=>plain(t).replace(/^\s*\[유저\]\s*\n\s*(\/\S+|\(shortcut:[^)\n]*\))\s*\n+(\s*\[캐릭터\]\s*\n)?/i,'');
+const clean=t=>stripComments(plain(t)).replace(/^\s*\[유저\]\s*\n\s*(\/\S+|\(shortcut:[^)\n]*\))\s*\n+(\s*\[캐릭터\]\s*\n)?/i,'');
 function mergeCont(parts){
   if(!parts.some(hasUser)) return parts;
   const out=[]; parts.forEach(p=>{ if(out.length&&isCont(p)) out[out.length-1]=joinCont(out[out.length-1],p); else out.push(p); }); return out;
@@ -488,6 +490,7 @@ function textBlocks(t,blocks){
     if(/^\[(캐릭터|character|ai|봇|char|AI)\]$/i.test(s)){ flush(); mode='prose'; return; }
     if(/^[#\s]*\[?\s*\d+\s*턴\s*\]?\s*$/.test(s)) return; /* 턴 번호만 있는 줄은 숨김 */
     if(s===CONT) return;
+    if(isMdComment(s)) return;
     buf.push(line);
   });
   flush();
@@ -529,13 +532,20 @@ function prose(text,isUser){
 /* 인물 이름 모으기 (색 지정용) */
 function speakers(c){ const cnt={}; (c.turns||[]).forEach(t=>{ String(t.raw).split('\n').forEach(l=>{ const s=l.replace(/^\s*\*?/,'').trim(); if(isStatusStart(s)) return; const m=s.match(NAME_RE); if(m&&/["“「『']/.test(s.slice(m[0].length,m[0].length+3))){ const n=m[1].trim(); cnt[n]=(cnt[n]||0)+1; } }); }); return Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,16); }
 /* 상태창 시작 줄(T: 18 | 서울 | 38.01.03 … 같은) 찾기 */
-const isStatusStart=l=>{ const s=String(l).trim(); return /^T\s*[:：]\s*\d+\s*\|/.test(s) || ((s.match(/\|/g)||[]).length>=3 && /\d{1,2}[.:]\d{2}/.test(s) && s.length<160); };
-function splitStatus(text){ const ls=text.split('\n'); const k=ls.findIndex(isStatusStart); if(k<=0&&k!==0) return null; return {body:ls.slice(0,k).join('\n'), tail:ls.slice(k).join('\n')}; }
-function statusProse(t){ return t.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<p>${inline(l)}</p>`).join(''); }
+const isStatusStart=l=>/^T\s*[:：]\s*\d+\s*\|/.test(String(l).trim());
+function splitStatus(text){ const ls=text.split('\n'); let k=-1; ls.forEach((l,x)=>{ if(isStatusStart(l)) k=x; }); if(k<0) return null; return {body:ls.slice(0,k).join('\n'), tail:ls.slice(k).join('\n')}; }
+function statusProse(t){ return t.split('\n').map(l=>l.trim()).filter(l=>l&&!isMdComment(l)&&l!==CONT).map(l=>`<p>${inline(l)}</p>`).join(''); }
 let frameN=0;
 function renderBlocks(blocks){
-  return blocks.map(b=>{
-    if(b.k==='prose'){ const sp=splitStatus(b.text); if(sp) return prose(sp.body)+`<div class="st-tail">${statusProse(sp.tail)}</div>`; return prose(b.text); }
+  let si=-1; blocks.forEach((b,x)=>{ if(b.k==='prose'&&splitStatus(b.text)) si=x; });
+  const one=b=>renderBlock(b,false);
+  if(si<0) return blocks.map(one).join('');
+  const sp=splitStatus(blocks[si].text);
+  return blocks.slice(0,si).map(one).join('')+prose(sp.body)+`<div class="st-tail">${statusProse(sp.tail)}${blocks.slice(si+1).map(b=>renderBlock(b,true)).join('')}</div>`;
+}
+function renderBlock(b,inTail){
+  {
+    if(b.k==='prose') return inTail?statusProse(b.text):prose(b.text);
     if(b.k==='user'&&isCmd(b.text)) return ''; /* /자동진행 같은 단축어는 보이지 않게 */
     if(b.k==='user') return `<div class="tn-user"><div class="who">USER</div>${prose(b.text,true)}</div>`;
     if(b.k==='status') return `<details class="st" open><summary>${esc(b.title)}</summary><div class="sb">${b.items.map(it=>it.t==='kv'?`<div class="kv"><b>${esc(it.k)}</b><span>${esc(it.v)}</span></div>`:it.t==='li'?`<div class="li">${esc(it.v)}</div>`:it.t==='sec'?`<div class="sec">${esc(it.v)}</div>`:`<div class="pl">${esc(it.v)}</div>`).join('')}</div></details>`;
@@ -543,7 +553,7 @@ function renderBlocks(blocks){
     if(b.k==='html'){ const id='f'+(++frameN); return `<div class="st-html"><iframe sandbox="allow-scripts" scrolling="no" data-fid="${id}" loading="lazy" srcdoc="${esc(frameDoc(b.src,id))}"></iframe></div>`; }
     if(b.k==='code') return `<details class="st st-code"><summary>${esc(b.title)}</summary><pre>${esc(b.src)}</pre></details>`;
     return '';
-  }).join('');
+  }
 }
 function sanitize(html){
   const tpl=document.createElement('template'); tpl.innerHTML=html;
@@ -629,7 +639,7 @@ function renderMain(keepScroll){
   $('txt').onclick=()=>download(fileName(c.title)+'.txt',chatTxt(c));
   if($('bmExit')) $('bmExit').onclick=()=>{ UI.bmView=false; renderAll(); restorePos(c); };
   /* 상태창 접기 칩 */
-  $('scroll').querySelectorAll('.tn').forEach(el=>{ const n=el.querySelectorAll('.st-tail,.st,.st-inline.code').length; if(!n) return; const b=document.createElement('button'); b.type='button'; b.className='st-chip'; b.innerHTML='<i class="tri">▸</i><span>상태창</span>'; b.onclick=()=>{ el.classList.toggle('show-st'); }; const f=el.querySelector('.st-tail,.st,.st-inline.code'); f.parentNode.insertBefore(b,f); });
+  $('scroll').querySelectorAll('.tn').forEach(el=>{ const n=el.querySelectorAll('.st-tail,.st').length; if(!n) return; const b=document.createElement('button'); b.type='button'; b.className='st-chip'; b.innerHTML='<i class="tri">▸</i><span>상태창</span>'; b.onclick=()=>{ el.classList.toggle('show-st'); }; const f=el.querySelector('.st-tail,.st'); f.parentNode.insertBefore(b,f); });
   $('stTog').onclick=()=>{ UI.hideSt=!UI.hideSt; saveUI(); $('stTog').classList.toggle('on',!UI.hideSt); const T=$('scroll').querySelector('.lk-turns'); if(T) T.classList.toggle('hide-st',UI.hideSt); $('scroll').querySelectorAll('.tn.show-st').forEach(e=>e.classList.remove('show-st')); toast(UI.hideSt?'상태창을 접었어요. ▸ 상태창을 누르면 그 턴만 펼쳐져요':'상태창을 다시 보여줘요'); };
   $('goto').onclick=()=>{ if(UI.bmView){ UI.bmView=false; renderAll(); } gotoModal(c); };
   $('bms').onclick=()=>bmModal(c);
@@ -702,7 +712,7 @@ function bmModal(c){
   $('md').querySelectorAll('.bm-it').forEach(b=>b.onclick=()=>{ closeModal(); jumpTurn(b.dataset.t); });
 }
 function addTurns(){
-  const c=chat(); if(!c) return; const raw=$('in').value.replace(/\r\n/g,'\n').trim(); if(!raw){ $('in').focus(); return; }
+  const c=chat(); if(!c) return; const raw=stripComments($('in').value.replace(/\r\n/g,'\n')).trim(); if(!raw){ $('in').focus(); return; }
   let n=0;
   let skip=0;
   if(UI.mode==='bulk'){
@@ -833,7 +843,7 @@ const SITE_RE=/^https:\/\/([a-z0-9-]+\.)*(caveduck\.io|teapotchat\.com|fairytale
 const SITE_ORIGINS=['https://crack.wrtn.ai','https://wrtn.ai','https://www.wrtn.ai','https://caveduck.io','https://www.caveduck.io','https://teapotchat.com','https://www.teapotchat.com','https://fairytale.ai.kr','https://www.fairytale.ai.kr','https://rofan.ai','https://www.rofan.ai'];
 let LOADED=false;
 function importFromSite(p){
-  const text=String(p.text||'').replace(/\r\n/g,'\n').trim(); if(!text) return 0;
+  const text=stripComments(String(p.text||'').replace(/\r\n/g,'\n')).trim(); if(!text) return 0;
   const pid=String(p.id||''); const site=pid.startsWith('cr')?'크랙':pid.startsWith('rf')?'로판':pid.startsWith('tp')?'티팟':'케이브덕';
   const title=String(p.title||'').trim()||site+' 로그';
   const parts=p.mode==='bulk'?mergeCont(splitBulk(text)):[text];

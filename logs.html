@@ -244,6 +244,27 @@
   .lk-site{width:100%;border-radius:12px;font-size:12.5px;padding:8px 10px;color:#3f80ba;background:#f4f8fc;border:1px dashed #bcd8f2}
   .lk-site:hover{background:#e7f1fb}
   .tn-cmd{display:inline-block;margin:2px 0 12px;padding:4px 12px;border-radius:999px;background:#f1ecfd;color:#6a4fc8;font-size:12.5px;font-weight:600}
+  /* --- 크기 줄이기 · 유저 바탕 없애기 · 상태창 구분 --- */
+  .lk-turns{max-width:740px;gap:10px}
+  .tn{padding:14px 18px 12px;border-radius:16px}
+  .tn-h{margin-bottom:6px}
+  .tn-no{font-size:11px;padding:2px 8px}
+  .tn-body{font-size:14px;line-height:1.75}
+  .tn-body p{margin:0 0 .35em}
+  .tn-user{margin:6px 0 10px;padding:0;background:none;border:0;border-radius:0}
+  .tn-user .who{font-size:10px;color:#a3aebb;margin-bottom:2px}
+  .tn-user .dlg{color:#4a5563;font-weight:500}
+  .tn-user .nar{color:#8a93a0}
+  .st-tail{margin-top:12px;padding-top:10px;border-top:1px dashed #d5dfea;font-size:12.5px;line-height:1.7;color:#5b6673}
+  .st-tail p{margin:0 0 .15em}
+  .st-tail .nar{color:#5b6673}
+  .st-tail .dlg{color:#3f5f86;font-weight:500}
+  .st-inline{margin:8px 0;max-width:100%;overflow:hidden}
+  .st-inline img{width:auto!important;max-width:100%!important;max-height:340px;height:auto;display:block;border-radius:10px;margin:8px 0}
+  .st-inline pre{max-height:none}
+  .st{margin:8px 0}
+  .st .sb{font-size:12.5px}
+  @media (max-width:860px){ .tn-body{font-size:13.5px} .st-inline img{max-height:280px} }
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -336,6 +357,7 @@ function newPart(c,parts){
   return {fresh:parts.filter((p,i)=>!set.has(inc[i])),skip:parts.filter((p,i)=>set.has(inc[i])).length,found:false};
 }
 /* 길어서 다음 메시지로 넘어간 답변(유저 입력 없이 이어진 캐릭터 턴)은 앞 턴에 합친다 */
+const isCmd=t=>{ t=String(t||'').trim(); return /^\/\S+$/.test(t)||/^\(shortcut:[^)]*\)$/i.test(t); };
 const hasUser=t=>/^\s*\[유저\]/.test(String(t));
 const CONT='<!--lk-cont-->';
 /* 새 답변처럼 시작하면(*서술*, "대사") 끊긴 조각이 아니라 자동진행 같은 새 턴으로 본다 */
@@ -344,7 +366,7 @@ const isCont=t=>!hasUser(t)&&!looksFresh(t);
 const joinCont=(a,b)=>String(a).replace(/\s+$/,'')+'\n\n'+CONT+'\n\n'+String(b).replace(/^\s+/,'');
 const plain=t=>String(t||'').split('\n\n'+CONT+'\n\n').join('\n\n').split(CONT).join('');
 /* 복사 · TXT용: 단축어만 있는 유저 입력(/자동진행 등)은 빼고 */
-const clean=t=>plain(t).replace(/^\s*\[유저\]\s*\n\s*\/\S+\s*\n+(\s*\[캐릭터\]\s*\n)?/,'');
+const clean=t=>plain(t).replace(/^\s*\[유저\]\s*\n\s*(\/\S+|\(shortcut:[^)\n]*\))\s*\n+(\s*\[캐릭터\]\s*\n)?/i,'');
 function mergeCont(parts){
   if(!parts.some(hasUser)) return parts;
   const out=[]; parts.forEach(p=>{ if(out.length&&isCont(p)) out[out.length-1]=joinCont(out[out.length-1],p); else out.push(p); }); return out;
@@ -402,41 +424,62 @@ function textBlocks(t,blocks){
   flush();
 }
 function inline(line){
-  if(line.includes('*')&&/\*[^*]+\*/.test(line)){
-    let out='', i=0;
-    while(i<line.length){
-      if(line[i]==='*'){ const c=line.indexOf('*',i+1); if(c>i+1){ out+=`<span class="nar">${esc(line.slice(i+1,c))}</span>`; i=c+1; continue; } out+='*'; i++; continue; }
-      let n=line.indexOf('*',i); if(n<0) n=line.length; const seg=line.slice(i,n); out+=seg.trim()?`<span class="dlg">${esc(seg)}</span>`:esc(seg); i=n;
-    }
-    return out;
-  }
   const qre=/(["“][^"”]*["”]|「[^」]*」|『[^』]*』)/g;
   if(qre.test(line)){ return line.split(qre).map((seg,i)=>i%2?`<span class="dlg">${esc(seg)}</span>`:(seg.trim()?`<span class="nar">${esc(seg)}</span>`:esc(seg))).join(''); }
   return `<span class="nar">${esc(line)}</span>`;
 }
+/* *별표* 서술이 여러 줄에 걸쳐 있어도 한 덩어리로 보고, 그 안의 줄바꿈은 이어 붙인다 */
 function prose(text){
+  const hasStar=/\*[^*]+\*/.test(text);
   const isMsg=l=>/^\[[\s\S]*\]$/.test(l);
+  let html='';
+  if(hasStar){
+    /* 별표 기준으로 서술/대사 조각을 먼저 나누고, 조각을 줄 단위로 내보낸다 */
+    const toks=[]; let i=0, inN=false, buf='';
+    while(i<text.length){ const ch=text[i]; if(ch==='*'){ const close=inN?true:text.indexOf('*',i+1)>i; if(close){ toks.push({n:inN,t:buf}); buf=''; inN=!inN; i++; continue; } } buf+=ch; i++; }
+    toks.push({n:inN,t:buf});
+    /* 줄 만들기: 서술 조각 안의 줄바꿈은 공백으로, 바깥의 줄바꿈은 줄 나눔 */
+    let lines=[[]];
+    toks.forEach(tk=>{
+      const t=tk.n?tk.t.replace(/\s*\n+\s*/g,' '):tk.t;
+      const parts=t.split('\n');
+      parts.forEach((pt,k)=>{ if(k>0) lines.push([]); if(pt) lines[lines.length-1].push({n:tk.n,t:pt}); });
+    });
+    lines.forEach(ln=>{ const raw=ln.map(x=>x.t).join('').trim(); if(!raw) return;
+      html+=`<p>${ln.map(x=>x.n?`<span class="nar">${esc(x.t)}</span>`:(x.t.trim()?inline(x.t):esc(x.t))).join('')}</p>`; });
+    return html;
+  }
   const lines=text.split('\n');
-  let h='';
-  lines.forEach((l,i)=>{ const s=l.trim(); if(!s) return; const nx=(lines[i+1]||'').trim(); h+=`<p${isMsg(s)&&isMsg(nx)?' class="tight"':''}>${inline(s)}</p>`; });
-  return h;
+  lines.forEach((l,i)=>{ const s=l.trim(); if(!s) return; const nx=(lines[i+1]||'').trim(); html+=`<p${isMsg(s)&&isMsg(nx)?' class="tight"':''}>${inline(s)}</p>`; });
+  return html;
 }
+/* 상태창 시작 줄(T: 18 | 서울 | 38.01.03 … 같은) 찾기 */
+const isStatusStart=l=>{ const s=String(l).trim(); return /^T\s*[:：]\s*\d+\s*\|/.test(s) || ((s.match(/\|/g)||[]).length>=3 && /\d{1,2}[.:]\d{2}/.test(s) && s.length<160); };
+function splitStatus(text){ const ls=text.split('\n'); const k=ls.findIndex(isStatusStart); if(k<=0&&k!==0) return null; return {body:ls.slice(0,k).join('\n'), tail:ls.slice(k).join('\n')}; }
+function statusProse(t){ return t.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<p>${inline(l)}</p>`).join(''); }
 let frameN=0;
 function renderBlocks(blocks){
   return blocks.map(b=>{
-    if(b.k==='prose') return prose(b.text);
-    if(b.k==='user'&&/^\/\S+$/.test(b.text.trim())) return ''; /* /자동진행 같은 단축어는 보이지 않게 */
+    if(b.k==='prose'){ const sp=splitStatus(b.text); if(sp) return prose(sp.body)+`<div class="st-tail">${statusProse(sp.tail)}</div>`; return prose(b.text); }
+    if(b.k==='user'&&isCmd(b.text)) return ''; /* /자동진행 같은 단축어는 보이지 않게 */
     if(b.k==='user') return `<div class="tn-user"><div class="who">USER</div>${prose(b.text)}</div>`;
     if(b.k==='status') return `<details class="st" open><summary>${esc(b.title)}</summary><div class="sb">${b.items.map(it=>it.t==='kv'?`<div class="kv"><b>${esc(it.k)}</b><span>${esc(it.v)}</span></div>`:it.t==='li'?`<div class="li">${esc(it.v)}</div>`:it.t==='sec'?`<div class="sec">${esc(it.v)}</div>`:`<div class="pl">${esc(it.v)}</div>`).join('')}</div></details>`;
-    if(b.k==='html'){ const id='f'+(++frameN); return `<div class="st-html"><iframe sandbox="allow-scripts" data-fid="${id}" loading="lazy" srcdoc="${esc(frameDoc(b.src,id))}"></iframe></div>`; }
+    if(b.k==='html'&&!/<script|<style|<html|<body/i.test(b.src)) return `<div class="st-inline">${sanitize(b.src)}</div>`;
+    if(b.k==='html'){ const id='f'+(++frameN); return `<div class="st-html"><iframe sandbox="allow-scripts" scrolling="no" data-fid="${id}" loading="lazy" srcdoc="${esc(frameDoc(b.src,id))}"></iframe></div>`; }
     if(b.k==='code') return `<details class="st st-code"><summary>${esc(b.title)}</summary><pre>${esc(b.src)}</pre></details>`;
     return '';
   }).join('');
 }
+function sanitize(html){
+  const tpl=document.createElement('template'); tpl.innerHTML=html;
+  tpl.content.querySelectorAll('script,iframe,object,embed,link,meta,base,form,input,button,textarea,select').forEach(e=>e.remove());
+  tpl.content.querySelectorAll('*').forEach(e=>{ [...e.attributes].forEach(a=>{ const n=a.name.toLowerCase(), v=a.value.trim().toLowerCase(); if(n.startsWith('on')||((n==='href'||n==='src'||n==='xlink:href')&&v.startsWith('javascript:'))) e.removeAttribute(a.name); }); });
+  return tpl.innerHTML;
+}
 function frameDoc(html,id){
   const full=/<html[\s>]/i.test(html);
-  const sizer=`<script>(function(){function s(){parent.postMessage({lkH:${JSON.stringify(id)},h:Math.ceil(document.documentElement.scrollHeight)},'*')}addEventListener('load',s);new ResizeObserver(s).observe(document.documentElement);setTimeout(s,300);setTimeout(s,1200)})()<\/script>`;
-  return full?html.replace(/<\/body>/i,sizer+'</body>'):`<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;padding:10px;font-family:Pretendard,'Noto Sans KR',sans-serif}</style></head><body>${html}${sizer}</body></html>`;
+  const sizer=`<script>(function(){function s(){var b=document.body;parent.postMessage({lkH:${JSON.stringify(id)},h:Math.ceil(b.getBoundingClientRect().height+parseFloat(getComputedStyle(b).marginTop)+parseFloat(getComputedStyle(b).marginBottom))},'*')}addEventListener('load',s);new ResizeObserver(s).observe(document.documentElement);setTimeout(s,300);setTimeout(s,1200)})()<\/script>`;
+  return full?html.replace(/<\/body>/i,sizer+'</body>'):`<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;overflow:hidden}body{padding:10px;font-family:Pretendard,'Noto Sans KR',sans-serif;display:flow-root}</style></head><body>${html}${sizer}</body></html>`;
 }
 window.addEventListener('message',e=>{ const d=e.data; if(!d||!d.lkH) return; const f=document.querySelector(`iframe[data-fid="${d.lkH}"]`); if(f&&e.source===f.contentWindow) f.style.height=Math.min(Math.max(d.h,40),4000)+'px'; });
 

@@ -218,7 +218,7 @@
   .pill.blue:hover{background:#d6e8f9}
 
   /* shortcuts */
-  .scs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+  .scs{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
   .sc{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 6px 18px;border:1px solid var(--ln);border-radius:18px;text-decoration:none;color:#2a323d;font-size:13.5px;text-align:center;background:#fff;transition:border-color .15s,background .15s}
   .sc svg{width:22px;height:22px;color:#4f86bf}
   .sc:hover{border-color:#bcd8f2;background:#f7fbff}
@@ -367,6 +367,21 @@
   .hm .home-backup ul{margin-top:12px}
   @media (max-width:820px){ .scs{grid-template-columns:repeat(4,minmax(0,1fr))} }
 </style>
+<style>
+  .sync-d{font-size:12.5px;color:#6b7785;line-height:1.6;margin:6px 0 10px}
+  .sync-setup input,.sync-on input[type=text]{width:100%;margin-bottom:8px;padding:9px 12px;border:1px solid #e1e8ef;border-radius:10px;font-size:13px}
+  .sync-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+  .sync-btns .sp{flex:1}
+  .sync-help{margin:10px 0 0;padding-left:18px;font-size:12px;line-height:1.75;color:#5b6673;background:#f7f9fc;border-radius:12px;padding:10px 12px 10px 28px}
+  .sync-st{font-size:12.5px;color:#5b6673;line-height:1.7;margin:6px 0 10px}
+  .sync-st b{color:#2f5f96}
+  .sync-auto{display:flex;gap:6px;align-items:center;font-size:12.5px;color:#6b7785;margin-top:10px}
+  .sync-banner{max-width:1500px;display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;border-radius:16px;background:#eef5fd;border:1px solid #d4e5f6;font-size:13.5px;color:#2f5f96}
+  .sync-banner span{flex:1}
+  .sync-banner .x{border:0;background:transparent;color:#8aa6c8;font-size:14px;padding:4px 6px}
+  .rbtn{position:relative}
+  .cdot{display:none;position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#e2655f;border:2px solid #fff}
+</style>
 </head>
 <body>
 <div class="main">
@@ -386,9 +401,11 @@
       <h1>홈</h1><span class="m-brand"><span class="bub" aria-hidden="true"></span>Log Studio</span>
       <span class="sp"></span>
       <button type="button" class="rbtn" id="home-editBtn" title="바로가기 순서 바꾸기"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>
+      <button type="button" class="rbtn" id="home-cloud" title="GitHub 동기화" style="display:none"><svg viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9a4 4 0 0 1 0 9z"/><path d="M12 12v5M9.5 14.5 12 12l2.5 2.5"/></svg><i class="cdot" id="home-cdot"></i></button>
       <button type="button" class="rbtn" id="home-gear" title="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     </div>
 
+    <div class="sync-banner" id="home-syncBanner" style="display:none"><span id="home-syncBannerTx">다른 기기에서 올린 새 백업이 있어요.</span><button type="button" class="pill blue" id="home-syncBannerGo">☁ 받아오기</button><button type="button" class="x" id="home-syncBannerX" title="닫기">✕</button></div>
     <div class="dash">
       <section class="w s3 short">
         <div class="wh"><h2>SHORTCUTS</h2></div>
@@ -421,6 +438,27 @@
     <div class="wh"><h2>SETTINGS</h2><button type="button" class="x" id="home-setClose" title="닫기">✕</button></div>
     <div class="set-row"><span class="lb">정렬</span><div class="home-seg" id="home-sort"></div></div>
     <div class="set-row" id="home-openRow"><span class="lb">열기</span><div class="home-seg" id="home-open"></div></div>
+    <div class="set-row sync-row" style="display:block" id="home-syncRow">
+      <span class="lb">☁ GitHub 동기화</span>
+      <div id="home-syncSetup" class="sync-setup">
+        <p class="sync-d">내 GitHub <b>비공개 저장소</b>에 스튜디오 전체를 올리고, 다른 기기에서 받아와요. 열쇠(토큰)는 이 기기에만 저장되고 백업 파일에도 들어가지 않아요.</p>
+        <input type="text" id="home-syncRepo" placeholder="저장소 (예: doldol11/log-studio-data)" autocomplete="off" spellcheck="false">
+        <input type="password" id="home-syncTok" placeholder="토큰 (github_pat_...)" autocomplete="off">
+        <div class="sync-btns"><button type="button" class="pill blue" id="home-syncConn">연결하기</button><button type="button" class="pill" id="home-syncHelp">토큰 만드는 법</button></div>
+        <ol class="sync-help" id="home-syncHelpBox" style="display:none">
+          <li>GitHub에서 <b>New repository</b> → 이름(예: log-studio-data) → <b>Private</b> 선택 → <b>Add a README</b> 체크 → 만들기</li>
+          <li>오른쪽 위 프로필 → <b>Settings</b> → 맨 아래 <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b></li>
+          <li>이름 아무거나, 만료일 원하는 만큼 → <b>Repository access</b>: <b>Only select repositories</b> → 방금 만든 저장소 고르기</li>
+          <li><b>Permissions</b> → Repository permissions → <b>Contents</b>를 <b>Read and write</b>로 → 맨 아래 <b>Generate token</b></li>
+          <li>나온 토큰(github_pat_로 시작)을 복사해서 위 칸에 붙여넣고 <b>연결하기</b>. 폰에서도 같은 저장소·토큰으로 한 번 연결해 주세요.</li>
+        </ol>
+      </div>
+      <div id="home-syncOn" class="sync-on" style="display:none">
+        <div class="sync-st" id="home-syncSt"></div>
+        <div class="sync-btns"><button type="button" class="pill blue" id="home-syncUp">☁ 올리기</button><button type="button" class="pill" id="home-syncDown">☁ 받아오기</button><span class="sp"></span><button type="button" class="pill" id="home-syncOff" title="이 기기에서 연결 끊기">연결 끊기</button></div>
+        <label class="sync-auto"><input type="checkbox" id="home-syncAuto"> 홈을 열 때 다른 기기에서 올린 새 백업이 있는지 확인하기</label>
+      </div>
+    </div>
     <div class="set-row home-backup" style="display:block">
       <span class="lb">전체 백업</span>
       <div class="bk-big" id="home-last" style="margin-top:8px"></div>
@@ -710,6 +748,85 @@ if($h('undo')) $h('undo').onclick=async()=>{
 };
 function paintLast(){ const el=$h('last'); if(!el) return; const t=+get('studio-home-lastBackup'); el.textContent=t?`마지막 전체 백업: ${ago(t)}`:'아직 전체 백업을 받은 적이 없어요'; }
 
+
+/* ---------- GitHub 비공개 저장소 동기화 ---------- */
+const SYNC_KEY='studio-sync';   /* 토큰이 들어 있어서 STUDIO_RE(백업 대상)에 넣지 않는다 */
+const SYNC_PATH='studio-backup.json';
+let SY={}; try{ SY=JSON.parse(localStorage.getItem(SYNC_KEY)||'{}'); }catch(e){}
+const saveSY=()=>{ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(SY)); }catch(e){} };
+const ghUrl=()=>`https://api.github.com/repos/${SY.repo}/contents/${SYNC_PATH}`;
+async function gh(method,url,body,accept){
+  const r=await fetch(url,{method,headers:{'Authorization':'Bearer '+SY.token,'Accept':accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  return r;
+}
+function ghErr(r){ return r.status===401?'토큰이 맞지 않거나 만료됐어요':r.status===403?'토큰에 Contents 쓰기 권한이 없어요':r.status===404?'저장소를 찾지 못했어요. 이름과 토큰의 저장소 선택을 확인해 주세요':r.status===409?'저장소가 비어 있어요. README를 하나 만들어 주세요':r.status===422?'올리는 중 충돌이 났어요. 다시 시도해 주세요':`GitHub 오류 (${r.status})`; }
+function b64utf8(str){ const u=new TextEncoder().encode(str); let s=''; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000)); return btoa(s); }
+async function remoteMeta(){ const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.object'); if(r.status===404) return null; if(!r.ok) throw r; const j=await r.json(); return {sha:j.sha,size:j.size}; }
+function paintSync(){
+  const on=!!(SY.repo&&SY.token);
+  if($h('syncSetup')) $h('syncSetup').style.display=on?'none':'';
+  if($h('syncOn')) $h('syncOn').style.display=on?'':'none';
+  if($h('cloud')) $h('cloud').style.display=on?'':'none';
+  if(!on) return;
+  $h('syncAuto').checked=SY.auto!==false;
+  $h('syncSt').innerHTML=`<b>${esc(SY.repo)}</b> 에 연결됨<br>${SY.upAt?`마지막으로 올림: ${ago(SY.upAt)}`:'아직 올린 적 없음'} · ${SY.downAt?`마지막으로 받음: ${ago(SY.downAt)}`:'아직 받은 적 없음'}`;
+}
+async function syncConnect(){
+  const repo=$h('syncRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/+$/,''), token=$h('syncTok').value.trim();
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ toastH('저장소를 "아이디/저장소이름" 형식으로 적어 주세요'); return; }
+  if(!token){ toastH('토큰을 붙여넣어 주세요'); return; }
+  SY={repo,token,auto:true};
+  try{
+    const r=await gh('GET',`https://api.github.com/repos/${repo}`); if(!r.ok){ toastH(ghErr(r)); SY={}; return; }
+    const j=await r.json(); if(!j.private&&!confirm('이 저장소는 공개(Public) 저장소예요. 누구나 백업 내용을 볼 수 있어요.\n그래도 연결할까요? (비공개 저장소를 추천해요)')){ SY={}; return; }
+    if(j.permissions&&!j.permissions.push){ toastH('토큰에 쓰기 권한이 없어요. Contents를 Read and write로 해 주세요'); SY={}; return; }
+    saveSY(); $h('syncTok').value=''; paintSync();
+    const m=await remoteMeta().catch(()=>null);
+    toastH(m?'연결됐어요. 저장소에 백업이 있어요. 받아오기를 눌러 보세요':'연결됐어요. 올리기를 눌러 첫 백업을 올려 보세요');
+  }catch(e){ SY={}; toastH('GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요'); }
+}
+async function syncUp(){
+  const btn=$h('syncUp'); if(btn.disabled) return; btn.disabled=true; btn.textContent='올리는 중…';
+  try{
+    const m=await remoteMeta();
+    if(m&&SY.sha&&m.sha!==SY.sha&&!confirm('다른 기기에서 더 최근에 올린 백업이 있어요.\n지금 기기 내용으로 덮어쓸까요? (먼저 받아오기를 하는 게 안전해요)')) return;
+    if(m&&!SY.sha&&!confirm('저장소에 이미 백업이 있어요. 이 기기 내용으로 덮어쓸까요?')) return;
+    const txt=await backupText();
+    const d=new Date();
+    const r=await gh('PUT',ghUrl(),{message:`스튜디오 백업 ${d.toLocaleString('ko-KR')} (${/Mobi|Android|iPhone/i.test(navigator.userAgent)?'폰':'PC'})`,content:b64utf8(txt),...(m?{sha:m.sha}:{})});
+    if(!r.ok){ toastH(ghErr(r)); return; }
+    const j=await r.json(); SY.sha=j.content&&j.content.sha; SY.upAt=Date.now(); saveSY(); paintSync();
+    try{ localStorage.setItem('studio-home-lastBackup',String(Date.now())); }catch(e){} paintLast();
+    toastH(`올렸어요 (${fmtB(txt.length)})`);
+  }catch(e){ toastH(e&&e.status?ghErr(e):'올리지 못했어요. 인터넷 연결을 확인해 주세요'); }
+  finally{ btn.disabled=false; btn.textContent='☁ 올리기'; }
+}
+async function syncDown(){
+  const btn=$h('syncDown'); if(btn&&btn.disabled) return; if(btn){ btn.disabled=true; btn.textContent='받는 중…'; }
+  try{
+    const m=await remoteMeta(); if(!m){ toastH('저장소에 아직 올린 백업이 없어요'); return; }
+    const r=await gh('GET',ghUrl()+'?t='+Date.now(),null,'application/vnd.github.raw+json'); if(!r.ok){ toastH(ghErr(r)); return; }
+    const txt=await r.text();
+    if(await restore(txt)){ SY.sha=m.sha; SY.downAt=Date.now(); saveSY(); paintSync(); if($h('syncBanner')) $h('syncBanner').style.display='none'; setDot(false); }
+  }catch(e){ toastH(e&&e.status?ghErr(e):'받아오지 못했어요. 인터넷 연결을 확인해 주세요'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='☁ 받아오기'; } }
+}
+function setDot(on){ const d=$h('cdot'); if(d) d.style.display=on?'block':'none'; }
+async function syncCheck(){
+  if(!(SY.repo&&SY.token)||SY.auto===false) return;
+  try{ const m=await remoteMeta(); if(m&&m.sha!==SY.sha){ $h('syncBanner').style.display='flex'; $h('syncBannerTx').textContent=SY.sha?'다른 기기에서 올린 새 백업이 있어요.':'GitHub에 올라간 백업이 있어요. 이 기기로 받아올까요?'; setDot(true); } }catch(e){}
+}
+if($h('syncConn')){
+  $h('syncConn').onclick=syncConnect;
+  $h('syncHelp').onclick=()=>{ const b=$h('syncHelpBox'); b.style.display=b.style.display==='none'?'':'none'; };
+  $h('syncUp').onclick=syncUp; $h('syncDown').onclick=syncDown;
+  $h('syncOff').onclick=()=>{ if(!confirm('이 기기에서 GitHub 연결을 끊을까요?\n(저장소에 올린 백업은 그대로 남아요)')) return; SY={}; try{ localStorage.removeItem(SYNC_KEY); }catch(e){} paintSync(); toastH('연결을 끊었어요'); };
+  $h('syncAuto').onchange=()=>{ SY.auto=$h('syncAuto').checked; saveSY(); };
+  $h('cloud').onclick=()=>{ openSettings(true); setTimeout(()=>{ const r=$h('syncRow'); if(r) r.scrollIntoView({block:'start',behavior:'smooth'}); },50); };
+  $h('syncBannerGo').onclick=syncDown;
+  $h('syncBannerX').onclick=()=>{ $h('syncBanner').style.display='none'; };
+  paintSync(); syncCheck();
+}
 
 function paintLast(){ const el=$h('last'); if(!el) return; const t=+get('studio-home-lastBackup');
   el.innerHTML=t?`<b>${ago(t)}</b> 마지막 전체 백업`:'아직 전체 백업을 받은 적이 없어요'; }

@@ -487,6 +487,9 @@
   .v-taginput .chip ~ input:not(:focus){min-width:0!important;width:0!important;flex:0 0 0!important;padding:0!important;margin:0!important;height:22px}
   .orig-note{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px}
   .orig-note button{margin-left:auto;border:1px solid #c9ddef;background:#fff;color:#3f6a92;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
+
+  .t-vault .v-tagbar .chip.off{background:#f3f6f9;border-color:#e0e7ee;color:#9aabbb;text-decoration:line-through;text-decoration-color:#b9c6d2}
+  .t-vault .v-tagbar .chip .x-ic{display:inline-block;margin-right:3px;font-weight:700;color:#c0594b;text-decoration:none}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -773,6 +776,7 @@ function filtered(){
   const ws=U.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   if(ws.length) arr=arr.filter(it=>{ const h=hay(it); return ws.every(w=>h.includes(w)); });
   if(U.tag) arr=arr.filter(it=>(it.tags||[]).includes(U.tag));
+  if((U.xtags||[]).length) arr=arr.filter(it=>!(it.tags||[]).some(t=>U.xtags.includes(t)));
   const nm=it=>(U.tab==='prompt'||U.tab==='gallery'?it.title:it.name)||'';
   if(U.sort==='custom'&&U.tab!=='gallery'){ const ord=orderList(); const pos=new Map(ord.map((id,i)=>[id,i])); arr=[...arr].sort((a,b)=>(pos.get(a.id)??-1)-(pos.get(b.id)??-1)); }
   else arr=[...arr].sort((a,b)=>(b.pin?1:0)-(a.pin?1:0) || (U.sort==='name'?nm(a).localeCompare(nm(b),'ko'):U.sort==='new'?(b.created||0)-(a.created||0):U.sort==='old'?(a.created||0)-(b.created||0):(b.updated||0)-(a.updated||0)));
@@ -805,15 +809,21 @@ function renderSide(){
     const as=e.target.closest('[data-addsub]'); if(as){ e.stopPropagation(); catModal(null,as.dataset.addsub); return; }
     const ed=e.target.closest('[data-e]'); if(ed){ e.stopPropagation(); catModal(cs.find(c=>c.id===ed.dataset.e)); return; }
     if(b.dataset.add){ catModal(null); return; }
-    U.cat[U.tab]=b.dataset.c; U.tag=null; saveUI(); render();
+    U.cat[U.tab]=b.dataset.c; U.tag=null; U.xtags=[]; saveUI(); render();
   });
 }
 function renderTags(base){
   const m=new Map(); base.forEach(it=>(it.tags||[]).forEach(t=>m.set(t,(m.get(t)||0)+1)));
   const tags=[...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0,30);
   if(U.tag && !m.has(U.tag)) U.tag=null;
-  $('tagbar').innerHTML=tags.length?tags.map(([t,n])=>`<button class="chip ${U.tag===t?'on':''}" data-t="${esc(t)}">#${esc(t)} <span style="opacity:.6">${n}</span></button>`).join(''):'';
-  $('tagbar').querySelectorAll('button').forEach(b=>b.onclick=()=>{ U.tag=U.tag===b.dataset.t?null:b.dataset.t; render(); });
+  U.xtags=(U.xtags||[]).filter(t=>m.has(t));
+  /* 누를 때마다: 해제 → 이 태그만 → 이 태그 제외 → 해제 */
+  $('tagbar').innerHTML=tags.length?tags.map(([t,n])=>{ const st=U.tag===t?'on':U.xtags.includes(t)?'off':''; return `<button class="chip ${st}" data-t="${esc(t)}" title="${st==='on'?'한 번 더 누르면 이 태그 제외':st==='off'?'한 번 더 누르면 해제':'누르면 이 태그만 보기'}">${st==='off'?'<span class="x-ic">−</span>':''}#${esc(t)} <span style="opacity:.6">${n}</span></button>`; }).join(''):'';
+  $('tagbar').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t;
+    if(U.tag===t){ U.tag=null; U.xtags.push(t); }
+    else if(U.xtags.includes(t)){ U.xtags=U.xtags.filter(x=>x!==t); }
+    else { U.tag=t; U.xtags=U.xtags.filter(x=>x!==t); }
+    render(); });
 }
 function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
 function render(){
@@ -946,7 +956,7 @@ function gview(i){
     if(x.src==='up'){ editPic(x.item); return; }
     if(x.src==='clip'){ editClip(x.item); return; }
     const t=x.ref.tab, it=(D[TABS[t].list]||[]).find(y=>y.id===x.ref.id); if(!it) return;
-    U.tab=t; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0);
+    U.tab=t; U.tag=null; U.xtags=[]; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0);
     t==='persona'?viewPersona(it,x.ref.au||null):t==='pair'?editPair(it,x.ref.au||null):editPrompt(it); };
 }
 function gvClose(){ if(gvEl){ gvEl.classList.remove('on'); gvEl.innerHTML=''; } if(!(modalEl&&modalEl.classList.contains('on'))) document.body.style.overflow=''; }
@@ -1075,9 +1085,9 @@ async function finish(){
 }
 /* 지금 보이는 정렬 기준으로 전체 순서 만들기 (처음 끌 때) */
 function filteredAllIds(){
-  const keep=U.cat[U.tab], q=U.q, tg=U.tag; U.cat[U.tab]='all'; U.q=''; U.tag=null;
+  const keep=U.cat[U.tab], q=U.q, tg=U.tag, xt=U.xtags; U.cat[U.tab]='all'; U.q=''; U.tag=null; U.xtags=[];
   const all=items().map(x=>x.id); const shown=filtered().arr.map(x=>x.id);
-  U.cat[U.tab]=keep; U.q=q; U.tag=tg;
+  U.cat[U.tab]=keep; U.q=q; U.tag=tg; U.xtags=xt;
   const s=new Set(shown); return [...shown,...all.filter(id=>!s.has(id))];
 }
 document.addEventListener('touchmove',e=>{ if(drag) e.preventDefault(); },{passive:false});
@@ -1575,8 +1585,8 @@ async function importData(o,replace){
 }
 
 /* ---------- 시작 ---------- */
-document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.preventDefault(); if(modalEl&&modalEl.classList.contains('on')) close(); U.tab=a.dataset.vtab; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0); });
-document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); });
+document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.preventDefault(); if(modalEl&&modalEl.classList.contains('on')) close(); U.tab=a.dataset.vtab; U.tag=null; U.xtags=[]; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0); });
+document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.tag=null; U.xtags=[]; U.q=''; $('q').value=''; saveUI(); render(); });
 let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').value; render(); },120); };
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
 $('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):editPrompt(null);

@@ -496,6 +496,13 @@
   .t-vault .v-tagbar .tg-mode button.on{background:#eaf3fc;color:#2f6ea6;font-weight:700}
   .t-vault .v-tagbar .tg-clear{border:0;background:none;color:#9aabbb;font-size:12px;cursor:pointer;padding:4px 6px;text-decoration:underline;text-underline-offset:3px}
   .t-vault .v-tagbar .tg-clear:hover{color:#2f6ea6}
+
+  .v-fab{position:fixed;right:22px;bottom:24px;display:none;flex-direction:column;gap:6px;z-index:60}
+  .v-fab.on{display:flex}
+  .v-fab button{width:40px;height:40px;padding:0;border-radius:50%;background:#fff;border:1px solid #dde6ef;box-shadow:0 4px 14px rgba(30,60,90,.12);color:#3f80ba;font-size:12px;cursor:pointer;transition:opacity .15s,background .15s}
+  .v-fab button:hover{background:#e7f1fb}
+  .v-fab button.dim{opacity:.35}
+  @media (max-width:600px){ .v-fab{right:14px;bottom:16px} .v-fab button{width:36px;height:36px} }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -903,6 +910,14 @@ async function paintOrigNote(){
     await save(); render(); toast('원본을 지웠어요');
   });
 }
+/* 맨 위로 / 맨 아래로 */
+(()=>{ const f=document.createElement('div'); f.className='v-fab'; f.innerHTML='<button type="button" data-d="up" title="맨 위로">▲</button><button type="button" data-d="dn" title="맨 아래로">▼</button>'; document.body.appendChild(f);
+  const se=()=>document.scrollingElement||document.documentElement;
+  f.querySelector('[data-d=up]').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  f.querySelector('[data-d=dn]').onclick=()=>window.scrollTo({top:se().scrollHeight,behavior:'smooth'});
+  const upd=()=>{ const s=se(), max=s.scrollHeight-window.innerHeight; f.classList.toggle('on',max>400); f.querySelector('[data-d=up]').classList.toggle('dim',s.scrollTop<40); f.querySelector('[data-d=dn]').classList.toggle('dim',s.scrollTop>max-40); };
+  window.addEventListener('scroll',upd,{passive:true}); window.addEventListener('resize',upd); new MutationObserver(()=>requestAnimationFrame(upd)).observe(document.body,{childList:true,subtree:true}); setTimeout(upd,300);
+})();
 let GV=[];
 /* 열 개수는 바깥 칸 너비로 계산 (이전 탭 카드가 남아 있어도 영향 없게) */
 const gW=g=>{ const p=g.parentElement; if(!p) return g.clientWidth; const cs=getComputedStyle(p); return p.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0); };
@@ -1335,8 +1350,17 @@ async function editPersona(p0,auMode){
 }
 
 /* ---------- 프롬프트 ---------- */
+/* 프롬프트 번호 자동 기입: 같은 카테고리에서 제일 큰 번호 + 1. "12 | 이름" 같은 꼴이면 구분자도 따라가요 */
+function nextPromptNo(cat){
+  const L=(D.prompts||[]).filter(x=>(x.cat||'')===(cat||''));
+  if(!L.length) return '1';
+  let best=null;
+  L.forEach(x=>{ const m=/^\s*(\d+)(\s*[|.)\-:·]\s*)?/.exec(x.title||''); if(m){ const n=+m[1]; if(!best||n>best.n) best={n,sep:m[2]||''}; } });
+  return best?String(best.n+1)+best.sep:'';
+}
 async function editPrompt(q0){
   const isNew=!q0; const q=JSON.parse(JSON.stringify(q0||{id:uid(),title:'',tags:[],cat:curCat()}));
+  let autoNo=isNew?nextPromptNo(q.cat):null; if(isNew&&autoNo) q.title=autoNo;
   const src=await img(q.img); let dirtyFn=null;
   const m=modal(`<div class="v-dh"><b>${isNew?'＋ 새 프롬프트':'✨ 프롬프트'}</b><button class="x" type="button">×</button></div>
     <div class="v-db"><div class="v-form big">
@@ -1388,7 +1412,8 @@ async function editPrompt(q0){
       if(c.img){ const v=await img(q0.img); if(v){ c.img=uid(); await imgSet(c.img,v); IMG.set(c.img,v); if(q0.orig){ const o=await imgGet(ORIG(q0.img)).catch(()=>null); if(o) await imgSet(ORIG(c.img),o); else c.orig=null; } } else { c.img=null; c.orig=null; } }
       D.prompts.push(c); await save(); render(); toast('사본을 만들었어요'); editPrompt(c); };
   }
-  if(isNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) $('f-title').focus(); },50);
+  if(isNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)){ const t=$('f-title'); t.focus(); const L=t.value.length; try{ t.setSelectionRange(L,L); }catch(e){} } },50);
+  if(isNew) $('f-cat').addEventListener('change',()=>{ const t=$('f-title'); if(autoNo!==null&&t.value===autoNo){ autoNo=nextPromptNo($('f-cat').value||''); t.value=autoNo; } });
 }
 
 /* ---------- 페어 정리함 ---------- */

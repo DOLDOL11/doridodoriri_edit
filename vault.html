@@ -481,7 +481,9 @@
   .v-gv .gv-reveal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:999px;background:rgba(255,255,255,.92);color:#c0594b;font-weight:700;font-size:13.5px;padding:10px 18px;cursor:pointer}
   @media (max-width:600px){ .nsfw-bar{order:3} .t-vault .np{height:32px;padding:0 11px} }
 
-  .v-taginput input{flex:1 1 60px!important;width:auto!important;min-width:60px!important}
+  .v-taginput input{flex:1 1 40px!important;width:auto!important;min-width:40px!important}
+  /* 태그가 있을 때 입력칸이 혼자 다음 줄로 내려가 빈 줄을 만들지 않게: 입력 중이 아닐 땐 아주 작게 */
+  .v-taginput .chip ~ input:not(:focus){min-width:6px!important;flex-basis:6px!important}
   .orig-note{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px}
   .orig-note button{margin-left:auto;border:1px solid #c9ddef;background:#fff;color:#3f6a92;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
 </style>

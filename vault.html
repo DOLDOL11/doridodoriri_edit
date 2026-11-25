@@ -483,7 +483,8 @@
 
   .v-taginput input{flex:1 1 40px!important;width:auto!important;min-width:40px!important}
   /* 태그가 있을 때 입력칸이 혼자 다음 줄로 내려가 빈 줄을 만들지 않게: 입력 중이 아닐 땐 아주 작게 */
-  .v-taginput .chip ~ input:not(:focus){min-width:6px!important;flex-basis:6px!important}
+  .v-taginput{align-content:flex-start;height:auto!important;min-height:0!important}
+  .v-taginput .chip ~ input:not(:focus){min-width:0!important;width:0!important;flex:0 0 0!important;padding:0!important;margin:0!important;height:22px}
   .orig-note{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px}
   .orig-note button{margin-left:auto;border:1px solid #c9ddef;background:#fff;color:#3f6a92;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
 </style>

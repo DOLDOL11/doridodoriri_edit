@@ -635,7 +635,7 @@ try{ U.adult=sessionStorage.getItem('vault-adult')==='1'; }catch(e){ U.adult=fal
 if(!['all','only','hide'].includes(U.nsfw)) U.nsfw='all';
 const isN=q=>!!(q&&(q.nsfw||(q.tags||[]).some(t=>/^nsfw$/i.test(t))));
 function paintNsfwBar(){
-  const b=$('nsfwBar'); if(!b) return; const showF=U.tab==='prompt', show19=U.tab==='prompt'||U.tab==='gallery';
+  const b=$('nsfwBar'); if(!b) return; const showF=U.tab==='prompt', show19=U.tab==='prompt';
   b.style.display=show19?'':'none';
   b.innerHTML=`<button type="button" class="np np19 ${U.adult?'on':''}" id="v-np19" title="${U.adult?'다시 블러 처리':'NSFW 블러 한 번에 풀기'}"><span class="bx">${U.adult?'✓':''}</span>19</button>${showF?`<button type="button" class="np npN ${U.nsfw}" id="v-npN" title="누를 때마다 전체 → NSFW만 → NSFW 제외">${U.nsfw==='only'?'NSFW만':U.nsfw==='hide'?'NSFW 제외':'NSFW'}</button>`:''}`;
   $('np19').onclick=()=>{ U.adult=!U.adult; try{ sessionStorage.setItem('vault-adult',U.adult?'1':'0'); }catch(e){} render(); };
@@ -765,7 +765,6 @@ function renderSide(){
     h+=`<button class="cat${d?' sub':''} ${cur===c.id?'on':''}" data-c="${c.id}" style="padding-left:${10+d*14}px">${hasK?`<span class="tw" data-tw="${c.id}">${closed.has(c.id)?'▸':'▾'}</span>`:`<span class="tw sp0">${d?'└':''}</span>`}${d?'':'📁 '}${esc(c.name)}<span class="n">${cnt(c.id)}</span><span class="ed" data-addsub="${c.id}" title="하위 카테고리 추가">＋</span><span class="ed" data-e="${c.id}" title="편집">✎</span></button>`; });
   const none=cnt('none'); if(cs.length && none) h+=`<button class="cat ${cur==='none'?'on':''}" data-c="none">미분류<span class="n">${none}</span></button>`;
   h+=`<button class="cat add" data-add="1">＋ 카테고리</button>`;
-  if(U.tab==='gallery'){ h+=`<div class="side-h au-h">모아보기</div>`; [['up','직접 올린 사진'],['persona','캐릭터'],['pair','페어'],['prompt','프롬프트']].forEach(([k,l])=>{ const n=cnt('src:'+k); if(n||k==='up') h+=`<button class="cat aucat ${cur==='src:'+k?'on':''}" data-c="src:${k}"><span class="dot"></span>${l}<span class="n">${n}</span></button>`; }); }
   if(U.tab==='persona'||U.tab==='pair'){ const gs=auGroups(); if(gs.length){ h+=`<div class="side-h au-h">AU</div>`; gs.forEach(g=>{ h+=`<button class="cat aucat ${cur==='au:'+g.k?'on':''}" data-c="au:${esc(g.k)}"><span class="dot"></span>${esc(g.label)}<span class="n">${g.n}</span></button>`; }); } else if(String(cur).startsWith('au:')) U.cat[U.tab]='all'; }
   $('side').innerHTML=h;
   $('side').querySelectorAll('.cat').forEach(b=>b.onclick=e=>{
@@ -787,7 +786,7 @@ function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
 function render(){
   document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===U.tab));
   document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>{ const t=a.dataset.vtab, n=t==='gallery'?allPics().length:(D[TABS[t].list]||[]).length; a.classList.toggle('on',t===U.tab); a.querySelector('.n').textContent=n||''; });
-  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],gallery:['갤러리','직접 올린 사진과 캐릭터·페어·프롬프트의 이미지를 한곳에서 모아봐요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
+  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],gallery:['갤러리','직접 올린 이미지를 모아보는 곳이에요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
   const hh=document.querySelector('.t-vault > header'); if(hh){ hh.querySelector('h1').textContent=H[0]; hh.querySelector('p').textContent=H[1]; }
   $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어',gallery:'＋ 사진 올리기',clip:'＋ 발췌 올리기'}[U.tab];
   $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기'}[U.tab];
@@ -835,27 +834,23 @@ function allPics(){
   const out=[], seen=new Set();
   const add=o=>{ if(!o.img||seen.has(o.img)) return; seen.add(o.img); out.push(o); };
   (D.gallery||[]).forEach(g=>add({id:g.id,img:g.img,title:g.title||'',memo:g.memo||'',sub:'',src:'up',tags:g.tags||[],cat:g.cat,created:g.created,updated:g.updated,pin:g.pin,item:g}));
-  (D.personas||[]).forEach(p=>{ add({id:'p:'+p.img,img:p.img,title:p.name||'',sub:'캐릭터',src:'persona',ref:{tab:'persona',id:p.id},tags:p.tags||[],created:p.created,updated:p.updated});
-    (p.aus||[]).forEach(a=>add({id:'p:'+a.img,img:a.img,title:a.name||p.name||'',sub:`캐릭터 · ${a.label} AU`,src:'persona',ref:{tab:'persona',id:p.id,au:a.id},tags:p.tags||[],created:p.created,updated:p.updated})); });
-  (D.pairs||[]).forEach(r=>{ const nm=r.name||(pairName(r.a)+' × '+pairName(r.b)); const base={src:'pair',tags:r.tags||[],created:r.created,updated:r.updated};
-    [r.img,r.imgA,r.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:nm,sub:'페어',ref:{tab:'pair',id:r.id}}));
-    (r.aus||[]).forEach(a=>[a.img,a.imgA,a.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:a.name||nm,sub:`페어 · ${a.label} AU`,ref:{tab:'pair',id:r.id,au:a.id}}))); });
-  (D.prompts||[]).forEach(q=>add({id:'q:'+q.img,img:q.img,title:q.title||'',sub:'프롬프트',src:'prompt',nsfw:isN(q),ref:{tab:'prompt',id:q.id},tags:q.tags||[],created:q.created,updated:q.updated,orig:!!q.orig}));
   return out;
 }
 let GV=[];
+/* 열 개수는 바깥 칸 너비로 계산 (이전 탭 카드가 남아 있어도 영향 없게) */
+const gW=g=>{ const p=g.parentElement; if(!p) return g.clientWidth; const cs=getComputedStyle(p); return p.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0); };
 function renderGallery(){
   const {arr,base}=filtered(); renderTags(base); GV=arr;
-  const g=$('grid'); g.classList.remove('prompts','pairs','clips'); g.classList.add('gallery'); $('dragHint').style.display='none';
-  if(!arr.length){ g.innerHTML=`<div class="v-empty">${allPics().length?'조건에 맞는 이미지가 없어요.':'아직 모인 이미지가 없어요.<br><b>＋ 사진 올리기</b>를 누르거나, 사진을 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.<br>캐릭터·페어·프롬프트에 넣은 이미지도 자동으로 여기에 모여요.'}</div>`; return; }
-  const n=Math.max(2,Math.floor((g.clientWidth||900)/210)); g.dataset.cols=n;
+  const g=$('grid'); g.innerHTML=''; g.classList.remove('prompts','pairs','clips'); g.classList.add('gallery'); $('dragHint').style.display='none';
+  if(!arr.length){ g.innerHTML=`<div class="v-empty">${allPics().length?'조건에 맞는 이미지가 없어요.':'아직 모인 이미지가 없어요.<br><b>＋ 사진 올리기</b>를 누르거나, 사진을 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.'}</div>`; return; }
+  const n=Math.max(2,Math.floor((gW(g)||900)/210)); g.dataset.cols=n;
   const cols=Array.from({length:n},()=>[]);
   arr.forEach((x,i)=>cols[i%n].push(`<div class="gc${x.nsfw?' nsfw'+(U.adult?'':' blur'):''}" data-i="${i}">${x.pin?'<span class="pin">📌</span>':''}${x.nsfw?'<span class="nb">NSFW</span>':''}<div class="gi" data-gimg="${x.img}"></div><div class="gt"><b>${esc(x.title||'제목 없음')}</b><span>${esc(x.sub||SRCL.up)}</span></div></div>`));
   g.innerHTML=cols.map(c=>`<div class="gcol">${c.join('')}</div>`).join('');
   g.querySelectorAll('.gc').forEach(el=>el.onclick=()=>gview(+el.dataset.i));
   g.querySelectorAll('[data-gimg]').forEach(async el=>{ const v=await img(el.dataset.gimg); if(v){ el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; el.classList.add('has'); } else el.closest('.gc').style.display='none'; });
 }
-let rzT=0; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(U.tab!=='gallery'&&U.tab!=='clip') return; const g=$('grid'); const n=Math.max(2,Math.floor((g.clientWidth||900)/(U.tab==='clip'?230:210))); if(String(n)!==g.dataset.cols) U.tab==='clip'?renderClips():renderGallery(); },150); });
+let rzT=0; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(U.tab!=='gallery'&&U.tab!=='clip') return; const g=$('grid'); const n=Math.max(2,Math.floor((gW(g)||900)/(U.tab==='clip'?230:210))); if(String(n)!==g.dataset.cols) U.tab==='clip'?renderClips():renderGallery(); },150); });
 /* 올리기 */
 function pickPics(clip){ const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true; inp.onchange=()=>addPics([...inp.files],clip); inp.click(); }
 async function addPics(files,clip){
@@ -941,7 +936,7 @@ function clipSide(){
   $('side').querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ U.cat.clip=b.dataset.c; saveUI(); render(); });
 }
 function renderClips(){
-  const g=$('grid'); g.classList.remove('prompts','pairs'); g.classList.add('gallery','clips'); $('dragHint').style.display='none'; $('tagbar').innerHTML='';
+  const g=$('grid'); g.innerHTML=''; g.classList.remove('prompts','pairs'); g.classList.add('gallery','clips'); $('dragHint').style.display='none'; $('tagbar').innerHTML='';
   const c=U.cat.clip||'all'; let arr=(D.clips||[]).slice();
   if(c==='ch:none') arr=arr.filter(x=>!(x.chars||[]).length); else if(String(c).startsWith('ch:')) arr=arr.filter(x=>(x.chars||[]).some(n=>chKey(n)===c.slice(3)));
   const ws=U.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -949,7 +944,7 @@ function renderClips(){
   arr.sort((a,b)=>U.sort==='new'?(b.created||0)-(a.created||0):U.sort==='upd'?(b.updated||0)-(a.updated||0):(a.created||0)-(b.created||0));
   GV=arr.map(x=>({id:x.id,img:x.img,title:(x.chars||[]).map(n=>'#'+n).join(' '),memo:x.memo||'',sub:'발췌',src:'clip',item:x}));
   if(!arr.length){ g.innerHTML=`<div class="v-empty">${(D.clips||[]).length?'조건에 맞는 발췌가 없어요.':'아직 모은 발췌가 없어요.<br><b>＋ 발췌 올리기</b>를 누르거나, 이미지를 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.<br>올린 뒤 어떤 캐릭터의 발췌인지 태그를 달 수 있어요.'}</div>`; return; }
-  const n=Math.max(2,Math.floor((g.clientWidth||900)/230)); g.dataset.cols=n;
+  const n=Math.max(2,Math.floor((gW(g)||900)/230)); g.dataset.cols=n;
   const cols=Array.from({length:n},()=>[]);
   arr.forEach((x,i)=>cols[i%n].push(`<div class="gc bare" data-i="${i}"><div class="gi" data-gimg="${x.img}"></div></div>`));
   g.innerHTML=cols.map(c=>`<div class="gcol">${c.join('')}</div>`).join('');

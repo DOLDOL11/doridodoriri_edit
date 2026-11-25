@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><meta name="referrer" content="no-referrer">
 <meta charset="utf-8">
 <meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -384,6 +384,29 @@
 </style>
 <style>
   .sync-msg{font-size:12px;color:#b4423c;background:#fdf1f0;border-radius:10px;padding:8px 10px;margin:0 0 8px;word-break:break-all;font-family:ui-monospace,Menlo,monospace}
+  .lks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .lks .empty2{grid-column:1/-1}
+  .lk{position:relative}
+  .lk a{display:flex;align-items:center;gap:12px;padding:13px 40px 13px 14px;border:1px solid var(--ln);border-radius:16px;text-decoration:none;color:#2a323d;background:#fff;transition:border-color .15s,background .15s}
+  .lk a:hover{border-color:#bcd8f2;background:#f7fbff}
+  .lk-i{flex:none;width:34px;height:34px;border-radius:11px;background:var(--soft);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .lk-t{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .lk-t b{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lk-t small{font-size:11.5px;color:#9aa8b6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lk-e{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:26px;height:26px;border-radius:8px;border:0;background:transparent;color:#a9b6c3;font-size:13px;cursor:pointer;opacity:0;transition:opacity .15s}
+  .lk:hover .lk-e,.lk-e:focus{opacity:1}
+  .lk-e:hover{background:var(--soft);color:var(--deep)}
+  @media (hover:none){ .lk-e{opacity:1} }
+  .lk-f{display:flex;flex-direction:column;gap:12px;margin:6px 0 18px}
+  .lk-f label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#7a8794}
+  .lk-f small{color:#a9b6c3}
+  .lk-f input{border:1px solid var(--ln);border-radius:12px;padding:10px 12px;font-size:14px;color:#2a323d;outline:none;font-family:inherit}
+  .lk-f input:focus{border-color:#9cc8ee}
+  .lk-f input.bad{border-color:#e9a3a3;background:#fff7f7}
+  .lk-btns{display:flex;gap:8px;align-items:center}
+  .lk-btns .sp{flex:1}
+  .side .it.ext{display:flex;align-items:center}
+  .side .it .ext-i{margin-left:auto;font-size:11px;color:#b3c0cc}
 </style>
 </head>
 <body>
@@ -429,6 +452,12 @@
       <section class="w s3">
         <div class="wh"><h2>D-DAY</h2><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
         <div id="home-dday" style="flex:1;display:flex;flex-direction:column"></div>
+      </section>
+
+
+      <section class="w s3">
+        <div class="wh"><h2>LINKS</h2><button type="button" class="more" id="home-lkAdd">＋ 링크 추가</button></div>
+        <div class="lks" id="home-lks"></div>
       </section>
 
 
@@ -483,6 +512,17 @@
 </div>
 </section>
 </div>
+<div class="hm-ov" id="home-lkOv">
+  <div class="hm">
+    <div class="wh"><h2 id="home-lkTitle">LINK</h2><button type="button" class="x" id="home-lkX" title="닫기">✕</button></div>
+    <div class="lk-f">
+      <label>이름<input type="text" id="home-lkName" placeholder="예: ○○님 상태창 에디터" autocomplete="off"></label>
+      <label>주소<input type="url" id="home-lkUrl" placeholder="https://" autocomplete="off" spellcheck="false"></label>
+      <label>메모 <small>(선택)</small><input type="text" id="home-lkMemo" placeholder="어떤 용도인지 짧게" autocomplete="off"></label>
+    </div>
+    <div class="lk-btns"><button type="button" class="pill" id="home-lkDel">삭제</button><span class="sp"></span><button type="button" class="pill" id="home-lkCancel">취소</button><button type="button" class="pill blue" id="home-lkSave">저장</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>window.HOME_CFG={newTab:true};
 (function(){
@@ -529,7 +569,7 @@ function paintSide(){
       const n=a.dataset.ed==='vault'&&V.personas.length?`<span class="n">${V.personas.length}</span>`:'';
       return `<a class="it" data-ed="${a.dataset.ed}" href="${a.getAttribute('href')}">${esc(a.dataset.nm)}${n}</a>`;
     }).join('');
-  }).join('');
+  }).join('')+((P.links||[]).length?`<div class="lbl">LINKS</div>`+P.links.map(k=>`<a class="it ext" href="${esc(k.url)}" target="_blank" rel="noreferrer noopener">${esc(k.name||host(k.url))}<span class="ext-i">↗</span></a>`).join(''):'');
   applyOpen();
 }
 
@@ -629,6 +669,38 @@ async function loadVault(){
   });
   d.close(); paintWidgets();
 }
+/* ---------- 링크 모음 (다른 사람이 만든 에디터 등) ---------- */
+function host(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return u; } }
+function fixUrl(u){ u=String(u||'').trim(); if(!u) return ''; if(!/^[a-z][a-z0-9+.-]*:/i.test(u)) u='https://'+u; try{ const x=new URL(u); return /^https?:$/.test(x.protocol)?x.href:''; }catch(e){ return ''; } }
+function paintLinks(){
+  const box=$h('lks'); if(!box) return; const L=P.links||[];
+  box.innerHTML=L.length?L.map(k=>`<div class="lk"><a href="${esc(k.url)}" target="_blank" rel="noreferrer noopener"><span class="lk-i">${esc(([...(k.name||host(k.url)).trim()][0]||'?').toUpperCase())}</span><span class="lk-t"><b>${esc(k.name||host(k.url))}</b><small>${esc(k.memo||host(k.url))}</small></span></a><button type="button" class="lk-e" data-id="${k.id}" title="편집">✎</button></div>`).join('')
+    :`<div class="empty2" style="min-height:90px">다른 사람이 만든 에디터나 자주 가는 사이트 주소를 여기에 모아둘 수 있어요.<button type="button" class="pill" id="home-lkAdd2">＋ 링크 추가</button></div>`;
+  box.querySelectorAll('.lk-e').forEach(b=>b.onclick=()=>lkOpen((P.links||[]).find(x=>x.id===b.dataset.id)));
+  const a2=$h('lkAdd2'); if(a2) a2.onclick=()=>lkOpen(null);
+}
+let lkCur=null;
+function lkOpen(k){
+  lkCur=k; $h('lkTitle').textContent=k?'EDIT LINK':'NEW LINK';
+  $h('lkName').value=k?k.name||'':''; $h('lkUrl').value=k?k.url:''; $h('lkMemo').value=k?k.memo||'':'';
+  $h('lkDel').style.display=k?'':'none'; $h('lkOv').classList.add('on'); setTimeout(()=>(k?$h('lkName'):$h('lkUrl')).focus(),30);
+}
+const lkClose=()=>$h('lkOv').classList.remove('on');
+$h('lkAdd').onclick=()=>lkOpen(null);
+$h('lkX').onclick=lkClose; $h('lkCancel').onclick=lkClose;
+$h('lkOv').addEventListener('mousedown',e=>{ if(e.target===$h('lkOv')) lkClose(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$h('lkOv').classList.contains('on')) lkClose(); });
+$h('lkSave').onclick=()=>{
+  const url=fixUrl($h('lkUrl').value); if(!url){ $h('lkUrl').focus(); $h('lkUrl').classList.add('bad'); setTimeout(()=>$h('lkUrl').classList.remove('bad'),1200); return; }
+  const v={name:$h('lkName').value.trim(), url, memo:$h('lkMemo').value.trim()};
+  if(!P.links) P.links=[];
+  if(lkCur) Object.assign(P.links.find(x=>x.id===lkCur.id)||{},v); else P.links.push({id:Date.now().toString(36),...v});
+  savePref(); lkClose(); paintLinks(); paintSide();
+};
+$h('lkDel').onclick=()=>{ if(!lkCur) return; if(!confirm(`'${lkCur.name||host(lkCur.url)}' 링크를 지울까요?`)) return; P.links=(P.links||[]).filter(x=>x.id!==lkCur.id); savePref(); lkClose(); paintLinks(); paintSide(); };
+[$h('lkName'),$h('lkUrl'),$h('lkMemo')].forEach(i=>i.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); $h('lkSave').click(); } }));
+paintLinks();
+
 /* ---------- 페어 디데이 ---------- */
 const DAY=86400000;
 function dayDiff(s){ const t=new Date(s+'T00:00:00'); if(isNaN(t)) return null; const n=new Date(); n.setHours(0,0,0,0); return Math.round((n-t)/DAY); }

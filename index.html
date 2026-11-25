@@ -523,7 +523,7 @@ function paintSide(){
     if(!its.length) return '';
     if(g==='archive'){ const vh=(its[0]||{getAttribute:()=>'vault.html'}).getAttribute('href').split('#')[0];
       const n=x=>x?`<span class="n">${x}</span>`:'';
-      return `<div class="lbl">${l}</div>`+[['persona','캐릭터',V.personas.length],['pair','페어',V.pairs.length],['prompt','프롬프트',V.prompts.length]]
+      return `<div class="lbl">${l}</div>`+[['persona','캐릭터',V.personas.length],['pair','페어',V.pairs.length],['prompt','프롬프트',V.prompts.length],['gallery','갤러리',(json('vault-summary')||{}).g||0]]
         .map(([t,nm,c])=>`<a class="it" data-ed="vault" href="${vh}#tab=${t}">${nm}${n(c)}</a>`).join('')+`<a class="it" data-ed="logs" href="logs.html">로그${n((json('logs-summary')||{}).c||0)}</a>`; }
     return `<div class="lbl">${l}</div>`+its.map(a=>{
       const n=a.dataset.ed==='vault'&&V.personas.length?`<span class="n">${V.personas.length}</span>`:'';

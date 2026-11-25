@@ -1423,12 +1423,14 @@ async function editPrompt(q0){
     if(n) toast('이미지 속 프롬프트를 채웠어요'); return n; };
   const st=imgPicker($('drop'),src,true,{aspect:'4/5',pos:q.imgPos||'',defPos:'50% 0%',hasOrig:!!q.orig, getOrig, onChange:s2=>{ if(s2.meta&&s2.meta.pos) fill(s2.meta,false); paintMeta(s2); }});
   paintMeta(st);
-  const getTags=tagInput($('f-tags'),q.tags||[]);
+  let tagGet=tagInput($('f-tags'),q.tags||[]); const getTags=()=>tagGet();
+  /* NSFW 블러를 켜면 #NSFW 태그도 자동으로, 끄면 같이 빠져요 */
+  $('f-nsfw').addEventListener('change',()=>{ let ts=tagGet().filter(t=>!/^nsfw$/i.test(t)); if($('f-nsfw').checked) ts=[...ts,'NSFW']; tagGet=tagInput($('f-tags'),ts); });
   const formState=()=>JSON.stringify([$('f-title').value,$('f-cat').value,$('f-pos').value,$('f-neg').value,$('f-memo').value,$('f-pin').checked,$('f-nsfw').checked,getTags()]);
   const snap0=formState(); dirtyFn=()=>st.changed||formState()!==snap0;
   $('cpPos').onclick=()=>copy($('f-pos').value.trim(),'긍정 프롬프트를');
   $('cpNeg').onclick=()=>copy($('f-neg').value.trim(),'부정 프롬프트를');
-  const collect=()=>{ Object.assign(q,{title:$('f-title').value.trim(), cat:$('f-cat').value||null, tags:getTags(), pos:$('f-pos').value.trim(), neg:$('f-neg').value.trim(), memo:$('f-memo').value.trim(), pin:$('f-pin').checked, nsfw:$('f-nsfw').checked, updated:Date.now()}); if(!q.nsfw) q.tags=(q.tags||[]).filter(t=>!/^nsfw$/i.test(t)); };
+  const collect=()=>{ Object.assign(q,{title:$('f-title').value.trim(), cat:$('f-cat').value||null, tags:getTags(), pos:$('f-pos').value.trim(), neg:$('f-neg').value.trim(), memo:$('f-memo').value.trim(), pin:$('f-pin').checked, nsfw:$('f-nsfw').checked, updated:Date.now()}); q.tags=(q.tags||[]).filter(t=>!/^nsfw$/i.test(t)); if(q.nsfw) q.tags.push('NSFW'); };
   $('save').onclick=async()=>{
     collect(); if(!q.title){ toast('제목을 적어 주세요'); $('f-title').focus(); return; }
     if(isNew) q.created=Date.now();
@@ -1656,7 +1658,9 @@ let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').va
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
 $('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):editPrompt(null);
 (async()=>{
-  try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d); }
+  try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d);
+    /* 예전에 블러만 켜둔 프롬프트에도 #NSFW 태그 달아주기 (한 번만) */
+    let fixed=0; (D.prompts||[]).forEach(q=>{ if(q.nsfw&&!(q.tags||[]).some(t=>/^nsfw$/i.test(t))){ q.tags=[...(q.tags||[]),'NSFW']; fixed++; } }); if(fixed) await kvSet('data',D).catch(()=>{}); }
   catch(e){ $('grid').innerHTML='<div class="v-empty">이 브라우저에서는 보관함 저장소를 열 수 없어요.<br>시크릿 모드라면 일반 창에서 열어 주세요.</div>'; return; }
   try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
   try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length})); }catch(e){}

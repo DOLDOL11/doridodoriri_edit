@@ -731,7 +731,7 @@ function renderSide(){
     h+=`<button class="cat${d?' sub':''} ${cur===c.id?'on':''}" data-c="${c.id}" style="padding-left:${10+d*14}px">${hasK?`<span class="tw" data-tw="${c.id}">${closed.has(c.id)?'▸':'▾'}</span>`:`<span class="tw sp0">${d?'└':''}</span>`}${d?'':'📁 '}${esc(c.name)}<span class="n">${cnt(c.id)}</span><span class="ed" data-addsub="${c.id}" title="하위 카테고리 추가">＋</span><span class="ed" data-e="${c.id}" title="편집">✎</span></button>`; });
   const none=cnt('none'); if(cs.length && none) h+=`<button class="cat ${cur==='none'?'on':''}" data-c="none">미분류<span class="n">${none}</span></button>`;
   h+=`<button class="cat add" data-add="1">＋ 카테고리</button>`;
-  if(U.tab==='gallery'){ h+=`<div class="side-h au-h">모아보기</div>`; [['up','직접 올린 사진'],['clip','발췌'],['persona','캐릭터'],['pair','페어'],['prompt','프롬프트']].forEach(([k,l])=>{ const n=cnt('src:'+k); if(n||k==='up') h+=`<button class="cat aucat ${cur==='src:'+k?'on':''}" data-c="src:${k}"><span class="dot"></span>${l}<span class="n">${n}</span></button>`; }); }
+  if(U.tab==='gallery'){ h+=`<div class="side-h au-h">모아보기</div>`; [['up','직접 올린 사진'],['persona','캐릭터'],['pair','페어'],['prompt','프롬프트']].forEach(([k,l])=>{ const n=cnt('src:'+k); if(n||k==='up') h+=`<button class="cat aucat ${cur==='src:'+k?'on':''}" data-c="src:${k}"><span class="dot"></span>${l}<span class="n">${n}</span></button>`; }); }
   if(U.tab==='persona'||U.tab==='pair'){ const gs=auGroups(); if(gs.length){ h+=`<div class="side-h au-h">AU</div>`; gs.forEach(g=>{ h+=`<button class="cat aucat ${cur==='au:'+g.k?'on':''}" data-c="au:${esc(g.k)}"><span class="dot"></span>${esc(g.label)}<span class="n">${g.n}</span></button>`; }); } else if(String(cur).startsWith('au:')) U.cat[U.tab]='all'; }
   $('side').innerHTML=h;
   $('side').querySelectorAll('.cat').forEach(b=>b.onclick=e=>{
@@ -806,7 +806,6 @@ function allPics(){
   (D.pairs||[]).forEach(r=>{ const nm=r.name||(pairName(r.a)+' × '+pairName(r.b)); const base={src:'pair',tags:r.tags||[],created:r.created,updated:r.updated};
     [r.img,r.imgA,r.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:nm,sub:'페어',ref:{tab:'pair',id:r.id}}));
     (r.aus||[]).forEach(a=>[a.img,a.imgA,a.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:a.name||nm,sub:`페어 · ${a.label} AU`,ref:{tab:'pair',id:r.id,au:a.id}}))); });
-  (D.clips||[]).forEach(c=>add({id:'c:'+c.img,img:c.img,title:(c.chars||[]).map(n=>'#'+n).join(' '),memo:c.memo||'',sub:'발췌',src:'clip',tags:c.chars||[],created:c.created,updated:c.updated,item:c}));
   (D.prompts||[]).forEach(q=>add({id:'q:'+q.img,img:q.img,title:q.title||'',sub:'프롬프트',src:'prompt',ref:{tab:'prompt',id:q.id},tags:q.tags||[],created:q.created,updated:q.updated,orig:!!q.orig}));
   return out;
 }

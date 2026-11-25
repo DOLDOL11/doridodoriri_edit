@@ -1442,7 +1442,7 @@ function catModal(c,preParent){
   modal(`<div class="v-dh"><b>${isNew?'＋ 새 카테고리':'카테고리 편집'}</b><button class="x" type="button">×</button></div>
     <div class="v-db v-fields">
       <div><label>이름</label><input type="text" id="v-c-name" value="${esc(c&&c.name)}" placeholder="예: 오리지널, 현대 AU, 화풍"></div>
-      <div><label>상위 카테고리 (선택)</label><select id="v-c-parent"><option value="">없음 (맨 위)</option>${roots.map(({c:r,d})=>`<option value="${r.id}" ${curP===r.id?'selected':''}>${'\u3000'.repeat(d)}${d?'└ ':''}${esc(r.name)}</option>`).join('')}</select><div style="font-size:11.5px;color:var(--sub);margin-top:4px">카테고리 안에 카테고리를 몇 단계든 넣을 수 있어요.</div></div>':''}</div>
+      <div><label>상위 카테고리 (선택)</label><select id="v-c-parent"><option value="">없음 (맨 위)</option>${roots.map(({c:r,d})=>`<option value="${r.id}" ${curP===r.id?'selected':''}>${'\u3000'.repeat(d)}${d?'└ ':''}${esc(r.name)}</option>`).join('')}</select><div style="font-size:11.5px;color:var(--sub);margin-top:4px">카테고리 안에 카테고리를 몇 단계든 넣을 수 있어요.</div></div>
     </div>
     <div class="v-df">${isNew?'':'<button type="button" class="danger" id="v-cdel">삭제</button>'}<span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-csave">저장</button></div>`,{sm:true});
   setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) $('c-name').focus(); },50);

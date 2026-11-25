@@ -452,6 +452,13 @@
   .gp-wrap{display:grid;grid-template-columns:220px 1fr;gap:16px}
   .gp-im img{width:100%;border-radius:12px;display:block}
   @media (max-width:600px){ .gp-wrap{grid-template-columns:1fr} .gp-im img{max-height:240px;object-fit:contain} }
+
+  .t-vault .gc.bare{border-radius:12px}
+  .t-vault .gc.bare .gi{min-height:120px}
+  .t-vault .gc.bare .gi.has{min-height:0}
+  .ct-thumbs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ct-thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #dfeaf4}
+  .ct-thumbs .more{font-size:12px;color:var(--sub);padding:0 6px}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -521,6 +528,7 @@
   <a class="it" href="#tab=persona" data-vtab="persona">캐릭터<span class="n"></span></a>
   <a class="it" href="#tab=pair" data-vtab="pair">페어<span class="n"></span></a>
   <a class="it" href="#tab=prompt" data-vtab="prompt">프롬프트<span class="n"></span></a>
+  <a class="it" href="#tab=clip" data-vtab="clip">발췌 모음<span class="n"></span></a>
   <a class="it" href="#tab=gallery" data-vtab="gallery">갤러리<span class="n"></span></a>
   <a class="it" href="logs.html">로그</a>
   <div class="lbl">TOOLS</div>
@@ -536,6 +544,7 @@
         <button class="tab" data-tab="persona">🧑 캐릭터</button>
         <button class="tab" data-tab="pair">💞 페어</button>
         <button class="tab" data-tab="prompt">✨ 프롬프트</button>
+        <button class="tab" data-tab="clip">📑 발췌 모음</button>
         <button class="tab" data-tab="gallery">🖼 갤러리</button>
         <span class="sp"></span>
         <button id="v-export" type="button">💾 보관함 내보내기</button>
@@ -589,7 +598,7 @@ const imgDel=id=>tx('img','readwrite',s=>s.delete(id));
 const imgAll=()=>new Promise((res,rej)=>{ const out={}; const t=db.transaction('img','readonly'); const c=t.objectStore('img').openCursor(); c.onsuccess=()=>{ const cur=c.result; if(cur){ out[cur.key]=cur.value; cur.continue(); } }; t.oncomplete=()=>res(out); t.onerror=()=>rej(t.error); });
 const imgClear=()=>tx('img','readwrite',s=>s.clear());
 
-const BLANK=()=>({v:1, personas:[], prompts:[], pairs:[], gallery:[], pcats:[], qcats:[], rcats:[], gcats:[]});
+const BLANK=()=>({v:1, personas:[], prompts:[], pairs:[], gallery:[], clips:[], pcats:[], qcats:[], rcats:[], gcats:[]});
 let D=BLANK();
 const IMG=new Map();
 async function img(id){ if(!id) return null; if(IMG.has(id)) return IMG.get(id); const v=await imgGet(id).catch(()=>null); IMG.set(id,v||null); return v||null; }
@@ -597,12 +606,12 @@ async function img(id){ if(!id) return null; if(IMG.has(id)) return IMG.get(id);
 let U={tab:'persona', cat:{persona:'all',prompt:'all',pair:'all'}, q:'', tag:null, sort:'old'};
 try{ Object.assign(U, JSON.parse(localStorage.getItem('vault-ui')||'{}')); }catch(e){}
 if(!U.cat||typeof U.cat!=='object') U.cat={persona:'all',prompt:'all',pair:'all'};
-if(!['persona','prompt','pair','gallery'].includes(U.tab)) U.tab='persona';
+if(!['persona','prompt','pair','gallery','clip'].includes(U.tab)) U.tab='persona';
 const saveUI=()=>{ try{ localStorage.setItem('vault-ui',JSON.stringify({tab:U.tab,cat:U.cat,sort:U.sort,catClosed:U.catClosed||[]})); }catch(e){} };
 
 async function save(){
   try{ await kvSet('data',D); }catch(e){ toast('저장하지 못했어요: '+(e&&e.name||'오류')); return; }
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
 }
 
 /* ---------- 원본 메타데이터 (PNG 텍스트 정보) ---------- */
@@ -664,7 +673,7 @@ async function copy(t,label){
 }
 
 /* ---------- 목록 ---------- */
-const TABS={persona:{list:'personas',cats:'pcats',ord:'porder'}, prompt:{list:'prompts',cats:'qcats',ord:'qorder'}, pair:{list:'pairs',cats:'rcats',ord:'rorder'}, gallery:{list:'gallery',cats:'gcats',ord:'gorder'}};
+const TABS={persona:{list:'personas',cats:'pcats',ord:'porder'}, prompt:{list:'prompts',cats:'qcats',ord:'qorder'}, pair:{list:'pairs',cats:'rcats',ord:'rorder'}, gallery:{list:'gallery',cats:'gcats',ord:'gorder'}, clip:{list:'clips',cats:'ccats',ord:'corder'}};
 const items=()=>D[TABS[U.tab].list]||(D[TABS[U.tab].list]=[]);
 const cats=()=>D[TABS[U.tab].cats]||(D[TABS[U.tab].cats]=[]);
 /* 카테고리 트리: 단계 제한 없이 아래로 계속 넣을 수 있다 */
@@ -711,6 +720,7 @@ function orderList(){
   return [...o,...fresh];
 }
 function renderSide(){
+  if(U.tab==='clip'){ clipSide(); return; }
   const cs=cats(), cur=U.cat[U.tab]||'all';
   const P0=pool(); const cnt=c=>P0.filter(it=>inCat(it,c)).length;
   let h=`<div class="side-h">카테고리</div><button class="cat ${cur==='all'?'on':''}" data-c="all">전체<span class="n">${cnt('all')}</span></button>`;
@@ -721,7 +731,7 @@ function renderSide(){
     h+=`<button class="cat${d?' sub':''} ${cur===c.id?'on':''}" data-c="${c.id}" style="padding-left:${10+d*14}px">${hasK?`<span class="tw" data-tw="${c.id}">${closed.has(c.id)?'▸':'▾'}</span>`:`<span class="tw sp0">${d?'└':''}</span>`}${d?'':'📁 '}${esc(c.name)}<span class="n">${cnt(c.id)}</span><span class="ed" data-addsub="${c.id}" title="하위 카테고리 추가">＋</span><span class="ed" data-e="${c.id}" title="편집">✎</span></button>`; });
   const none=cnt('none'); if(cs.length && none) h+=`<button class="cat ${cur==='none'?'on':''}" data-c="none">미분류<span class="n">${none}</span></button>`;
   h+=`<button class="cat add" data-add="1">＋ 카테고리</button>`;
-  if(U.tab==='gallery'){ h+=`<div class="side-h au-h">모아보기</div>`; [['up','직접 올린 사진'],['persona','캐릭터'],['pair','페어'],['prompt','프롬프트']].forEach(([k,l])=>{ const n=cnt('src:'+k); if(n||k==='up') h+=`<button class="cat aucat ${cur==='src:'+k?'on':''}" data-c="src:${k}"><span class="dot"></span>${l}<span class="n">${n}</span></button>`; }); }
+  if(U.tab==='gallery'){ h+=`<div class="side-h au-h">모아보기</div>`; [['up','직접 올린 사진'],['clip','발췌'],['persona','캐릭터'],['pair','페어'],['prompt','프롬프트']].forEach(([k,l])=>{ const n=cnt('src:'+k); if(n||k==='up') h+=`<button class="cat aucat ${cur==='src:'+k?'on':''}" data-c="src:${k}"><span class="dot"></span>${l}<span class="n">${n}</span></button>`; }); }
   if(U.tab==='persona'||U.tab==='pair'){ const gs=auGroups(); if(gs.length){ h+=`<div class="side-h au-h">AU</div>`; gs.forEach(g=>{ h+=`<button class="cat aucat ${cur==='au:'+g.k?'on':''}" data-c="au:${esc(g.k)}"><span class="dot"></span>${esc(g.label)}<span class="n">${g.n}</span></button>`; }); } else if(String(cur).startsWith('au:')) U.cat[U.tab]='all'; }
   $('side').innerHTML=h;
   $('side').querySelectorAll('.cat').forEach(b=>b.onclick=e=>{
@@ -743,15 +753,16 @@ function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
 function render(){
   document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===U.tab));
   document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>{ const t=a.dataset.vtab, n=t==='gallery'?allPics().length:(D[TABS[t].list]||[]).length; a.classList.toggle('on',t===U.tab); a.querySelector('.n').textContent=n||''; });
-  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],gallery:['갤러리','직접 올린 사진과 캐릭터·페어·프롬프트의 이미지를 한곳에서 모아봐요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
+  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],gallery:['갤러리','직접 올린 사진과 캐릭터·페어·프롬프트의 이미지를 한곳에서 모아봐요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
   const hh=document.querySelector('.t-vault > header'); if(hh){ hh.querySelector('h1').textContent=H[0]; hh.querySelector('p').textContent=H[1]; }
-  $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어',gallery:'＋ 사진 올리기'}[U.tab];
-  $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기'}[U.tab];
-  const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery';
-  $('sort').value=(U.tab==='gallery'&&U.sort==='custom')?'old':U.sort;
+  $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어',gallery:'＋ 사진 올리기',clip:'＋ 발췌 올리기'}[U.tab];
+  $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기'}[U.tab];
+  const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'; const cn=$('sort').querySelector('option[value=name]'); if(cn) cn.hidden=U.tab==='clip';
+  $('sort').value=((U.tab==='gallery'||U.tab==='clip')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
   renderSide();
   if(U.tab==='gallery'){ renderGallery(); return; }
-  $('grid').classList.remove('gallery');
+  if(U.tab==='clip'){ renderClips(); return; }
+  $('grid').classList.remove('gallery','clips');
   const {arr,base}=filtered(); renderTags(base);
   const g=$('grid'); g.classList.toggle('prompts',U.tab==='prompt'); g.classList.toggle('pairs',U.tab==='pair');
   if(!arr.length){
@@ -785,7 +796,7 @@ function render(){
 
 /* ---------- 갤러리 ---------- */
 const pool=()=>U.tab==='gallery'?allPics():items();
-const SRCL={up:'직접 올림',persona:'캐릭터',pair:'페어',prompt:'프롬프트'};
+const SRCL={up:'직접 올림',persona:'캐릭터',pair:'페어',prompt:'프롬프트',clip:'발췌'};
 function allPics(){
   const out=[], seen=new Set();
   const add=o=>{ if(!o.img||seen.has(o.img)) return; seen.add(o.img); out.push(o); };
@@ -795,13 +806,14 @@ function allPics(){
   (D.pairs||[]).forEach(r=>{ const nm=r.name||(pairName(r.a)+' × '+pairName(r.b)); const base={src:'pair',tags:r.tags||[],created:r.created,updated:r.updated};
     [r.img,r.imgA,r.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:nm,sub:'페어',ref:{tab:'pair',id:r.id}}));
     (r.aus||[]).forEach(a=>[a.img,a.imgA,a.imgB].forEach(id=>add({...base,id:'r:'+id,img:id,title:a.name||nm,sub:`페어 · ${a.label} AU`,ref:{tab:'pair',id:r.id,au:a.id}}))); });
+  (D.clips||[]).forEach(c=>add({id:'c:'+c.img,img:c.img,title:(c.chars||[]).map(n=>'#'+n).join(' '),memo:c.memo||'',sub:'발췌',src:'clip',tags:c.chars||[],created:c.created,updated:c.updated,item:c}));
   (D.prompts||[]).forEach(q=>add({id:'q:'+q.img,img:q.img,title:q.title||'',sub:'프롬프트',src:'prompt',ref:{tab:'prompt',id:q.id},tags:q.tags||[],created:q.created,updated:q.updated,orig:!!q.orig}));
   return out;
 }
 let GV=[];
 function renderGallery(){
   const {arr,base}=filtered(); renderTags(base); GV=arr;
-  const g=$('grid'); g.classList.remove('prompts','pairs'); g.classList.add('gallery'); $('dragHint').style.display='none';
+  const g=$('grid'); g.classList.remove('prompts','pairs','clips'); g.classList.add('gallery'); $('dragHint').style.display='none';
   if(!arr.length){ g.innerHTML=`<div class="v-empty">${allPics().length?'조건에 맞는 이미지가 없어요.':'아직 모인 이미지가 없어요.<br><b>＋ 사진 올리기</b>를 누르거나, 사진을 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.<br>캐릭터·페어·프롬프트에 넣은 이미지도 자동으로 여기에 모여요.'}</div>`; return; }
   const n=Math.max(2,Math.floor((g.clientWidth||900)/210)); g.dataset.cols=n;
   const cols=Array.from({length:n},()=>[]);
@@ -810,28 +822,30 @@ function renderGallery(){
   g.querySelectorAll('.gc').forEach(el=>el.onclick=()=>gview(+el.dataset.i));
   g.querySelectorAll('[data-gimg]').forEach(async el=>{ const v=await img(el.dataset.gimg); if(v){ el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; el.classList.add('has'); } else el.closest('.gc').style.display='none'; });
 }
-let rzT=0; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(U.tab!=='gallery') return; const g=$('grid'); const n=Math.max(2,Math.floor((g.clientWidth||900)/210)); if(String(n)!==g.dataset.cols) renderGallery(); },150); });
+let rzT=0; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(U.tab!=='gallery'&&U.tab!=='clip') return; const g=$('grid'); const n=Math.max(2,Math.floor((g.clientWidth||900)/(U.tab==='clip'?230:210))); if(String(n)!==g.dataset.cols) U.tab==='clip'?renderClips():renderGallery(); },150); });
 /* 올리기 */
-function pickPics(){ const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true; inp.onchange=()=>addPics([...inp.files]); inp.click(); }
-async function addPics(files){
+function pickPics(clip){ const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true; inp.onchange=()=>addPics([...inp.files],clip); inp.click(); }
+async function addPics(files,clip){
   files=files.filter(f=>f&&/^image\//.test(f.type)); if(!files.length){ toast('이미지 파일만 올릴 수 있어요'); return; }
-  if(!D.gallery) D.gallery=[];
+  if(!D.gallery) D.gallery=[]; if(!D.clips) D.clips=[]; const added=[];
   toast(`사진 ${files.length}장을 올리는 중…`);
   const now=Date.now(); let ok=0;
   for(let i=0;i<files.length;i++){ const f=files[i];
     try{ const data=(f.size<=2.5*1024*1024||/gif/.test(f.type))?await readFile(f):await shrink(f,2048);
       const id=uid(); await imgSet(id,data); IMG.set(id,data);
       const t=(f.name||'').replace(/\.[^.]+$/,''); 
-      D.gallery.push({id:uid(),img:id,title:/^image$/i.test(t)?'':t,tags:[],cat:curCat()||null,created:now+i,updated:now+i}); ok++;
+      if(clip){ const ch=curClipChar(); const c={id:uid(),img:id,chars:ch?[ch]:[],memo:'',created:now+i,updated:now+i}; D.clips.push(c); added.push(c); }
+      else D.gallery.push({id:uid(),img:id,title:/^image$/i.test(t)?'':t,tags:[],cat:curCat()||null,created:now+i,updated:now+i}); ok++;
     }catch(e){}
   }
-  await save(); render(); toast(ok?`사진 ${ok}장을 올렸어요`:'올리지 못했어요');
+  await save(); render(); toast(ok?`${clip?'발췌':'사진'} ${ok}장을 올렸어요`:'올리지 못했어요');
+  if(clip&&added.length) clipTagBatch(added);
 }
-(()=>{ let dc=0; const on=e=>U.tab==='gallery'&&!(modalEl&&modalEl.classList.contains('on'))&&[...(e.dataTransfer&&e.dataTransfer.types)||[]].includes('Files');
+(()=>{ let dc=0; const on=e=>(U.tab==='gallery'||U.tab==='clip')&&!(modalEl&&modalEl.classList.contains('on'))&&[...(e.dataTransfer&&e.dataTransfer.types)||[]].includes('Files');
   document.addEventListener('dragenter',e=>{ if(!on(e)) return; dc++; $('grid').classList.add('dropping'); });
   document.addEventListener('dragleave',e=>{ if(!on(e)) return; if(--dc<=0){ dc=0; $('grid').classList.remove('dropping'); } });
   document.addEventListener('dragover',e=>{ if(on(e)) e.preventDefault(); });
-  document.addEventListener('drop',e=>{ if(!on(e)) return; e.preventDefault(); dc=0; $('grid').classList.remove('dropping'); addPics([...e.dataTransfer.files]); });
+  document.addEventListener('drop',e=>{ if(!on(e)) return; e.preventDefault(); dc=0; $('grid').classList.remove('dropping'); addPics([...e.dataTransfer.files],U.tab==='clip'); });
 })();
 /* 크게 보기 (넘겨보기) */
 let gvEl=null, gvI=0;
@@ -843,10 +857,10 @@ function gview(i){
     gvEl.addEventListener('pointerup',e=>{ if(sx==null) return; const dx=e.clientX-sx; sx=null; if(Math.abs(dx)>50) gview(gvI+(dx<0?1:-1)); else if(e.target===gvEl||e.target.classList.contains('gv-stage')) gvClose(); });
   }
   if(!GV.length) return; gvI=(i+GV.length)%GV.length; const x=GV[gvI];
-  const openL=x.src==='up'?'✏️ 편집':`${SRCL[x.src]}에서 보기 ›`;
+  const openL=x.src==='up'?'✏️ 편집':x.src==='clip'?'✏️ 태그 편집':`${SRCL[x.src]}에서 보기 ›`;
   gvEl.innerHTML=`<div class="gv-top"><span class="gv-n">${gvI+1} / ${GV.length}</span><span class="sp"></span><button type="button" class="gv-dl">⬇ 저장</button><button type="button" class="gv-op">${openL}</button><button type="button" class="gv-x" title="닫기">×</button></div>
     <div class="gv-stage">${GV.length>1?'<button type="button" class="gv-nav prev" aria-label="이전">‹</button>':''}<img alt="">${GV.length>1?'<button type="button" class="gv-nav next" aria-label="다음">›</button>':''}</div>
-    <div class="gv-cap"><b>${esc(x.title||'제목 없음')}</b><span>${esc(x.sub||SRCL.up)}${x.memo?' · '+esc(x.memo):''}</span></div>`;
+    <div class="gv-cap"><b>${esc(x.title||(x.src==='clip'?'캐릭터 태그 없음':'제목 없음'))}</b><span>${esc(x.sub||SRCL.up)}${x.memo?' · '+esc(x.memo):''}</span></div>`;
   gvEl.classList.add('on'); document.body.style.overflow='hidden';
   img(x.img).then(v=>{ const im=gvEl.querySelector('img'); if(im&&GV[gvI]===x&&v) im.src=v; });
   gvEl.querySelector('.gv-x').onclick=gvClose;
@@ -854,6 +868,7 @@ function gview(i){
   gvEl.querySelector('.gv-dl').onclick=async()=>{ const d=(x.orig&&await imgGet(ORIG(x.img)).catch(()=>null))||await img(x.img); if(!d) return; const ext=(/^data:image\/(\w+)/.exec(d)||[])[1]||'png'; downloadData(d,`${(x.title||'image').replace(/[\\/:*?"<>|]/g,'_')}.${ext==='jpeg'?'jpg':ext}`); };
   gvEl.querySelector('.gv-op').onclick=()=>{ gvClose();
     if(x.src==='up'){ editPic(x.item); return; }
+    if(x.src==='clip'){ editClip(x.item); return; }
     const t=x.ref.tab, it=(D[TABS[t].list]||[]).find(y=>y.id===x.ref.id); if(!it) return;
     U.tab=t; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); window.scrollTo(0,0);
     t==='persona'?viewPersona(it,x.ref.au||null):t==='pair'?editPair(it,x.ref.au||null):editPrompt(it); };
@@ -874,6 +889,63 @@ async function editPic(g0){
   $('gsave').onclick=async()=>{ Object.assign(g,{title:$('g-title').value.trim(),memo:$('g-memo').value.trim(),cat:$('g-cat').value||null,tags:getTags(),pin:$('g-pin').checked,updated:Date.now()});
     const i=D.gallery.findIndex(x=>x.id===g.id); if(i>=0) D.gallery[i]=g; await save(); close(); render(); toast('저장했어요'); };
   $('gdel').onclick=()=>confirmBox('이 사진을 갤러리에서 삭제할까요?','삭제',async()=>{ D.gallery=D.gallery.filter(x=>x.id!==g.id); await imgDel(g.img).catch(()=>{}); await imgDel(ORIG(g.img)).catch(()=>{}); IMG.delete(g.img); await save(); close(); render(); toast('삭제했어요'); },()=>editPic(g0));
+}
+
+
+/* ---------- 발췌 모음 ---------- */
+const chKey=n=>String(n||'').trim().toLowerCase();
+const curClipChar=()=>{ const c=U.cat.clip; if(!c||!String(c).startsWith('ch:')||c==='ch:none') return ''; const k=c.slice(3); const hit=clipChars().find(x=>x.k===k); return hit?hit.name:''; };
+function clipChars(){ const m=new Map(); (D.clips||[]).forEach(c=>(c.chars||[]).forEach(n=>{ const k=chKey(n); if(!k) return; const g=m.get(k)||{k,name:String(n).trim(),n:0}; g.n++; m.set(k,g); })); return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name,'ko')); }
+const charSugg=()=>[...new Set([...(D.personas||[]).map(p=>p.name).filter(Boolean),...clipChars().map(x=>x.name)])];
+function clipSide(){
+  const cur=U.cat.clip||'all', L=D.clips||[], cs=clipChars(), none=L.filter(c=>!(c.chars||[]).length).length;
+  if(String(cur).startsWith('ch:')&&cur!=='ch:none'&&!cs.some(x=>'ch:'+x.k===cur)) U.cat.clip='all';
+  let h=`<div class="side-h">발췌</div><button class="cat ${U.cat.clip==='all'||!U.cat.clip?'on':''}" data-c="all">전체<span class="n">${L.length}</span></button>`;
+  if(cs.length){ h+=`<div class="side-h au-h">캐릭터</div>`; cs.forEach(x=>{ h+=`<button class="cat aucat ${U.cat.clip==='ch:'+x.k?'on':''}" data-c="ch:${esc(x.k)}"><span class="dot"></span>${esc(x.name)}<span class="n">${x.n}</span></button>`; }); }
+  if(none) h+=`<button class="cat ${U.cat.clip==='ch:none'?'on':''}" data-c="ch:none" style="color:var(--sub)">태그 없음<span class="n">${none}</span></button>`;
+  $('side').innerHTML=h;
+  $('side').querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ U.cat.clip=b.dataset.c; saveUI(); render(); });
+}
+function renderClips(){
+  const g=$('grid'); g.classList.remove('prompts','pairs'); g.classList.add('gallery','clips'); $('dragHint').style.display='none'; $('tagbar').innerHTML='';
+  const c=U.cat.clip||'all'; let arr=(D.clips||[]).slice();
+  if(c==='ch:none') arr=arr.filter(x=>!(x.chars||[]).length); else if(String(c).startsWith('ch:')) arr=arr.filter(x=>(x.chars||[]).some(n=>chKey(n)===c.slice(3)));
+  const ws=U.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if(ws.length) arr=arr.filter(x=>{ const h=[(x.chars||[]).join(' '),x.memo].join(' ').toLowerCase(); return ws.every(w=>h.includes(w)); });
+  arr.sort((a,b)=>U.sort==='new'?(b.created||0)-(a.created||0):U.sort==='upd'?(b.updated||0)-(a.updated||0):(a.created||0)-(b.created||0));
+  GV=arr.map(x=>({id:x.id,img:x.img,title:(x.chars||[]).map(n=>'#'+n).join(' '),memo:x.memo||'',sub:'발췌',src:'clip',item:x}));
+  if(!arr.length){ g.innerHTML=`<div class="v-empty">${(D.clips||[]).length?'조건에 맞는 발췌가 없어요.':'아직 모은 발췌가 없어요.<br><b>＋ 발췌 올리기</b>를 누르거나, 이미지를 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.<br>올린 뒤 어떤 캐릭터의 발췌인지 태그를 달 수 있어요.'}</div>`; return; }
+  const n=Math.max(2,Math.floor((g.clientWidth||900)/230)); g.dataset.cols=n;
+  const cols=Array.from({length:n},()=>[]);
+  arr.forEach((x,i)=>cols[i%n].push(`<div class="gc bare" data-i="${i}"><div class="gi" data-gimg="${x.img}"></div></div>`));
+  g.innerHTML=cols.map(c=>`<div class="gcol">${c.join('')}</div>`).join('');
+  g.querySelectorAll('.gc').forEach(el=>el.onclick=()=>gview(+el.dataset.i));
+  g.querySelectorAll('[data-gimg]').forEach(async el=>{ const v=await img(el.dataset.gimg); if(v){ el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; el.classList.add('has'); } else el.closest('.gc').style.display='none'; });
+}
+function clipTagBatch(list){
+  const pre=list[0]&&list[0].chars||[];
+  modal(`<div class="v-dh"><b>🏷 어떤 캐릭터의 발췌인가요?</b><button class="x" type="button">×</button></div>
+    <div class="v-db"><div class="ct-thumbs" id="v-ctTh"></div>
+      <label style="display:block;margin:12px 0 6px;font-size:12.5px;color:var(--sub)">방금 올린 ${list.length}장에 한꺼번에 달아요. 나중에 한 장씩 바꿀 수도 있어요.</label>
+      <div class="v-taginput" id="v-ctTags"></div></div>
+    <div class="v-df"><span class="sp"></span><button type="button" data-close>나중에</button><button type="button" class="primary" id="v-ctOk">태그 달기</button></div>`,{sm:true});
+  const get=tagInput($('ctTags'),[...pre],charSugg(),'캐릭터 이름 입력 후 Enter');
+  list.slice(0,8).forEach(async c=>{ const v=await img(c.img); if(v) $('ctTh')&&$('ctTh').insertAdjacentHTML('beforeend',`<img src="${v}" alt="">`); });
+  if(list.length>8) setTimeout(()=>$('ctTh')&&$('ctTh').insertAdjacentHTML('beforeend',`<span class="more">+${list.length-8}</span>`),60);
+  setTimeout(()=>{ const i=$('ctTags')&&$('ctTags').querySelector('input'); if(i) i.focus(); },50);
+  $('ctOk').onclick=async()=>{ const ch=get(); const now=Date.now(); list.forEach(c=>{ const x=D.clips.find(y=>y.id===c.id); if(x){ x.chars=[...ch]; x.updated=now; } }); await save(); close(); render(); toast(ch.length?'태그를 달았어요':'태그 없이 두었어요'); };
+}
+async function editClip(c0){
+  const c=JSON.parse(JSON.stringify(c0)); const src=await img(c.img);
+  modal(`<div class="v-dh"><b>🏷 발췌 태그</b><button class="x" type="button">×</button></div>
+    <div class="v-db"><div class="gp-wrap"><div class="gp-im">${src?`<img src="${src}" alt="">`:''}</div><div class="v-fields">
+      <div><label>캐릭터</label><div class="v-taginput" id="v-cl-tags"></div></div>
+      <div><label>메모</label><textarea id="v-cl-memo" style="min-height:80px" placeholder="어느 장면인지 등 (선택)">${esc(c.memo)}</textarea></div>
+    </div></div></div>
+    <div class="v-df"><button type="button" class="danger" id="v-cldel">삭제</button><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-clsave">저장</button></div>`,{cls:'wide'});
+  const get=tagInput($('cl-tags'),[...(c.chars||[])],charSugg(),'캐릭터 이름 입력 후 Enter');
+  $('clsave').onclick=async()=>{ const x=D.clips.find(y=>y.id===c.id); if(x){ x.chars=get(); x.memo=$('cl-memo').value.trim(); x.updated=Date.now(); } await save(); close(); render(); toast('저장했어요'); };
+  $('cldel').onclick=()=>confirmBox('이 발췌 이미지를 삭제할까요?','삭제',async()=>{ D.clips=D.clips.filter(x=>x.id!==c.id); await imgDel(c.img).catch(()=>{}); IMG.delete(c.img); await save(); close(); render(); toast('삭제했어요'); },()=>editClip(c0));
 }
 
 /* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
@@ -954,16 +1026,16 @@ function modal(html,{sm=false,lock=false,cls='',dirty=null}={}){
 }
 function close(){ if(modalEl){ modalEl.classList.remove('on'); modalEl.innerHTML=''; } document.body.style.overflow=''; onPaste=null; }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(zoomEl&&zoomEl.classList.contains('on')){ zoomEl.classList.remove('on'); return; } if(modalEl&&modalEl.classList.contains('on')){ if(modalEl.dataset.lock) close(); else tryClose(); } } });
-document.addEventListener('paste',e=>{ if(!onPaste&&U.tab==='gallery'&&!(modalEl&&modalEl.classList.contains('on'))&&!/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'')){ const fs=[...(e.clipboardData||{}).items||[]].filter(i=>i.type&&i.type.startsWith('image/')).map(i=>i.getAsFile()).filter(Boolean); if(fs.length){ e.preventDefault(); addPics(fs); } return; }
+document.addEventListener('paste',e=>{ if(!onPaste&&(U.tab==='gallery'||U.tab==='clip')&&!(modalEl&&modalEl.classList.contains('on'))&&!/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'')){ const fs=[...(e.clipboardData||{}).items||[]].filter(i=>i.type&&i.type.startsWith('image/')).map(i=>i.getAsFile()).filter(Boolean); if(fs.length){ e.preventDefault(); addPics(fs,U.tab==='clip'); } return; }
   if(!onPaste) return; const it=[...(e.clipboardData||{}).items||[]].find(i=>i.type&&i.type.startsWith('image/')); if(it){ e.preventDefault(); onPaste(it.getAsFile()); } });
 let zoomEl=null;
 function zoom(src){ if(!zoomEl){ zoomEl=document.createElement('div'); zoomEl.className='v-zoom'; zoomEl.onclick=()=>zoomEl.classList.remove('on'); document.body.appendChild(zoomEl); } zoomEl.innerHTML=`<img src="${src}" alt="">`; zoomEl.classList.add('on'); }
 
 /* 태그 입력 */
-function tagInput(box,tags){
-  const all=[...new Set(items().flatMap(i=>i.tags||[]))];
+function tagInput(box,tags,sugg,ph){
+  const all=sugg||[...new Set(items().flatMap(i=>i.tags||[]))];
   const listId='v-tl-'+Math.random().toString(36).slice(2,6);
-  const paint=()=>{ box.innerHTML=tags.map((t,i)=>`<span class="chip">#${esc(t)} <b data-i="${i}">×</b></span>`).join('')+`<input type="text" list="${listId}" placeholder="${tags.length?'':'태그 입력 후 Enter'}"><datalist id="${listId}">${all.map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`;
+  const paint=()=>{ box.innerHTML=tags.map((t,i)=>`<span class="chip">#${esc(t)} <b data-i="${i}">×</b></span>`).join('')+`<input type="text" list="${listId}" placeholder="${tags.length?'':(ph||'태그 입력 후 Enter')}"><datalist id="${listId}">${all.map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`;
     const inp=box.querySelector('input');
     box.querySelectorAll('b[data-i]').forEach(b=>b.onclick=()=>{ tags.splice(+b.dataset.i,1); paint(); box.querySelector('input').focus(); });
     inp.onkeydown=e=>{ if((e.key==='Enter'||e.key===',') && !e.isComposing){ e.preventDefault(); add(inp.value); } else if(e.key==='Backspace' && !inp.value && tags.length){ tags.pop(); paint(); box.querySelector('input').focus(); } };
@@ -1411,8 +1483,8 @@ $('export').onclick=async()=>{
 $('import').onclick=()=>$('importFile').click();
 $('importFile').onchange=()=>{ const f=$('importFile').files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $('importFile').value=''; let o; try{ o=JSON.parse(r.result); }catch(e){ toast('파일을 읽지 못했어요'); return; }
   if(!o||o.app!=='studio-vault'||!o.data){ toast('보관함 백업 파일이 아니에요'); return; }
-  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length, nr=(o.data.pairs||[]).length, ng=(o.data.gallery||[]).length;
-  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개${nr?`, 페어 <b>${nr}</b>개`:''}${ng?`, 갤러리 사진 <b>${ng}</b>장`:''}가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
+  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length, nr=(o.data.pairs||[]).length, ng=(o.data.gallery||[]).length, nc=(o.data.clips||[]).length;
+  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개${nr?`, 페어 <b>${nr}</b>개`:''}${ng?`, 갤러리 사진 <b>${ng}</b>장`:''}${nc?`, 발췌 <b>${nc}</b>장`:''}가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
   $('imMerge').onclick=()=>importData(o,false); $('imReplace').onclick=()=>importData(o,true);
 }; r.readAsText(f); };
 async function importData(o,replace){
@@ -1420,7 +1492,7 @@ async function importData(o,replace){
     const inc=Object.assign(BLANK(),o.data), ims=o.images||{};
     if(replace){ await imgClear(); IMG.clear(); D=inc; for(const [k,v] of Object.entries(ims)) await imgSet(k,v); }
     else {
-      for(const key of ['pcats','qcats','rcats','gcats','personas','prompts','pairs','gallery']){ if(!D[key]) D[key]=[]; const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
+      for(const key of ['pcats','qcats','rcats','gcats','personas','prompts','pairs','gallery','clips']){ if(!D[key]) D[key]=[]; const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
     }
     await save(); close(); render(); toast(replace?'보관함을 바꿨어요':'보관함에 합쳤어요');
   }catch(e){ toast('불러오지 못했어요: '+(e&&e.name||'오류')); }
@@ -1431,12 +1503,12 @@ document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.pr
 document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.tag=null; U.q=''; $('q').value=''; saveUI(); render(); });
 let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').value; render(); },120); };
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
-$('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():editPrompt(null);
+$('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):editPrompt(null);
 (async()=>{
   try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d); }
   catch(e){ $('grid').innerHTML='<div class="v-empty">이 브라우저에서는 보관함 저장소를 열 수 없어요.<br>시크릿 모드라면 일반 창에서 열어 주세요.</div>'; return; }
   try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length})); }catch(e){}
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length})); }catch(e){}
   const hm=(location.hash||'').match(/^#(p|q|r|tab)=([\w-]+)$/);
   if(hm){ U.tab=hm[1]==='tab'?(TABS[hm[2]]?hm[2]:'persona'):{p:'persona',q:'prompt',r:'pair'}[hm[1]]; saveUI(); }
   render();

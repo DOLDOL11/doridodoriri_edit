@@ -480,6 +480,10 @@
   .v-gv .gv-stage{overflow:hidden}
   .v-gv .gv-reveal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:999px;background:rgba(255,255,255,.92);color:#c0594b;font-weight:700;font-size:13.5px;padding:10px 18px;cursor:pointer}
   @media (max-width:600px){ .nsfw-bar{order:3} .t-vault .np{height:32px;padding:0 11px} }
+
+  .v-taginput input{flex:1 1 60px!important;width:auto!important;min-width:60px!important}
+  .orig-note{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px}
+  .orig-note button{margin-left:auto;border:1px solid #c9ddef;background:#fff;color:#3f6a92;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -587,6 +591,7 @@
             <div class="nsfw-bar" id="v-nsfwBar"></div>
             <button class="primary" id="v-new" type="button">＋ 새 페르소나</button>
           </div>
+          <div class="v-note orig-note" id="v-origNote" style="display:none"></div>
           <div class="v-tagbar" id="v-tagbar"></div>
           <div class="drag-hint" id="v-dragHint">💡 카드를 끌어서 원하는 순서로 옮길 수 있어요. 휴대폰에서는 꾹 누른 뒤 끌면 돼요.</div>
           <div class="v-grid" id="v-grid"></div>
@@ -652,7 +657,32 @@ const ORIG=id=>id+':o';
 async function inflate(u8){ try{ if(!window.DecompressionStream) return null; const st=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate')); return new Uint8Array(await new Response(st).arrayBuffer()); }catch(e){ return null; } }
 const latin1=u=>{ let r=''; for(const b of u) r+=String.fromCharCode(b); return r; };
 const utf8=u=>new TextDecoder().decode(u);
+/* 노벨AI는 이미지 투명도(알파) 채널에도 정보를 숨겨둬요. 텍스트 정보가 지워진 이미지도 여기서 읽을 수 있어요 */
+async function readStealth(file){
+  try{
+    if(!window.createImageBitmap||!window.DecompressionStream) return null;
+    const bmp=await createImageBitmap(file,{premultiplyAlpha:'none',colorSpaceConversion:'none'}); const w=bmp.width,h=bmp.height; if(w*h<400) return null;
+    const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(bmp,0,0); const px=x.getImageData(0,0,w,h).data;
+    let bi=0; const bit=()=>{ const xx=(bi/h)|0, yy=bi%h; bi++; return px[(yy*w+xx)*4+3]&1; };
+    const bytes=n=>{ const o=new Uint8Array(n); for(let i=0;i<n;i++){ let v=0; for(let k=0;k<8;k++) v=(v<<1)|bit(); o[i]=v; } return o; };
+    const magic=latin1(bytes(15)); if(magic!=='stealth_pngcomp'&&magic!=='stealth_pnginfo') return null;
+    let len=0; for(let k=0;k<32;k++) len=len*2+bit(); if(len<=0||len>w*h-152) return null;
+    const data=bytes(Math.floor(len/8));
+    let txt; if(magic==='stealth_pngcomp'){ const st=new Blob([data]).stream().pipeThrough(new DecompressionStream('gzip')); txt=utf8(new Uint8Array(await new Response(st).arrayBuffer())); } else txt=utf8(data);
+    const j=JSON.parse(txt); let cm=j.Comment||j.comment; if(typeof cm==='string'){ try{ cm=JSON.parse(cm); }catch(e){ cm=null; } }
+    const src=cm||j;
+    const pos=src.prompt||(src.v4_prompt&&src.v4_prompt.caption&&src.v4_prompt.caption.base_caption)||j.Description||'';
+    const neg=src.uc||(src.v4_negative_prompt&&src.v4_negative_prompt.caption&&src.v4_negative_prompt.caption.base_caption)||'';
+    return pos?{has:true,pos,neg,src:'NovelAI'}:null;
+  }catch(e){ return null; }
+}
 async function readMeta(file){
+  const m=await readMetaText(file);
+  if(m&&m.pos) return m;
+  if(/png|webp/i.test(file.type||'')||/\.(png|webp)$/i.test(file.name||'')){ const s=await readStealth(file); if(s) return s; }
+  return m||{has:false,pos:'',neg:'',src:''};
+}
+async function readMetaText(file){
   try{
     const u8=new Uint8Array(await file.arrayBuffer());
     if(!(u8[0]===0x89&&u8[1]===0x50&&u8[2]===0x4E&&u8[3]===0x47)) return null;
@@ -792,7 +822,7 @@ function render(){
   $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기'}[U.tab];
   const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'; const cn=$('sort').querySelector('option[value=name]'); if(cn) cn.hidden=U.tab==='clip';
   $('sort').value=((U.tab==='gallery'||U.tab==='clip')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
-  renderSide(); paintNsfwBar();
+  renderSide(); paintNsfwBar(); paintOrigNote();
   if(U.tab==='gallery'){ renderGallery(); return; }
   if(U.tab==='clip'){ renderClips(); return; }
   $('grid').classList.remove('gallery','clips');
@@ -835,6 +865,20 @@ function allPics(){
   const add=o=>{ if(!o.img||seen.has(o.img)) return; seen.add(o.img); out.push(o); };
   (D.gallery||[]).forEach(g=>add({id:g.id,img:g.img,title:g.title||'',memo:g.memo||'',sub:'',src:'up',tags:g.tags||[],cat:g.cat,created:g.created,updated:g.updated,pin:g.pin,item:g}));
   return out;
+}
+/* 예전에 보관한 프롬프트 원본 지우기 */
+const fmtSizeG=b=>b>=1048576?(b/1048576).toFixed(1)+'MB':Math.max(1,Math.round(b/1024))+'KB';
+async function paintOrigNote(){
+  const el=$('origNote'); if(!el) return;
+  const L=U.tab==='prompt'?(D.prompts||[]).filter(q=>q.orig&&q.img):[];
+  if(!L.length){ el.style.display='none'; return; }
+  const size=L.reduce((a,q)=>a+((q.orig&&q.orig.size)||0),0);
+  el.style.display=''; el.innerHTML=`<span>예전에 메타데이터 보관용으로 저장한 원본 이미지 <b>${L.length}개</b>${size?` (약 ${fmtSizeG(size)})`:''}가 남아 있어요. 카드에 보이는 이미지는 그대로 두고 원본만 지울 수 있어요.</span><button type="button" id="v-origDel">원본 지우기</button>`;
+  $('origDel').onclick=()=>confirmBox(`원본 이미지 ${L.length}개를 지울까요?\n카드에 보이는 이미지와 프롬프트 내용은 그대로 남아요.\n지운 원본은 되돌릴 수 없어요.`,'지우기',async()=>{
+    for(const q of D.prompts){ if(q.orig&&q.img){ await imgDel(ORIG(q.img)).catch(()=>{}); } q.orig=null; }
+    try{ await tx('img','readwrite',s2=>{ const r=s2.openCursor(); r.onsuccess=()=>{ const c=r.result; if(!c) return; if(String(c.key).endsWith(':o')) c.delete(); c.continue(); }; }); }catch(e){}
+    await save(); render(); toast('원본을 지웠어요');
+  });
 }
 let GV=[];
 /* 열 개수는 바깥 칸 너비로 계산 (이전 탭 카드가 남아 있어도 영향 없게) */
@@ -1087,7 +1131,7 @@ function imgPicker(drop, cur, sq, o={}){
     const zm=drop.querySelector('.zm'); if(zm) zm.onclick=async e=>{ e.stopPropagation(); lightbox(st.orig||(st.keepOld&&o.getOrig&&await o.getOrig())||st.data); }; };
   const take=async(f,pasted)=>{ if(!f||!/^image\//.test(f.type)) return; try{
       st.data=await shrink(f); st.changed=true; st.keepOld=false; st.orig=null; if(st.pos){ st.pos=''; st.posChanged=true; }
-      if(sq){ st.orig=await readFile(f); st.origName=f.name||''; st.meta=pasted?null:await readMeta(f); st.pasted=!!pasted; }
+      if(sq){ st.meta=pasted?null:await readMeta(f); st.pasted=!!pasted; }
       paint(); o.onChange&&o.onChange(st);
     }catch(e){ toast('이미지를 읽지 못했어요'); } };
   drop.onclick=()=>{ if(st.data&&sq){ drop.querySelector('.zm').click(); return; } file.click(); }; file.onchange=()=>{ take(file.files[0]); file.value=''; };
@@ -1287,11 +1331,11 @@ async function editPrompt(q0){
   const fmtSize=b=>b>=1048576?(b/1048576).toFixed(1)+'MB':Math.max(1,Math.round(b/1024))+'KB';
   const paintMeta=st=>{
     const el=$('meta'); if(!el) return;
-    if(!st.data){ el.innerHTML='결과 예시 이미지를 넣어두면 찾기 쉬워요. <b>파일로</b> 넣으면 원본 그대로(메타데이터 포함) 보관돼요.'; return; }
-    const has=st.orig||(st.keepOld&&q.orig);
-    let h=has?`<div class="ok">✓ 원본 보관 중${q.orig&&st.keepOld&&q.orig.size?' · '+fmtSize(q.orig.size):st.orig?' · '+fmtSize(st.orig.length*0.75):''}</div><button type="button" id="v-dlOrig">⬇ 원본 받기</button>`
-             :`<div class="warn">${st.pasted?'붙여넣은 이미지는 메타데이터가 없어요. 파일로 넣어 주세요.':'미리보기용 이미지만 있어요. 메타데이터를 남기려면 원본 파일을 다시 넣어 주세요.'}</div>`;
+    if(!st.data){ el.innerHTML='결과 예시 이미지를 넣어두면 찾기 쉬워요. 노벨AI 이미지를 <b>파일로</b> 넣으면 이미지 속 프롬프트를 자동으로 채워줘요.'; return; }
+    const has=st.keepOld&&q.orig;
+    let h=has?`<div class="ok">예전에 보관한 원본이 있어요${q.orig.size?' · '+fmtSize(q.orig.size):''}</div><button type="button" id="v-dlOrig">⬇ 원본 받기</button>`:'';
     if(st.meta&&st.meta.pos) h+=`<button type="button" id="v-fillMeta">✨ 이미지 속 프롬프트로 채우기</button><div class="src">${esc(st.meta.src)} 정보가 들어 있어요</div>`;
+    else if(st.changed&&st.data) h+=`<div class="src">${st.pasted?'붙여넣은 이미지에는 프롬프트 정보가 없어요. 노벨AI에서 받은 파일을 끌어다 놓거나 골라서 넣어 주세요.':'이 이미지에는 프롬프트 정보가 없어요. 노벨AI에서 바로 받은 PNG 파일이어야 읽을 수 있어요.'}</div>`;
     el.innerHTML=h;
     const dl=$('dlOrig'); if(dl) dl.onclick=async()=>{ const d=st.orig||await getOrig(); if(!d){ toast('원본을 찾지 못했어요'); return; } const ext=(/^data:image\/(\w+)/.exec(d)||[])[1]||'png'; downloadData(d,(st.origName||(q.orig&&q.orig.name)||((q.title||'prompt')+'.'+ext.replace('jpeg','jpg')))); };
     const fm=$('fillMeta'); if(fm) fm.onclick=()=>fill(st.meta,true);

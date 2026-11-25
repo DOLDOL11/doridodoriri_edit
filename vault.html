@@ -216,7 +216,7 @@
   .pview .outfit .oh .cp{margin-left:auto;padding:3px 10px;font-size:12px;color:#6b7a88;border-color:#dbe4ee;border-radius:9px}
   .pview .outfit .od{font-size:13px;color:#7f8c99;margin-top:3px;white-space:pre-wrap}
   .t-vault .pc .aub-old{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;background:rgba(253,233,242,.95);color:#b04a7c;border-radius:999px;padding:1px 8px;z-index:1}
-  .v-note{font-size:12.5px;line-height:1.6;background:#fff8e6;border:1px solid #f1e2b8;color:#7a5c12;border-radius:10px;padding:8px 11px}
+  .v-note{font-size:12.5px;line-height:1.6;background:#eef6fd;border:1px solid #d3e5f5;color:#3f6a92;border-radius:10px;padding:8px 11px}
   /* 상세: 왼쪽 프로필 사진 · 오른쪽 정보 스크롤 */
   .v-dialog.wide{max-width:920px}
   .pview2{display:grid;grid-template-columns:minmax(240px,340px) 1fr;grid-template-rows:minmax(0,1fr);height:min(74vh,720px)}
@@ -416,6 +416,9 @@
 
   .t-vault .side-h.au-h{margin-top:16px;padding-top:12px;border-top:1px dashed #dbe6f0}
   .t-vault .cat.aucat .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;margin:0 3px 0 4px}
+
+  .v-dialog.pairm .pm-tabs{border-radius:28px 28px 0 0}
+  .pm-note{margin-bottom:10px}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -642,11 +645,11 @@ function inCat(it,c){
 }
 const auKey=l=>String(l||'').trim().toLowerCase();
 const auOf=(p,k)=>(p.aus||[]).find(a=>auKey(a.label)===k)||null;
-function auGroups(){ const m=new Map(); (D.personas||[]).forEach(p=>(p.aus||[]).forEach(a=>{ const k=auKey(a.label); if(!k) return; const g=m.get(k)||{k,label:a.label.trim(),n:0}; g.n++; m.set(k,g); })); return [...m.values()].sort((a,b)=>a.label.localeCompare(b.label,'ko')); }
-const curAU=()=>{ const c=U.tab==='persona'&&U.cat.persona; return c&&String(c).startsWith('au:')?c.slice(3):null; };
+function auGroups(){ const m=new Map(); items().forEach(p=>(p.aus||[]).forEach(a=>{ const k=auKey(a.label); if(!k) return; const g=m.get(k)||{k,label:a.label.trim(),n:0}; g.n++; m.set(k,g); })); return [...m.values()].sort((a,b)=>a.label.localeCompare(b.label,'ko')); }
+const curAU=()=>{ const c=(U.tab==='persona'||U.tab==='pair')&&U.cat[U.tab]; return c&&String(c).startsWith('au:')?c.slice(3):null; };
 function hay(it){
   if(U.tab==='persona') return [it.name,it.intro,it.age,it.height,it.gender,it.with,it.au,it.setting,it.memo,it.pos,(it.tags||[]).join(' '),(it.outfits||[]).map(o=>o.name+' '+o.desc).join(' '),(it.aus||[]).map(a=>[a.label,a.name,a.intro,a.setting,a.with].join(' ')).join(' ')].join(' ').toLowerCase();
-  if(U.tab==='pair') return [it.name,pairName(it.a),pairName(it.b),it.dday,[it.ca,it.cb].map(c=>c?(c.pos+' '+(c.outfits||[]).map(o=>o.name+' '+o.pos).join(' ')):'').join(' '),it.rel,it.callAB,it.callBA,it.story,it.pos,it.memo,(it.tags||[]).join(' ')].join(' ').toLowerCase();
+  if(U.tab==='pair') return [it.name,pairName(it.a),pairName(it.b),it.dday,[it.ca,it.cb].map(c=>c?(c.pos+' '+(c.outfits||[]).map(o=>o.name+' '+o.pos).join(' ')):'').join(' '),it.rel,it.callAB,it.callBA,it.story,it.pos,it.memo,(it.tags||[]).join(' '),(it.aus||[]).map(a=>[a.label,a.name].join(' ')).join(' ')].join(' ').toLowerCase();
   return [it.title,it.pos,it.neg,it.memo,it.src,(it.tags||[]).join(' ')].join(' ').toLowerCase();
 }
 function filtered(){
@@ -680,7 +683,7 @@ function renderSide(){
     h+=`<button class="cat${d?' sub':''} ${cur===c.id?'on':''}" data-c="${c.id}" style="padding-left:${10+d*14}px">${hasK?`<span class="tw" data-tw="${c.id}">${closed.has(c.id)?'▸':'▾'}</span>`:`<span class="tw sp0">${d?'└':''}</span>`}${d?'':'📁 '}${esc(c.name)}<span class="n">${cnt(c.id)}</span><span class="ed" data-addsub="${c.id}" title="하위 카테고리 추가">＋</span><span class="ed" data-e="${c.id}" title="편집">✎</span></button>`; });
   const none=cnt('none'); if(cs.length && none) h+=`<button class="cat ${cur==='none'?'on':''}" data-c="none">미분류<span class="n">${none}</span></button>`;
   h+=`<button class="cat add" data-add="1">＋ 카테고리</button>`;
-  if(U.tab==='persona'){ const gs=auGroups(); if(gs.length){ h+=`<div class="side-h au-h">AU</div>`; gs.forEach(g=>{ h+=`<button class="cat aucat ${cur==='au:'+g.k?'on':''}" data-c="au:${esc(g.k)}"><span class="dot"></span>${esc(g.label)}<span class="n">${g.n}</span></button>`; }); } else if(String(cur).startsWith('au:')) U.cat.persona='all'; }
+  if(U.tab==='persona'||U.tab==='pair'){ const gs=auGroups(); if(gs.length){ h+=`<div class="side-h au-h">AU</div>`; gs.forEach(g=>{ h+=`<button class="cat aucat ${cur==='au:'+g.k?'on':''}" data-c="au:${esc(g.k)}"><span class="dot"></span>${esc(g.label)}<span class="n">${g.n}</span></button>`; }); } else if(String(cur).startsWith('au:')) U.cat[U.tab]='all'; }
   $('side').innerHTML=h;
   $('side').querySelectorAll('.cat').forEach(b=>b.onclick=e=>{
     const tw=e.target.closest('[data-tw]'); if(tw){ e.stopPropagation(); const s2=new Set(U.catClosed||[]); s2.has(tw.dataset.tw)?s2.delete(tw.dataset.tw):s2.add(tw.dataset.tw); U.catClosed=[...s2]; saveUI(); renderSide(); return; }
@@ -718,18 +721,19 @@ function render(){
     g.innerHTML=arr.map(p0=>{ const a=ak?auOf(p0,ak):null; const p=a?merged(p0,a):p0; const ip=a&&a.img?a.imgPos:p0.imgPos;
       return `<div class="pc" data-id="${p0.id}"${a?` data-au="${a.id}"`:''}>${p0.pin?'<span class="pin">📌</span>':''}<div class="im" data-img="${p.img||''}" data-pos="${esc(ip||'')}">${initial(p.name)}</div><div class="bd"><div class="nm">${esc(p.name)}</div>${p.intro?`<div class="in">${esc(p.intro)}</div>`:''}${(p0.tags||[]).length?`<div class="tg">${p0.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
   } else if(U.tab==='pair'){
-    g.innerHTML=arr.map(r=>{ const A=pairSide(r.a), B=pairSide(r.b), dd=ddayText(r.dday);
+    const ak=curAU();
+    g.innerHTML=arr.map(r0=>{ const au=ak?auOf(r0,ak):null; const r=au?pairAU(r0,au):r0; const A=pairSide(r0.a,au&&au.label), B=pairSide(r0.b,au&&au.label), dd=ddayText(r.dday);
       const ia=r.imgA||A.img, ib=r.imgB||B.img;
       const cov=r.mode==='two'?`<div class="half"><span data-img="${ia||''}" data-pos="${esc(r.imgPosA||'')}" class="hf">${initial(A.name)}</span><span data-img="${ib||''}" data-pos="${esc(r.imgPosB||'')}" class="hf">${initial(B.name)}</span></div>`
         :r.img?`<div class="cover" data-img="${r.img}" data-pos="${esc(r.imgPos||'')}"></div>`:`<div class="duo"><span class="av" data-img="${A.img||''}">${initial(A.name)}</span><span class="x">×</span><span class="av" data-img="${B.img||''}">${initial(B.name)}</span></div>`;
-      return `<div class="pc rc" data-id="${r.id}">${r.pin?'<span class="pin">📌</span>':''}<div class="rcov">${cov}${dd?`<span class="ddb">${dd}</span>`:''}</div><div class="bd"><div class="nm">${esc(r.name||(A.name+' × '+B.name))}</div><div class="who">${esc(A.name||'?')} <i>×</i> ${esc(B.name||'?')}</div>${(r.tags||[]).length?`<div class="tg">${r.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
+      return `<div class="pc rc" data-id="${r.id}"${au?` data-au="${au.id}"`:''}>${r.pin?'<span class="pin">📌</span>':''}<div class="rcov">${cov}${dd?`<span class="ddb">${dd}</span>`:''}</div><div class="bd"><div class="nm">${esc(r.name||(A.name+' × '+B.name))}</div><div class="who">${esc(A.name||'?')} <i>×</i> ${esc(B.name||'?')}</div>${(r.tags||[]).length?`<div class="tg">${r.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
   } else {
     g.innerHTML=arr.map(q=>`<div class="pc qc" data-id="${q.id}">${q.pin?'<span class="pin">📌</span>':''}${q.img?`<div class="cover" data-img="${q.img}" data-pos="${esc(q.imgPos||'')}">${q.orig?'<span class="ob" title="원본(메타데이터 포함) 보관 중">원본</span>':''}</div>`:''}<div class="top"><div style="min-width:0;flex:1"><div class="nm" style="font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.title)}</div>${(q.tags||[]).length?`<div class="tg" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${q.tags.slice(0,4).map(t=>`<span style="font-size:10.5px;color:#4f7ea8;background:#eaf3fc;border-radius:999px;padding:1px 7px">#${esc(t)}</span>`).join('')}</div>`:''}${q.memo?`<div style="font-size:12px;color:var(--sub);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.memo)}</div>`:''}</div></div>${q.pos?`<div class="pv">${esc(q.pos)}</div>`:''}${q.neg?`<div class="pv neg">${esc(q.neg)}</div>`:''}<div class="acts"><button data-cp="pos" ${q.pos?'':'disabled'}>긍정 복사</button><button data-cp="neg" ${q.neg?'':'disabled'}>부정 복사</button></div></div>`).join('');
   }
   g.querySelectorAll('.pc').forEach(el=>el.onclick=e=>{
     const it=items().find(x=>x.id===el.dataset.id); if(!it) return;
     const cp=e.target.closest('[data-cp]'); if(cp){ e.stopPropagation(); copy(it[cp.dataset.cp], cp.dataset.cp==='pos'?'긍정 프롬프트를':'부정 프롬프트를'); return; }
-    U.tab==='persona'?viewPersona(it,el.dataset.au||null):U.tab==='pair'?editPair(it):editPrompt(it);
+    U.tab==='persona'?viewPersona(it,el.dataset.au||null):U.tab==='pair'?editPair(it,el.dataset.au||null):editPrompt(it);
   });
   enableDrag(g);
   $('dragHint').style.display=arr.length>1?'':'none';
@@ -1083,8 +1087,20 @@ async function editPrompt(q0){
 }
 
 /* ---------- 페어 정리함 ---------- */
-function pairSide(x){
+/* AU 카드용: AU에 없는 값은 오리지널을 따라감. 반반 사진은 AU→캐릭터 AU→오리지널 순 */
+function pairAU(r,a){
+  const m={...r, name:a.name||r.name, dday:a.dday||r.dday, mode:a.mode||r.mode};
+  m.img=a.img||r.img; m.imgPos=a.img?a.imgPos:r.imgPos;
+  ['A','B'].forEach(K=>{ const ps=pairSide(r[K.toLowerCase()],a.label);
+    if(a['img'+K]){ m['img'+K]=a['img'+K]; m['imgPos'+K]=a['imgPos'+K]; }
+    else if(ps.au&&ps.au.img){ m['img'+K]=''; m['imgPos'+K]=a['imgPos'+K]||''; }
+    else { m['img'+K]=r['img'+K]; m['imgPos'+K]=r['imgPos'+K]; } });
+  return m;
+}
+function pairSide(x,label){
   x=x||{}; const p=x.pid&&D.personas.find(y=>y.id===x.pid);
+  const a=p&&label?auOf(p,auKey(label)):null;
+  if(a) return {name:a.name||p.name||x.name||'', img:a.img||p.img||'', pid:p.id, au:a};
   return p?{name:p.name||x.name||'', img:p.img||'', pid:p.id}:{name:x.name||'', img:'', pid:''};
 }
 function pairName(x){ return pairSide(x).name; }
@@ -1093,63 +1109,76 @@ function ddayText(d){
   const now=new Date(); now.setHours(0,0,0,0); const n=Math.round((now-t)/86400000);
   return n===0?'D-Day':n>0?'D+'+n:'D'+n;
 }
-async function editPair(r0){
+/* auMode: null = 오리지널, 'new' = 새 AU, id = AU 편집 */
+async function editPair(r0,auMode){
   const isNew=!r0; const r=JSON.parse(JSON.stringify(r0||{id:uid(),name:'',a:{},b:{},tags:[],cat:curCat(),mode:'one'}));
-  if(!r.mode) r.mode='one';
+  if(!r.mode) r.mode='one'; if(!r.aus) r.aus=[];
+  const isAU=!isNew&&!!auMode, auNew=auMode==='new';
+  const au=isAU?(auNew?{id:uid(),label:'',mode:r.mode}:JSON.parse(JSON.stringify(r.aus.find(x=>x.id===auMode)||{id:uid(),label:'',mode:r.mode}))):null;
+  const o=isAU?au:r; if(!o.mode) o.mode=r.mode;
+  const auLabel=()=>isAU?($('f-label')?$('f-label').value.trim():au.label):'';
   let dirtyFn=null;
   const ps=[...D.personas].sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
   const pick=(k,x)=>{ x=x||{}; const has=x.pid&&ps.some(p=>p.id===x.pid);
     return `<div class="r-pick"><select id="v-f-${k}sel"><option value="">✏️ 직접 입력</option>${ps.map(p=>`<option value="${p.id}" ${has&&x.pid===p.id?'selected':''}>${esc(p.name||'이름 없음')}</option>`).join('')}</select>
       <input type="text" id="v-f-${k}name" value="${esc(has?'':x.name||'')}" placeholder="캐릭터 ${k.toUpperCase()}" style="${has?'display:none':''}"></div>`; };
-  modal(`<div class="pm-hero" id="v-pmHero">
+  const tabs=`<div class="pv-tabs pm-tabs"><button type="button" class="pt ${isAU?'':'on'}" data-au="">★ 오리지널</button>${r.aus.map(x=>`<button type="button" class="pt ${isAU&&!auNew&&au.id===x.id?'on':''}" data-au="${x.id}">${esc(x.label)}</button>`).join('')}${auNew?`<button type="button" class="pt on">새 AU</button>`:''}<button type="button" class="pt add" data-au="new">＋ AU 추가</button><span class="sp"></span><button class="x" type="button" title="닫기">×</button></div>`;
+  modal(`${tabs}<div class="pm-hero" id="v-pmHero">
       <div class="pm-one" id="v-pmOne"><div class="v-drop pm-drop" id="v-drop"></div></div>
       <div class="pm-two" id="v-pmTwo"><div class="v-drop pm-drop" id="v-dropA"></div><div class="v-drop pm-drop" id="v-dropB"></div></div>
-      <button class="x pm-x" type="button" title="닫기">×</button>
     </div>
     <div class="pm-body">
       <div class="pm-row"><span class="pm-lb">이미지</span><div class="pm-seg" id="v-pmMode"><button type="button" data-m="one">대표 이미지 하나</button><button type="button" data-m="two">두 사람 나란히</button></div></div>
-      <input type="text" class="pm-title" id="v-f-name" value="${esc(r.name)}" placeholder="제목">
+      ${isAU?`<div class="v-note pm-note">비워둔 칸은 <b>오리지널</b>을 따라가요. 캐릭터에게 같은 이름의 AU가 있으면 그 사진과 프롬프트를 가져와요.</div><div class="pm-f"><label class="pm-lb">AU 이름 *</label><input type="text" id="v-f-label" value="${esc(au.label)}" placeholder="예: 해리포터, 현대 AU"></div>`:''}
+      <input type="text" class="pm-title" id="v-f-name" value="${esc(o.name||'')}" placeholder="${esc(isAU&&r.name?r.name+' (오리지널)':'제목')}">
       <div class="pm-sub" id="v-pmSub"></div>
-      <div class="pm-pair">${pick('a',r.a)}<span class="pm-times">×</span>${pick('b',r.b)}</div>
-      <div class="pm-f"><label class="pm-lb">기준일 (디데이)</label><div class="pm-dd"><input type="date" id="v-f-dday" value="${esc(r.dday||'')}"><span class="pm-badge" id="v-pmDD">D-Day</span></div></div>
-      <div class="pm-2"><div class="pm-f"><label class="pm-lb">태그</label><div class="v-taginput" id="v-f-tags"></div></div><div class="pm-f"><label class="pm-lb">카테고리</label><select id="v-f-cat">${catOptions(r.cat)}</select></div></div>
+      <div class="pm-pair" ${isAU?'style="display:none"':''}>${pick('a',r.a)}<span class="pm-times">×</span>${pick('b',r.b)}</div>
+      <div class="pm-f"><label class="pm-lb">기준일 (디데이)</label><div class="pm-dd"><input type="date" id="v-f-dday" value="${esc(o.dday||'')}"><span class="pm-badge" id="v-pmDD">D-Day</span></div></div>
+      <div class="pm-2" ${isAU?'style="display:none"':''}><div class="pm-f"><label class="pm-lb">태그</label><div class="v-taginput" id="v-f-tags"></div></div><div class="pm-f"><label class="pm-lb">카테고리</label><select id="v-f-cat">${catOptions(r.cat)}</select></div></div>
       <div class="pm-f"><label class="pm-lb">캐릭터별 프롬프트</label><div class="cp2"><div class="cpc" id="v-cpA"></div><div class="cpc" id="v-cpB"></div></div></div>
-      <div class="pm-foot">${isNew?'':'<button type="button" class="pm-del" id="v-del">삭제</button>'}<label class="chk pm-pin"><input type="checkbox" id="v-f-pin" ${r.pin?'checked':''}> 📌 고정</label><span class="sp"></span><button type="button" class="pm-save" id="v-save">저장</button></div>
-    </div>`,{cls:'pairm',dirty:()=>!!(dirtyFn&&dirtyFn())});
+      <div class="pm-foot">${(isNew||auNew)?'':`<button type="button" class="pm-del" id="v-del">${isAU?'이 AU 삭제':'삭제'}</button>`}<label class="chk pm-pin" ${isAU?'style="display:none"':''}><input type="checkbox" id="v-f-pin" ${r.pin?'checked':''}> 📌 고정</label><span class="sp"></span><button type="button" class="pm-save" id="v-save">저장</button></div>
+    </div>`,{cls:'pairm'+(isAU?' isau':''),dirty:()=>!!(dirtyFn&&dirtyFn())});
   const side=k=>{ const sel=$('f-'+k+'sel').value; return sel?{pid:sel,name:(ps.find(p=>p.id===sel)||{}).name||''}:{name:$('f-'+k+'name').value.trim()}; };
   /* 이미지 */
-  const stOne=imgPicker($('drop'),await img(r.img),false,{aspect:'16/10',pos:r.imgPos||'',defPos:'50% 25%'});
-  const sideImg=async k=>{ const own=r['img'+k.toUpperCase()]; if(own) return await img(own); const x=pairSide(side(k)); return x.img?await img(x.img):null; };
+  const stOne=imgPicker($('drop'),await img(o.img),false,{aspect:'16/10',pos:o.imgPos||'',defPos:'50% 25%'});
+  const sideImg=async k=>{ const K=k.toUpperCase(); const own=o['img'+K]; if(own) return await img(own);
+    if(isAU){ const x=pairSide(side(k),auLabel()); if(x.au&&x.img) return await img(x.img); if(r['img'+K]) return await img(r['img'+K]); return x.img?await img(x.img):null; }
+    const x=pairSide(side(k)); return x.img?await img(x.img):null; };
   const st={a:null,b:null};
-  const mkSide=async k=>{ const el=$('drop'+k.toUpperCase()); const keep=st[k]; if(keep&&keep.changed) return; st[k]=imgPicker(el,await sideImg(k),false,{aspect:'8/10',pos:r['imgPos'+k.toUpperCase()]||'',defPos:'50% 20%'}); st[k].fromPersona=!r['img'+k.toUpperCase()]; el.dataset.ph=side(k).name||('캐릭터 '+k.toUpperCase()); };
+  const mkSide=async k=>{ const el=$('drop'+k.toUpperCase()); const keep=st[k]; if(keep&&keep.changed) return; st[k]=imgPicker(el,await sideImg(k),false,{aspect:'8/10',pos:o['imgPos'+k.toUpperCase()]||'',defPos:'50% 20%'}); st[k].fromPersona=!o['img'+k.toUpperCase()]; el.dataset.ph=pairSide(side(k),auLabel()).name||('캐릭터 '+k.toUpperCase()); };
   await mkSide('a'); await mkSide('b');
-  const setMode=m=>{ r.mode=m; $('pmOne').style.display=m==='one'?'':'none'; $('pmTwo').style.display=m==='two'?'':'none'; $('pmMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); };
-  $('pmMode').querySelectorAll('button').forEach(b=>b.onclick=()=>setMode(b.dataset.m)); setMode(r.mode);
+  const setMode=m=>{ o.mode=m; $('pmOne').style.display=m==='one'?'':'none'; $('pmTwo').style.display=m==='two'?'':'none'; $('pmMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); };
+  $('pmMode').querySelectorAll('button').forEach(b=>b.onclick=()=>setMode(b.dataset.m)); setMode(o.mode);
   $('drop').dataset.ph='대표 이미지';
   /* 부제 · 디데이 */
-  const paintSub=()=>{ const A=side('a').name, B=side('b').name; $('pmSub').textContent=(A||B)?`${A||'?'} × ${B||'?'}`:'페어명 (A × B)'; $('pmSub').classList.toggle('ph',!(A||B)); };
+  const paintSub=()=>{ const A=pairSide(side('a'),auLabel()).name, B=pairSide(side('b'),auLabel()).name; $('pmSub').textContent=(A||B)?`${A||'?'} × ${B||'?'}`:'페어명 (A × B)'; $('pmSub').classList.toggle('ph',!(A||B)); };
   const paintDD=()=>{ const t=ddayText($('f-dday').value); $('pmDD').textContent=t||'D-Day'; $('pmDD').classList.toggle('ph',!t); };
   ['a','b'].forEach(k=>{ const upd=()=>{ $('f-'+k+'name').style.display=$('f-'+k+'sel').value?'none':''; paintSub(); if(st[k]&&!st[k].changed&&st[k].fromPersona) { st[k]=null; mkSide(k); } };
     $('f-'+k+'sel').onchange=upd; $('f-'+k+'name').oninput=paintSub; });
   $('f-dday').oninput=paintDD; $('f-dday').onchange=paintDD; paintSub(); paintDD();
+  let lblT=0; if(isAU) $('f-label').oninput=()=>{ clearTimeout(lblT); lblT=setTimeout(onLbl,200); };
+  const onLbl=()=>{ paintSub(); ['a','b'].forEach(k=>{ if(st[k]&&!st[k].changed&&st[k].fromPersona){ st[k]=null; mkSide(k); } paintC(k,readC(k)); }); };
   const getTags=tagInput($('f-tags'),r.tags||[]);
   /* 캐릭터별 프롬프트 (외관 + 의상) */
-  const CP={a:JSON.parse(JSON.stringify(r.ca||{pos:'',outfits:[]})), b:JSON.parse(JSON.stringify(r.cb||{pos:'',outfits:[]}))};
+  const CP={a:JSON.parse(JSON.stringify(o.ca||{pos:'',outfits:[]})), b:JSON.parse(JSON.stringify(o.cb||{pos:'',outfits:[]}))};
+  const origC=k=>(r['c'+k]||{});
   const readC=k=>{ const box=$('cp'+k.toUpperCase()); return {pos:box.querySelector('.cp-look').value.trim(), outfits:[...box.querySelectorAll('.cp-o')].map(o=>({name:o.querySelector('.cp-on').value.trim(),pos:o.querySelector('.cp-op').value.trim()})).filter(o=>o.name||o.pos)}; };
   const paintC=(k,data,focusLast)=>{
-    const box=$('cp'+k.toUpperCase()); const nm=side(k).name||('캐릭터 '+(k==='a'?'1':'2'));
-    const linked=side(k).pid&&ps.find(p=>p.id===side(k).pid);
-    box.innerHTML=`<div class="cp-h"><b>${esc(nm)}</b>${linked?`<button type="button" class="pm-mini cp-imp" title="보관함 캐릭터의 외관·의상 프롬프트를 가져와요">↓ 캐릭터에서 가져오기</button>`:''}</div>
+    const box=$('cp'+k.toUpperCase()); const nm=pairSide(side(k),auLabel()).name||('캐릭터 '+(k==='a'?'1':'2'));
+    const linked0=side(k).pid&&ps.find(p=>p.id===side(k).pid);
+    const pAU=isAU&&linked0?auOf(linked0,auKey(auLabel())):null;
+    const linked=linked0?(pAU?merged(linked0,pAU):linked0):null;
+    box.innerHTML=`<div class="cp-h"><b>${esc(nm)}</b>${linked?`<button type="button" class="pm-mini cp-imp" title="보관함 캐릭터의 외관·의상 프롬프트를 가져와요">↓ ${pAU?esc(pAU.label)+' AU에서':'캐릭터에서'} 가져오기</button>`:''}</div>
       <div class="cp-lb">외관<button type="button" class="pm-mini cp-cl">복사</button></div>
-      <textarea class="mono cp-look" placeholder="1boy, black hair, glasses, ...">${esc(data.pos)}</textarea>
+      <textarea class="mono cp-look" placeholder="${isAU&&origC(k).pos?'비워두면 오리지널 외관을 써요':'1boy, black hair, glasses, ...'}">${esc(data.pos)}</textarea>
       <div class="cp-lb">의상<button type="button" class="pm-mini cp-add">＋ 의상</button></div>
       <div class="cp-os">${(data.outfits||[]).map(o=>`<div class="cp-o"><div class="cp-oh"><input type="text" class="cp-on" value="${esc(o.name)}" placeholder="의상 이름"><button type="button" class="pm-mini cp-oc" title="외관 + 이 의상 복사">일괄 복사</button><button type="button" class="pm-mini cp-ox" title="삭제">✕</button></div><textarea class="mono cp-op" placeholder="school uniform, ...">${esc(o.pos)}</textarea></div>`).join('')||'<div class="cp-empty">의상이 없어요</div>'}</div>`;
     const join=(...a)=>a.map(x=>String(x||'').trim().replace(/^[,\s]+|[,\s]+$/g,'')).filter(Boolean).join(', ');
-    box.querySelector('.cp-cl').onclick=()=>copy(box.querySelector('.cp-look').value.trim(),`${nm} 외관 프롬프트를`);
+    box.querySelector('.cp-cl').onclick=()=>copy(box.querySelector('.cp-look').value.trim()||(isAU?origC(k).pos||'':''),`${nm} 외관 프롬프트를`);
     box.querySelector('.cp-add').onclick=()=>{ const d=readC(k); d.outfits.push({name:'',pos:''}); paintC(k,d,true); };
     box.querySelectorAll('.cp-o').forEach((o,i)=>{
       o.querySelector('.cp-ox').onclick=()=>{ const d=readC(k); const all=[...box.querySelectorAll('.cp-o')].map(x=>({name:x.querySelector('.cp-on').value.trim(),pos:x.querySelector('.cp-op').value.trim()})); all.splice(i,1); d.outfits=all; paintC(k,d); };
-      o.querySelector('.cp-oc').onclick=()=>{ const t=join(box.querySelector('.cp-look').value,o.querySelector('.cp-op').value); copy(t,`${nm} 외관 + '${o.querySelector('.cp-on').value.trim()||'의상'}' 프롬프트를`); };
+      o.querySelector('.cp-oc').onclick=()=>{ const t=join(box.querySelector('.cp-look').value||(isAU?origC(k).pos:''),o.querySelector('.cp-op').value); copy(t,`${nm} 외관 + '${o.querySelector('.cp-on').value.trim()||'의상'}' 프롬프트를`); };
     });
     const imp=box.querySelector('.cp-imp'); if(imp) imp.onclick=()=>{ const cur=readC(k); const P=linked; const d={pos:cur.pos||P.pos||'', outfits:[...cur.outfits]};
       (P.outfits||[]).forEach(o=>{ if(!d.outfits.some(x=>x.name===o.name&&x.pos===o.pos)) d.outfits.push({name:o.name||'',pos:o.pos||''}); });
@@ -1158,23 +1187,42 @@ async function editPair(r0){
   };
   paintC('a',CP.a); paintC('b',CP.b);
   ['a','b'].forEach(k=>{ const re=()=>paintC(k,readC(k)); $('f-'+k+'sel').addEventListener('change',re); $('f-'+k+'name').addEventListener('change',re); });
-  const formState=()=>JSON.stringify([$('f-name').value,side('a'),side('b'),$('f-dday').value,$('f-cat').value,readC('a'),readC('b'),$('f-pin').checked,getTags()]);
-  const mode0=r.mode, snap0=formState(); dirtyFn=()=>stOne.changed||(st.a&&st.a.changed)||(st.b&&st.b.changed)||r.mode!==mode0||formState()!==snap0;
-  $('save').onclick=async()=>{
+  const formState=()=>JSON.stringify([isAU?$('f-label').value:'',$('f-name').value,side('a'),side('b'),$('f-dday').value,$('f-cat').value,readC('a'),readC('b'),$('f-pin').checked,getTags()]);
+  const mode0=o.mode, snap0=formState(); dirtyFn=()=>stOne.changed||(st.a&&st.a.changed)||(st.b&&st.b.changed)||o.mode!==mode0||formState()!==snap0;
+  const doSave=async()=>{
+    if(isAU){
+      const label=$('f-label').value.trim(); if(!label){ toast('AU 이름을 적어 주세요'); $('f-label').focus(); return false; }
+      Object.assign(au,{label,name:$('f-name').value.trim(),dday:$('f-dday').value,ca:readC('a'),cb:readC('b')});
+      try{
+        await commitImg(au,stOne); if(stOne.posChanged) au.imgPos=stOne.pos||undefined;
+        for(const k of ['a','b']){ const s2=st[k]; if(s2&&s2.posChanged) au['imgPos'+k.toUpperCase()]=s2.pos||undefined; }
+        for(const k of ['a','b']){ const s2=st[k]; if(!s2||!s2.changed) continue; const key='img'+k.toUpperCase(); const t={img:au[key]}; await commitImg(t,s2); au[key]=t.img||null; }
+      }catch(e){ toast('이미지를 저장하지 못했어요'); return false; }
+      const R0=D.pairs.find(x=>x.id===r.id)||r; if(!R0.aus) R0.aus=[];
+      const i=R0.aus.findIndex(x=>x.id===au.id); if(i<0) R0.aus.push(au); else R0.aus[i]=au; R0.updated=Date.now();
+      await save(); render(); toast(auNew?`'${label}' AU를 추가했어요`:'AU를 수정했어요'); return R0;
+    }
     Object.assign(r,{name:$('f-name').value.trim(), a:side('a'), b:side('b'), dday:$('f-dday').value, cat:$('f-cat').value||null, tags:getTags(), ca:readC('a'), cb:readC('b'), pin:$('f-pin').checked, updated:Date.now()});
-    if(!r.name && !r.a.name && !r.b.name){ toast('제목이나 캐릭터를 적어 주세요'); $('f-name').focus(); return; }
+    if(!r.name && !r.a.name && !r.b.name){ toast('제목이나 캐릭터를 적어 주세요'); $('f-name').focus(); return false; }
     if(isNew) r.created=Date.now();
     try{
       await commitImg(r,stOne); if(stOne.posChanged) r.imgPos=stOne.pos||undefined;
       for(const k of ['a','b']){ const s2=st[k]; if(s2&&s2.posChanged) r['imgPos'+k.toUpperCase()]=s2.pos||undefined; }
       for(const k of ['a','b']){ const s2=st[k]; if(!s2||!s2.changed) continue; const key='img'+k.toUpperCase(); const t={img:r[key]}; await commitImg(t,s2); r[key]=t.img||null; }
-    }catch(e){ toast('이미지를 저장하지 못했어요'); return; }
+    }catch(e){ toast('이미지를 저장하지 못했어요'); return false; }
     if(!D.pairs) D.pairs=[];
     const i=D.pairs.findIndex(x=>x.id===r.id); if(i<0) D.pairs.push(r); else D.pairs[i]=r;
-    await save(); close(); render(); toast(isNew?'페어를 저장했어요':'수정했어요');
+    await save(); render(); toast(isNew?'페어를 저장했어요':'수정했어요'); return r;
   };
-  if(!isNew) $('del').onclick=()=>confirmBox(`'${r.name||pairName(r.a)+' × '+pairName(r.b)}' 페어를 삭제할까요?\n(캐릭터 자체는 지워지지 않아요)`,'삭제',async()=>{ D.pairs=D.pairs.filter(x=>x.id!==r.id); for(const id of [r.img,r.imgA,r.imgB]) if(id){ await imgDel(id).catch(()=>{}); IMG.delete(id); } await save(); close(); render(); toast('삭제했어요'); },()=>editPair(r0));
-  if(isNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) $('f-name').focus(); },50);
+  $('save').onclick=async()=>{ if(await doSave()) close(); };
+  modalEl.querySelectorAll('.pm-tabs .pt[data-au]').forEach(b=>b.onclick=async()=>{
+    const to=b.dataset.au||null; let R1=r0?D.pairs.find(x=>x.id===r0.id)||r0:null;
+    if(isNew||dirtyFn()){ const res=await doSave(); if(!res) return; R1=res; }
+    editPair(R1,to);
+  });
+  if(isAU&&!auNew) $('del').onclick=()=>confirmBox(`'${au.label}' AU를 삭제할까요?\n오리지널 페어는 그대로 남아요.`,'삭제',async()=>{ const R0=D.pairs.find(x=>x.id===r.id); if(R0){ R0.aus=(R0.aus||[]).filter(x=>x.id!==au.id); for(const id of [au.img,au.imgA,au.imgB]) if(id){ await imgDel(id).catch(()=>{}); IMG.delete(id); } } await save(); render(); toast('AU를 삭제했어요'); editPair(R0,null); },()=>editPair(r0,auMode));
+  else if(!isNew&&!isAU) $('del').onclick=()=>confirmBox(`'${r.name||pairName(r.a)+' × '+pairName(r.b)}' 페어를 삭제할까요?\n(캐릭터 자체는 지워지지 않아요)`,'삭제',async()=>{ D.pairs=D.pairs.filter(x=>x.id!==r.id); for(const id of [r.img,r.imgA,r.imgB,...r.aus.flatMap(x=>[x.img,x.imgA,x.imgB])]) if(id){ await imgDel(id).catch(()=>{}); IMG.delete(id); } await save(); close(); render(); toast('삭제했어요'); },()=>editPair(r0));
+  if(isNew||auNew) setTimeout(()=>{ if(!modalEl.contains(document.activeElement)) (auNew?$('f-label'):$('f-name')).focus(); },50);
 }
 
 /* ---------- 카테고리 ---------- */

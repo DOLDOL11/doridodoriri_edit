@@ -407,6 +407,12 @@
   .lk-btns .sp{flex:1}
   .side .it.ext{display:flex;align-items:center}
   .side .it .ext-i{margin-left:auto;font-size:11px;color:#b3c0cc}
+  .side .lbl.lk-tg{display:flex;align-items:center;gap:6px;width:100%;border:0;background:none;cursor:pointer;text-align:left}
+  .side .lbl.lk-tg:hover{color:var(--deep)}
+  .side .lk-tw{font-size:9px;letter-spacing:0}
+  .side .lk-c{margin-left:auto;font-size:11px;letter-spacing:0;color:#b3c0cc;font-weight:400}
+  .side .it.lk-more{display:block;width:100%;border:0;background:none;padding:6px 12px 8px 24px;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit;font-size:12.5px;color:#9aa8b6}
+  .side .it.lk-more:hover{color:var(--deep)}
 </style>
 </head>
 <body>
@@ -569,8 +575,10 @@ function paintSide(){
       const n=a.dataset.ed==='vault'&&V.personas.length?`<span class="n">${V.personas.length}</span>`:'';
       return `<a class="it" data-ed="${a.dataset.ed}" href="${a.getAttribute('href')}">${esc(a.dataset.nm)}${n}</a>`;
     }).join('');
-  }).join('')+((P.links||[]).length?`<div class="lbl">LINKS</div>`+P.links.map(k=>`<a class="it ext" href="${esc(k.url)}" target="_blank" rel="noreferrer noopener">${esc(k.name||host(k.url))}<span class="ext-i">↗</span></a>`).join(''):'');
+  }).join('')+sideLinks();
   applyOpen();
+  const lt=box.querySelector('.lbl.lk-tg'); if(lt) lt.onclick=()=>{ P.linksClosed=!P.linksClosed; savePref(); paintSide(); };
+  const lm=box.querySelector('.lk-more'); if(lm) lm.onclick=()=>{ P.linksAll=!P.linksAll; savePref(); paintSide(); };
 }
 
 /* ---------- 정렬 ---------- */
@@ -670,6 +678,15 @@ async function loadVault(){
   d.close(); paintWidgets();
 }
 /* ---------- 링크 모음 (다른 사람이 만든 에디터 등) ---------- */
+const LK_MAX=4;
+function sideLinks(){
+  const L=P.links||[]; if(!L.length) return '';
+  const head=`<button type="button" class="lbl lk-tg" title="${P.linksClosed?'펼치기':'접기'}">LINKS<span class="lk-tw">${P.linksClosed?'▸':'▾'}</span>${P.linksClosed?`<span class="lk-c">${L.length}</span>`:''}</button>`;
+  if(P.linksClosed) return head;
+  const show=P.linksAll?L:L.slice(0,LK_MAX);
+  return head+show.map(k=>`<a class="it ext" href="${esc(k.url)}" target="_blank" rel="noreferrer noopener">${esc(k.name||host(k.url))}<span class="ext-i">↗</span></a>`).join('')
+    +(L.length>LK_MAX?`<button type="button" class="it lk-more">${P.linksAll?'접기':`${L.length-LK_MAX}개 더 보기`}</button>`:'');
+}
 function host(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return u; } }
 function fixUrl(u){ u=String(u||'').trim(); if(!u) return ''; if(!/^[a-z][a-z0-9+.-]*:/i.test(u)) u='https://'+u; try{ const x=new URL(u); return /^https?:$/.test(x.protocol)?x.href:''; }catch(e){ return ''; } }
 function paintLinks(){

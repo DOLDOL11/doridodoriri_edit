@@ -503,6 +503,9 @@
   .v-fab button:hover{background:#e7f1fb}
   .v-fab button.dim{opacity:.35}
   @media (max-width:600px){ .v-fab{right:14px;bottom:16px} .v-fab button{width:36px;height:36px} }
+
+  .v-taginput input:focus{box-shadow:none!important;background:transparent!important;border:0!important}
+  .v-taginput:focus-within{border-color:#9cc8ee}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -927,7 +930,7 @@ function renderGallery(){
   if(!arr.length){ g.innerHTML=`<div class="v-empty">${allPics().length?'조건에 맞는 이미지가 없어요.':'아직 모인 이미지가 없어요.<br><b>＋ 사진 올리기</b>를 누르거나, 사진을 여기로 끌어다 놓거나 붙여넣어(Ctrl+V) 보세요.'}</div>`; return; }
   const n=Math.max(2,Math.floor((gW(g)||900)/210)); g.dataset.cols=n;
   const cols=Array.from({length:n},()=>[]);
-  arr.forEach((x,i)=>cols[i%n].push(`<div class="gc${x.nsfw?' nsfw'+(U.adult?'':' blur'):''}" data-i="${i}">${x.pin?'<span class="pin">📌</span>':''}${x.nsfw?'<span class="nb">NSFW</span>':''}<div class="gi" data-gimg="${x.img}"></div><div class="gt"><b>${esc(x.title||'제목 없음')}</b><span>${esc(x.sub||SRCL.up)}</span></div></div>`));
+  arr.forEach((x,i)=>cols[i%n].push(`<div class="gc bare" data-i="${i}">${x.pin?'<span class="pin">📌</span>':''}<div class="gi" data-gimg="${x.img}"></div></div>`));
   g.innerHTML=cols.map(c=>`<div class="gcol">${c.join('')}</div>`).join('');
   g.querySelectorAll('.gc').forEach(el=>el.onclick=()=>gview(+el.dataset.i));
   g.querySelectorAll('[data-gimg]').forEach(async el=>{ const v=await img(el.dataset.gimg); if(v){ el.innerHTML=`<img src="${v}" alt="" loading="lazy">`; el.classList.add('has'); } else el.closest('.gc').style.display='none'; });
@@ -938,6 +941,11 @@ function pickPics(clip){ const inp=document.createElement('input'); inp.type='fi
 async function addPics(files,clip){
   files=files.filter(f=>f&&/^image\//.test(f.type)); if(!files.length){ toast('이미지 파일만 올릴 수 있어요'); return; }
   if(!D.gallery) D.gallery=[]; if(!D.clips) D.clips=[]; const added=[];
+  if(!clip){ /* 갤러리: 먼저 정보 창을 띄우고, 저장을 눌러야 올라가요 */
+    const list=[]; for(const f of files){ try{ list.push({data:(f.size<=2.5*1024*1024||/gif/.test(f.type))?await readFile(f):await shrink(f,2048)}); }catch(e){} }
+    if(!list.length){ toast('이미지를 읽지 못했어요'); return; }
+    newPicModal(list); return;
+  }
   toast(`사진 ${files.length}장을 올리는 중…`);
   const now=Date.now(); let ok=0;
   for(let i=0;i<files.length;i++){ const f=files[i];
@@ -970,7 +978,7 @@ function gview(i){
   const openL=x.src==='up'?'✏️ 편집':x.src==='clip'?'✏️ 태그 편집':`${SRCL[x.src]}에서 보기 ›`;
   gvEl.innerHTML=`<div class="gv-top"><span class="gv-n">${gvI+1} / ${GV.length}</span><span class="sp"></span><button type="button" class="gv-dl">⬇ 저장</button><button type="button" class="gv-op">${openL}</button><button type="button" class="gv-x" title="닫기">×</button></div>
     <div class="gv-stage">${GV.length>1?'<button type="button" class="gv-nav prev" aria-label="이전">‹</button>':''}<img alt="" class="${x.nsfw&&!U.adult?'blur':''}">${x.nsfw&&!U.adult?'<button type="button" class="gv-reveal">NSFW · 눌러서 보기</button>':''}${GV.length>1?'<button type="button" class="gv-nav next" aria-label="다음">›</button>':''}</div>
-    <div class="gv-cap"><b>${esc(x.title||(x.src==='clip'?'캐릭터 태그 없음':'제목 없음'))}</b><span>${esc(x.sub||SRCL.up)}${x.memo?' · '+esc(x.memo):''}</span></div>`;
+    <div class="gv-cap"><b>${esc(x.title||(x.src==='clip'?'캐릭터 태그 없음':'제목 없음'))}</b><span>${x.src==='up'?esc([(x.tags||[]).map(t=>'#'+t).join(' '),x.memo].filter(Boolean).join(' · ')):esc(x.sub||'')+(x.memo?' · '+esc(x.memo):'')}</span></div>`;
   gvEl.classList.add('on'); document.body.style.overflow='hidden';
   img(x.img).then(v=>{ const im=gvEl.querySelector('img'); if(im&&GV[gvI]===x&&v) im.src=v; });
   gvEl.querySelector('.gv-x').onclick=gvClose;
@@ -985,6 +993,28 @@ function gview(i){
     t==='persona'?viewPersona(it,x.ref.au||null):t==='pair'?editPair(it,x.ref.au||null):editPrompt(it); };
 }
 function gvClose(){ if(gvEl){ gvEl.classList.remove('on'); gvEl.innerHTML=''; } if(!(modalEl&&modalEl.classList.contains('on'))) document.body.style.overflow=''; }
+/* 갤러리에 올리기 전 정보 입력 */
+function newPicModal(list){
+  const one=list.length===1;
+  modal(`<div class="v-dh"><b>🖼 ${one?'사진 올리기':`사진 ${list.length}장 올리기`}</b><button class="x" type="button">×</button></div>
+    <div class="v-db"><div class="gp-wrap"><div class="gp-im">${one?`<img src="${list[0].data}" alt="">`:`<div class="ct-thumbs">${list.slice(0,9).map(x=>`<img src="${x.data}" alt="">`).join('')}${list.length>9?`<span class="more">+${list.length-9}</span>`:''}</div>`}</div><div class="v-fields">
+      <div><label>제목</label><input type="text" id="v-g-title" placeholder="${one?'제목 (선택)':'제목 (선택) · 여러 장이면 뒤에 1, 2, 3… 번호가 붙어요'}"></div>
+      <div><label>메모</label><textarea id="v-g-memo" style="min-height:80px" placeholder="메모 (선택)"></textarea></div>
+      <div class="v-row2"><div><label>카테고리</label><select id="v-g-cat">${catOptions(curCat()||null)}</select></div><div><label>태그</label><div class="v-taginput" id="v-g-tags"></div></div></div>
+      <label class="chk"><input type="checkbox" id="v-g-pin"> 📌 맨 앞에 고정</label>
+    </div></div></div>
+    <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-gsave">올리기</button></div>`,{cls:'wide'});
+  const getTags=tagInput($('g-tags'),[]);
+  setTimeout(()=>{ const t=$('g-title'); if(t) t.focus(); },50);
+  $('g-title').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); $('gsave').click(); } });
+  $('gsave').onclick=async()=>{
+    const title=$('g-title').value.trim(), memo=$('g-memo').value.trim(), cat=$('g-cat').value||null, tags=getTags(), pin=$('g-pin').checked;
+    $('gsave').disabled=true; const now=Date.now(); let ok=0;
+    for(let i=0;i<list.length;i++){ try{ const id=uid(); await imgSet(id,list[i].data); IMG.set(id,list[i].data);
+      D.gallery.push({id:uid(),img:id,title:title&&!one?`${title} ${i+1}`:title,memo,tags:[...tags],cat,pin,created:now+i,updated:now+i}); ok++; }catch(e){} }
+    await save(); close(); render(); toast(ok?`사진 ${ok}장을 올렸어요`:'올리지 못했어요');
+  };
+}
 /* 직접 올린 사진 편집 */
 async function editPic(g0){
   const g=JSON.parse(JSON.stringify(g0)); const src=await img(g.img);

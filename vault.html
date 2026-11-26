@@ -529,7 +529,7 @@
   .oc-li.pinned{background:#fbfdff}
   .oc-li.reply{border-left:3px solid #cfe2f3}
   .oc-par{font-size:11.5px;color:#8ea2b5;margin-bottom:4px}
-  .oc-thr{display:inline-block;border:0;background:#eef6fd;color:#3f80ba;border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:600;cursor:pointer;margin-bottom:7px}
+  .oc-thr{display:inline-block;border:0;background:#eef6fd;color:#3f80ba;border-radius:999px;padding:3px 11px;font-size:11.5px;font-weight:600;cursor:pointer;margin-top:8px}
   .oc-thr:hover{background:#dcebf8}
   .oc-thr.on{background:#f3f6f9;color:#7d8fa1}
   .oc-li.reply{padding:10px 14px 9px;background:#fbfdff}
@@ -1229,11 +1229,11 @@ function renderOOC(){
         <button type="button" data-a="ed" title="수정">${IC.edit}</button>
         <button type="button" data-a="del" title="삭제">${IC.del}</button>
       </div>
-      ${nk?`<button type="button" class="oc-thr${op?' on':''}" data-thr="${o.id}">${op?'후속 OOC 접기 ▴':`↳ 후속 OOC ${nk}개 · 펼쳐보기 ▾`}</button>`:''}
       ${p&&!d?`<div class="oc-par">↳ 후속: ${esc(p.text.replace(/\s+/g,' ').slice(0,30))}${p.text.length>30?'…':''}</div>`:''}
       <div class="oc-tx">${esc(o.text)}</div>
       <button type="button" class="oc-more" style="display:none">펼치기 ▾</button>
       <div class="oc-meta">${o.pin?'<span class="oc-pin">📌 고정</span>':''}${(o.tags||[]).map(x=>`<button type="button" class="oc-tag" data-tag="${esc(x)}">#${esc(x)}</button>`).join('')}${o.uses?`<span class="oc-uses">복사 ${o.uses}회</span>`:''}</div>
+      ${nk?`<button type="button" class="oc-thr${op?' on':''}" data-thr="${o.id}">${op?'후속 OOC 접기 ▴':`↳ 후속 OOC ${nk}개 · 펼쳐보기 ▾`}</button>`:''}
     </div>`; }).join('');
   g.querySelectorAll('[data-thr]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.thr; OC_OPEN.has(id)?OC_OPEN.delete(id):OC_OPEN.add(id); render(); });
   const bump=async o=>{ o.uses=(o.uses||0)+1; await save(); const el=g.querySelector(`.oc-li[data-id="${o.id}"]`); if(!el) return; let u=el.querySelector('.oc-uses'); if(!u){ u=document.createElement('span'); u.className='oc-uses'; el.querySelector('.oc-meta').appendChild(u); } u.textContent=`복사 ${o.uses}회`; };

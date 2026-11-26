@@ -638,6 +638,20 @@
   .v-wed .we-f textarea.d{border:1px solid transparent!important;background:transparent!important;box-shadow:none!important;padding:5px 8px 5px 34px!important;min-height:0!important}
   .v-wed .we-f textarea.d:focus{background:#f7fafd!important}
   @media (max-width:600px){ .v-wed .we-name{font-size:19px!important} }
+
+  /* 위젯 레이아웃 다듬기 */
+  .t-vault .v-grid.widgets{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+  .t-vault .wc-pv{height:190px}
+  .t-vault .wc-q{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;justify-content:flex-end;padding:8px;background:linear-gradient(transparent,rgba(20,35,50,.35));opacity:0;transition:opacity .15s}
+  .t-vault .wc:hover .wc-q{opacity:1}
+  @media (hover:none){ .t-vault .wc-q{opacity:1} }
+  .t-vault .wc-q button{border:0;background:rgba(255,255,255,.95);color:#2f6ea6;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .t-vault .wc-q button:hover{background:#fff}
+  .v-wed .we-head{position:sticky;top:0;z-index:5;background:rgba(246,249,252,.94);backdrop-filter:blur(8px);margin:-22px -26px 14px;padding:16px 26px 4px;border-bottom:1px solid #e6edf4}
+  .v-wed .we-meta{margin:10px 0 12px}
+  @media (min-width:981px){ .v-wed .we-right{position:sticky;top:132px} }
+  .v-wed .we-pv iframe{height:420px;transition:height .15s}
+  @media (max-width:600px){ .v-wed .we-head{margin:-14px -12px 12px;padding:12px 12px 2px} }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -994,7 +1008,7 @@ function render(){
   $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기',ooc:'OOC 내용, 태그로 찾기',widget:'위젯 이름, 상태값, 태그로 찾기'}[U.tab];
   const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'||U.tab==='widget'; const cn=$('sort').querySelector('option[value=name]'); if(cn){ cn.hidden=U.tab==='clip'; cn.textContent=U.tab==='ooc'?'내용순':'이름순'; }
   $('sort').value=((U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'||U.tab==='widget')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
-  const noSide=U.tab==='ooc'; $('side').style.display=noSide?'none':''; $('side').parentElement.classList.toggle('noside',noSide);
+  const noSide=U.tab==='ooc'||U.tab==='widget'; $('side').style.display=noSide?'none':''; $('side').parentElement.classList.toggle('noside',noSide);
   $('oocTop').style.display=U.tab==='ooc'?'':'none';
   if(!noSide) renderSide(); paintNsfwBar(); paintOrigNote();
   if(U.tab==='gallery'){ renderGallery(); return; }
@@ -1366,10 +1380,11 @@ function editOOC(o0){
 /* ---------- 위젯 ---------- */
 const WKEY_RE=/\{\{\s*([^{}\s]+)\s*\}\}/g, W_LIMIT=10000;
 const wKeys=h=>{ const st=new Set(); String(h||'').replace(WKEY_RE,(m,k)=>{ st.add(k); return m; }); return [...st]; };
-function wDoc(w,bg){
+function wDoc(w,bg,fit){
   const map={}; (w.fields||[]).forEach(f=>{ if(f.k) map[f.k.trim()]=f.s; });
   const html=String(w.html||'').replace(WKEY_RE,(m,k)=>esc(map[k]!=null&&map[k]!==''?map[k]:`[${k}]`));
-  return `<!DOCTYPE html><meta charset="utf-8"><style>html,body{margin:0;background:${bg==='dark'?'#1b1d22':'#eef1f5'}}</style>`+(html.trim()?html:`<div style="font-family:sans-serif;color:#9aa8b6;font-size:13px;display:flex;align-items:center;justify-content:center;height:90vh">HTML을 넣으면 여기에 보여요</div>`);
+  const rep=fit?`<script>(function(){var t;function s(){clearTimeout(t);t=setTimeout(function(){parent.postMessage({weH:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)},'*')},30)}addEventListener('load',s);try{new ResizeObserver(s).observe(document.documentElement)}catch(e){}s()})()<\/script>`:'';
+  return `<!DOCTYPE html><meta charset="utf-8"><style>html,body{margin:0;background:${bg==='dark'?'#1b1d22':'#eef1f5'}}</style>`+rep+(html.trim()?html:`<div style="font-family:sans-serif;color:#9aa8b6;font-size:13px;display:flex;align-items:center;justify-content:center;height:90vh">HTML을 넣으면 여기에 보여요</div>`);
 }
 function renderWidgets(){
   const {arr,base}=filtered(); renderTags(base);
@@ -1377,12 +1392,14 @@ function renderWidgets(){
   if(!arr.length){ g.innerHTML=`<div class="v-empty">${(D.widgets||[]).length?'조건에 맞는 위젯이 없어요.':'아직 저장한 위젯이 없어요.<br><b>＋ 새 위젯</b>을 눌러 상태값과 HTML을 저장해 보세요.'}</div>`; return; }
   g.innerHTML=arr.map(w=>{ const fs=w.fields||[];
     return `<div class="wc" data-id="${w.id}">${w.pin?'<span class="pin">📌</span>':''}
-      <div class="wc-pv">${(w.html||'').trim()?'<iframe sandbox="allow-scripts" tabindex="-1" loading="lazy"></iframe>':'<span>HTML 없음</span>'}</div>
+      <div class="wc-pv">${(w.html||'').trim()?'<iframe sandbox="allow-scripts" tabindex="-1" loading="lazy"></iframe>':'<span>HTML 없음</span>'}
+        <div class="wc-q"><button type="button" data-q="f" title="상태값을 '이름: 지시사항' 목록으로 복사">상태값 복사</button><button type="button" data-q="h" title="HTML 복사">HTML 복사</button></div></div>
       <div class="wc-bd"><div class="nm">${esc(w.name||'이름 없는 위젯')}</div>
       <div class="mt">상태값 ${fs.length}개${(w.html||'').trim()?' · HTML 있음':''}</div>
       ${fs.length?`<div class="ks">${fs.slice(0,8).map(f=>`<span>${esc(f.k)}</span>`).join('')}${fs.length>8?`<span>+${fs.length-8}</span>`:''}</div>`:''}
       ${(w.tags||[]).length?`<div class="tg">${w.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
   g.querySelectorAll('.wc').forEach(el=>{ const w=D.widgets.find(x=>x.id===el.dataset.id); el.onclick=()=>openWidget(w);
+    el.querySelectorAll('[data-q]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); if(b.dataset.q==='h') copy(w.html||'','HTML을'); else copy((w.fields||[]).filter(f=>f.k||f.d).map(f=>`${f.k}: ${f.d}`).join('\n'),'상태값을'); });
     const f=el.querySelector('iframe'); if(f) f.srcdoc=wDoc(w,w.bg); });
 }
 let WE=null;
@@ -1393,9 +1410,9 @@ function openWidget(w0){
   if(WE) WE.remove();
   WE=document.createElement('div'); WE.className='v-wed t-vault';
   WE.innerHTML=`<div class="we-in">
-    <div class="we-top"><button type="button" class="we-back" title="목록으로">‹</button><input type="text" class="we-name" id="v-we-name" placeholder="위젯 이름" value="${esc(w.name)}">
+    <div class="we-head"><div class="we-top"><button type="button" class="we-back" title="목록으로">‹</button><input type="text" class="we-name" id="v-we-name" placeholder="위젯 이름" value="${esc(w.name)}">
       <div class="we-btns">${isNew?'':'<button type="button" class="danger" id="v-we-del">삭제</button><button type="button" id="v-we-dup">복제</button>'}<button type="button" class="primary" id="v-we-save">저장</button></div></div>
-    <div class="we-meta"><div class="v-taginput" id="v-we-tags"></div><select id="v-we-cat">${catOptions(w.cat)}</select><label class="chk"><input type="checkbox" id="v-we-pin" ${w.pin?'checked':''}> 📌 고정</label></div>
+    <div class="we-meta"><div class="v-taginput" id="v-we-tags"></div><label class="chk"><input type="checkbox" id="v-we-pin" ${w.pin?'checked':''}> 📌 고정</label></div></div>
     <div class="we-grid">
       <div class="we-col">
         <div class="we-h"><b>상태값</b><span class="cnt" id="v-we-cnt">0</span><span class="we-len" id="v-we-len"></span></div>
@@ -1405,7 +1422,7 @@ function openWidget(w0){
         <div class="we-fields" id="v-we-fields"></div>
         <button type="button" class="we-add2" id="v-we-add2">＋ 상태값 추가</button>
       </div>
-      <div class="we-col">
+      <div class="we-col we-right">
         <div class="we-h"><b>HTML</b><span class="sp"></span><div class="we-seg" id="v-we-tab"><button type="button" data-t="preview">미리보기</button><button type="button" data-t="code">코드</button></div><div class="we-seg" id="v-we-bg"><button type="button" data-b="light">밝게</button><button type="button" data-b="dark">어둡게</button></div></div>
         <div class="we-pv" id="v-we-pv"><iframe id="v-we-frame" sandbox="allow-scripts" title="위젯 미리보기"></iframe></div>
         <textarea class="we-code" id="v-we-html" spellcheck="false" placeholder="위젯 HTML을 붙여넣으세요. {{BGM}}처럼 상태값 이름을 넣으면 그 자리에 값이 들어가요.">${esc(w.html)}</textarea>
@@ -1416,7 +1433,10 @@ function openWidget(w0){
   const getTags=tagInput($('we-tags'),w.tags||[],null,'태그 입력 후 Enter');
   const mark=()=>{ $('we-save').textContent=dirty?'저장 •':'저장'; };
   const setDirty=()=>{ dirty=true; mark(); };
-  const preview=()=>{ clearTimeout(pvT); pvT=setTimeout(()=>{ if(tab==='preview') $('we-frame').srcdoc=wDoc(w,w.bg); },200); };
+  const preview=()=>{ clearTimeout(pvT); pvT=setTimeout(()=>{ if(tab==='preview') $('we-frame').srcdoc=wDoc(w,w.bg,true); },200); };
+  /* 미리보기 높이를 위젯 크기에 맞춰요 */
+  const onMsg=e=>{ const f=$('we-frame'); if(!f||e.source!==f.contentWindow||!e.data||typeof e.data.weH!=='number') return; f.style.height=Math.max(220,Math.min(e.data.weH+4,window.innerHeight*0.78))+'px'; };
+  window.addEventListener('message',onMsg);
   const meta=()=>{
     $('we-cnt').textContent=w.fields.length;
     const n=w.fields.reduce((a,f)=>a+(f.k||'').length+(f.d||'').length,0), L=$('we-len'); L.textContent=`글자수 ${n.toLocaleString()} / ${W_LIMIT.toLocaleString()}`; L.classList.toggle('over',n>W_LIMIT);
@@ -1457,12 +1477,12 @@ function openWidget(w0){
   $('we-html').addEventListener('input',()=>{ w.html=$('we-html').value; setDirty(); meta(); preview(); });
   $('we-html').addEventListener('keydown',e=>{ if(e.key==='Tab'){ e.preventDefault(); insAt(e.target,'  '); } });
   $('we-name').addEventListener('input',setDirty);
-  ['we-cat','we-pin'].forEach(id=>$(id).addEventListener('change',setDirty)); $('we-tags').addEventListener('click',()=>setTimeout(setDirty,0)); $('we-tags').addEventListener('keydown',()=>setTimeout(setDirty,0));
+  $('we-pin').addEventListener('change',setDirty); $('we-tags').addEventListener('click',()=>setTimeout(setDirty,0)); $('we-tags').addEventListener('keydown',()=>setTimeout(setDirty,0));
   const setTab=t=>{ tab=t; WE.querySelectorAll('#v-we-tab button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); $('we-pv').style.display=t==='preview'?'':'none'; $('we-html').style.display=t==='code'?'':'none'; $('we-bg').style.display=t==='preview'?'':'none'; if(t==='preview') preview(); };
   const setBg=b=>{ w.bg=b; WE.querySelectorAll('#v-we-bg button').forEach(x=>x.classList.toggle('on',x.dataset.b===b)); $('we-pv').classList.toggle('dark',b==='dark'); preview(); };
   WE.querySelectorAll('#v-we-tab button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
   WE.querySelectorAll('#v-we-bg button').forEach(b=>b.onclick=()=>{ setBg(b.dataset.b); setDirty(); });
-  const shut=()=>{ if(WE){ WE.remove(); WE=null; } document.removeEventListener('keydown',onKey,true); if(!(modalEl&&modalEl.classList.contains('on'))) document.body.style.overflow=''; };
+  const shut=()=>{ if(WE){ WE.remove(); WE=null; } document.removeEventListener('keydown',onKey,true); window.removeEventListener('message',onMsg); if(!(modalEl&&modalEl.classList.contains('on'))) document.body.style.overflow=''; };
   const back=()=>{ if(dirty) confirmBox('저장하지 않은 내용이 있어요. 목록으로 갈까요?','나가기',()=>{ close(); shut(); }); else shut(); };
   const onKey=e=>{ if(modalEl&&modalEl.classList.contains('on')) return; if(e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); back(); } else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); $('we-save').click(); } };
   document.addEventListener('keydown',onKey,true);
@@ -1472,7 +1492,7 @@ function openWidget(w0){
     w.fields=w.fields.map(f=>({k:(f.k||'').trim(),d:(f.d||'').trim(),s:f.s||''})).filter(f=>f.k||f.d);
     if(!w.name&&!w.fields.length&&!w.html.trim()){ toast('내용을 입력해 주세요'); return; }
     if(!w.name) w.name='이름 없는 위젯';
-    Object.assign(w,{tags:getTags(),cat:$('we-cat').value||null,pin:$('we-pin').checked,updated:Date.now()}); if(!w.created) w.created=Date.now();
+    Object.assign(w,{tags:getTags(),pin:$('we-pin').checked,updated:Date.now()}); if(!w.created) w.created=Date.now();
     if(!D.widgets) D.widgets=[]; const i=D.widgets.findIndex(x=>x.id===w.id); if(i<0) D.widgets.push(JSON.parse(JSON.stringify(w))); else D.widgets[i]=JSON.parse(JSON.stringify(w));
     await save(); render(); dirty=false; mark(); $('we-name').value=w.name; paint(); toast('위젯을 저장했어요');
     if(isNew){ const cur=D.widgets.find(x=>x.id===w.id); shut(); openWidget(cur); }

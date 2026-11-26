@@ -902,10 +902,10 @@ function render(){
   const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'; const cn=$('sort').querySelector('option[value=name]'); if(cn){ cn.hidden=U.tab==='clip'; cn.textContent=U.tab==='ooc'?'내용순':'이름순'; }
   $('sort').value=((U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
   const noSide=U.tab==='ooc'; $('side').style.display=noSide?'none':''; $('side').parentElement.classList.toggle('noside',noSide);
+  $('oocTop').style.display=U.tab==='ooc'?'':'none';
   if(!noSide) renderSide(); paintNsfwBar(); paintOrigNote();
   if(U.tab==='gallery'){ renderGallery(); return; }
   if(U.tab==='clip'){ renderClips(); return; }
-  $('oocTop').style.display=U.tab==='ooc'?'':'none';
   if(U.tab==='ooc'){ renderOOC(); return; }
   $('grid').classList.remove('gallery','clips','oocs');
   const {arr,base}=filtered(); renderTags(base);

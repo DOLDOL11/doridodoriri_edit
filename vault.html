@@ -987,10 +987,12 @@ function renderTags(base){
   U.itags=(U.itags||[]).filter(t=>m.has(t));
   U.xtags=(U.xtags||[]).filter(t=>m.has(t));
   /* 누를 때마다: 해제 → 포함 → 제외 → 해제. 포함·제외 모두 여러 개 가능 */
-  $('tagbar').innerHTML=tags.length?tags.map(([t,n])=>{ const st=U.itags.includes(t)?'on':U.xtags.includes(t)?'off':''; return `<button class="chip ${st}" data-t="${esc(t)}" title="${st==='on'?'한 번 더 누르면 이 태그 제외':st==='off'?'한 번 더 누르면 해제':'누르면 이 태그가 있는 것만 보기'}">${st==='off'?'<span class="x-ic">−</span>':''}#${esc(t)} <span style="opacity:.6">${n}</span></button>`; }).join('')
-    +(U.itags.length>1?`<span class="tg-mode"><button type="button" data-m="all" class="${U.tagAny?'':'on'}" title="고른 태그가 전부 달린 것">모두 포함</button><button type="button" data-m="any" class="${U.tagAny?'on':''}" title="고른 태그 중 하나라도 달린 것">하나라도</button></span>`:'')
-    +((U.itags.length||U.xtags.length)?`<button type="button" class="tg-clear" title="태그 선택 모두 해제">초기화</button>`:''):'';
+  $('tagbar').innerHTML=tags.length?tags.map(([t,n])=>{ const st=U.itags.includes(t)?'on':U.xtags.includes(t)?'off':''; return `<button class="chip ${st}" data-t="${esc(t)}" title="${U.tab==='widget'?(st==='on'?'한 번 더 누르면 해제':'누르면 이 태그가 있는 위젯만 보기'):st==='on'?'한 번 더 누르면 이 태그 제외':st==='off'?'한 번 더 누르면 해제':'누르면 이 태그가 있는 것만 보기'}">${st==='off'?'<span class="x-ic">−</span>':''}#${esc(t)} <span style="opacity:.6">${n}</span></button>`; }).join('')
+    +(U.itags.length>1&&U.tab!=='widget'?`<span class="tg-mode"><button type="button" data-m="all" class="${U.tagAny?'':'on'}" title="고른 태그가 전부 달린 것">모두 포함</button><button type="button" data-m="any" class="${U.tagAny?'on':''}" title="고른 태그 중 하나라도 달린 것">하나라도</button></span>`:'')
+    +((U.itags.length||U.xtags.length)&&U.tab!=='widget'?`<button type="button" class="tg-clear" title="태그 선택 모두 해제">초기화</button>`:''):'';
   $('tagbar').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ const t=b.dataset.t;
+    /* 위젯은 단순하게: 누르면 그 태그만 보기, 한 번 더 누르면 해제 */
+    if(U.tab==='widget'){ U.itags=U.itags.includes(t)?[]:[t]; U.xtags=[]; render(); return; }
     if(U.itags.includes(t)){ U.itags=U.itags.filter(x=>x!==t); U.xtags.push(t); }
     else if(U.xtags.includes(t)){ U.xtags=U.xtags.filter(x=>x!==t); }
     else U.itags.push(t);

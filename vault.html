@@ -554,6 +554,90 @@
   .oc-prev{font-size:12.5px;color:#7d8fa1;background:#f7fafd;border-radius:10px;padding:8px 10px;margin-bottom:10px;white-space:pre-wrap;max-height:90px;overflow:hidden}
   /* 터치 화면: 마우스를 올릴 수 없으니 버튼 줄을 카드 아래에 늘 보여줘요 */
   @media (hover:none){ .oc-acts{position:static;opacity:1;pointer-events:auto;transform:none;box-shadow:none;border:0;padding:0;margin-top:8px;justify-content:flex-end;background:none} }
+
+  /* 위젯 */
+  .t-vault .v-grid.widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .t-vault .wc{position:relative;background:#fff;border:1px solid #dfeaf4;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .t-vault .wc:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(90,159,216,.14)}
+  .t-vault .wc .pin{position:absolute;top:6px;left:6px;z-index:2}
+  .t-vault .wc-pv{height:150px;background:#eef1f5;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;color:#a9b6c3;font-size:12px}
+  .t-vault .wc-pv iframe{position:absolute;top:0;left:0;width:200%;height:200%;border:0;transform:scale(.5);transform-origin:0 0;pointer-events:none}
+  .t-vault .wc-bd{padding:10px 12px 12px}
+  .t-vault .wc .nm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .t-vault .wc .mt{font-size:11.5px;color:#8ea2b5;margin-top:2px}
+  .t-vault .wc .ks{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+  .t-vault .wc .ks span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;background:#f1f5f9;color:#5b7088;border-radius:5px;padding:1px 6px}
+  .t-vault .wc .tg{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .t-vault .wc .tg span{font-size:11px;color:#3f6a92;background:#eef5fc;border-radius:999px;padding:1px 8px}
+  .v-wed{position:fixed;inset:0;z-index:90;background:#f6f9fc;overflow:auto}
+  .v-wed .we-in{max-width:1400px;margin:0 auto;padding:22px 26px 40px}
+  .we-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .we-back{width:42px;height:42px;border-radius:50%;border:1px solid #dfe8f1;background:#fff;font-size:24px;line-height:1;color:#5b7088;cursor:pointer;padding:0 0 3px}
+  .we-back:hover{background:#eaf3fc}
+  .we-name{flex:1 1 220px;min-width:0;border:0;background:transparent;font-size:24px;font-weight:700;color:#2a323d;outline:none;padding:6px 4px}
+  .we-name::placeholder{color:#b8c4cf}
+  .we-btns{display:flex;gap:6px}
+  .we-btns button,.we-tb button{border:1px solid #d6e2ee;background:#fff;color:#3f5a74;border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;cursor:pointer}
+  .we-btns button:hover,.we-tb button:hover{background:#eef6fd}
+  .we-btns .primary,.we-tb .primary{background:#5a9fd8;border-color:#5a9fd8;color:#fff}
+  .we-btns .primary:hover,.we-tb .primary:hover{background:#4b8fc8}
+  .we-btns .danger{color:#c0594b;border-color:#efc9c3}
+  .we-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 18px}
+  .we-meta .v-taginput{flex:1 1 260px;min-width:0;background:#fff}
+  .we-meta select{flex:0 1 180px}
+  .we-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+  @media (max-width:980px){ .we-grid{grid-template-columns:minmax(0,1fr)} }
+  .we-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .we-h{display:flex;align-items:center;gap:8px;min-height:36px}
+  .we-h b{font-size:15px}
+  .we-h .sp,.we-tb .sp{flex:1}
+  .we-h .cnt{font-size:12px;background:#eef1f5;color:#5b7088;border-radius:999px;padding:1px 9px}
+  .we-len{margin-left:auto;font-size:12px;color:#9aa8b6}
+  .we-len.over{color:#c0594b;font-weight:700}
+  .we-tb{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .we-note{font-size:11.5px;color:#a9b6c3}
+  .we-bulk{background:#fff;border:1px solid #dfeaf4;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .we-bulk label{font-size:12.5px;color:#5b7088}
+  .we-bulk textarea{border:1px solid #dfe8f1;border-radius:10px;padding:9px 11px;font:inherit;font-size:13px;resize:vertical;outline:none}
+  .we-miss{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#eef6fd;border:1px solid #d3e5f5;color:#3f6a92;border-radius:12px;padding:8px 12px;font-size:12.5px}
+  .we-miss span{flex:1}
+  .we-miss code{background:#fff;border-radius:5px;padding:0 5px;font-size:12px}
+  .we-miss button{border:1px solid #c9ddef;background:#fff;color:#3f6a92;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
+  .we-fields{display:flex;flex-direction:column;gap:8px}
+  .we-empty{background:#fff;border:1px solid #dfeaf4;border-radius:16px;padding:28px;text-align:center;color:#9aa8b6;font-size:13px}
+  .we-f{background:#fff;border:1px solid #dfeaf4;border-radius:14px;padding:9px 10px 8px}
+  .we-f:focus-within{border-color:#9cc8ee}
+  .we-fr{display:flex;align-items:center;gap:6px}
+  .we-fr .ix{width:20px;text-align:center;font-size:11px;color:#a9b6c3;flex:none}
+  .we-fr input{border:1px solid transparent;background:#f7fafd;border-radius:8px;padding:6px 8px;font-size:13px;outline:none;min-width:0}
+  .we-fr input:focus{border-color:#c9ddef;background:#fff}
+  .we-fr .k{flex:1 1 40%;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#2f6ea6}
+  .we-fr .s{flex:1 1 60%}
+  .we-fr .ac{display:flex;gap:2px;flex:none}
+  .we-fr .ac button{width:26px;height:26px;border:0;background:transparent;border-radius:7px;color:#8ea2b5;font-size:10.5px;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .we-fr .ac button:hover{background:#eef5fc;color:#2f6ea6}
+  .we-fr .ac button.mono{font-family:ui-monospace,monospace;font-weight:700}
+  .we-fr .ac svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .we-f textarea.d{display:block;width:100%;box-sizing:border-box;margin-top:6px;border:1px solid transparent;background:transparent;border-radius:8px;padding:5px 8px 5px 34px;font:inherit;font-size:13px;line-height:1.55;resize:none;outline:none;overflow:hidden;color:#3a4654}
+  .we-f textarea.d:focus{background:#f7fafd}
+  .we-f .warn{display:block;font-size:11px;color:#c0594b;padding-left:34px;margin-top:2px}
+  .we-add2{border:1px dashed #c9ddef;background:transparent;color:#5a9fd8;border-radius:12px;padding:9px;font-size:13px;cursor:pointer}
+  .we-add2:hover{background:#eef6fd}
+  .we-seg{display:inline-flex;border:1px solid #d6e2ee;border-radius:999px;overflow:hidden;background:#fff}
+  .we-seg button{border:0;background:transparent;padding:6px 13px;font-size:12.5px;color:#7d8fa1;cursor:pointer}
+  .we-seg button.on{background:#eaf3fc;color:#2f6ea6;font-weight:700}
+  .we-pv{border:1px solid #dfeaf4;border-radius:16px;overflow:hidden;background:#eef1f5}
+  .we-pv.dark{background:#1b1d22}
+  .we-pv iframe{display:block;width:100%;height:560px;border:0;background:transparent}
+  .we-code{width:100%;box-sizing:border-box;min-height:560px;border:1px solid #dfeaf4;border-radius:16px;padding:14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.65;background:#fcfdfe;outline:none;resize:vertical;tab-size:2}
+  .we-code:focus{border-color:#9cc8ee;background:#fff}
+  @media (max-width:600px){ .v-wed .we-in{padding:14px 12px 30px} .we-name{font-size:19px} .we-pv iframe{height:420px} .we-code{min-height:420px} }
+  .v-wed .we-name{border:0!important;background:transparent!important;box-shadow:none!important;font-size:24px!important;font-weight:700!important;padding:6px 4px!important}
+  .v-wed .we-fr input{border:1px solid transparent!important;background:#f7fafd!important;box-shadow:none!important;padding:6px 8px!important;font-size:13px!important}
+  .v-wed .we-fr input:focus{border-color:#c9ddef!important;background:#fff!important}
+  .v-wed .we-f textarea.d{border:1px solid transparent!important;background:transparent!important;box-shadow:none!important;padding:5px 8px 5px 34px!important;min-height:0!important}
+  .v-wed .we-f textarea.d:focus{background:#f7fafd!important}
+  @media (max-width:600px){ .v-wed .we-name{font-size:19px!important} }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -624,6 +708,7 @@
   <a class="it" href="#tab=pair" data-vtab="pair">페어<span class="n"></span></a>
   <a class="it" href="#tab=prompt" data-vtab="prompt">프롬프트<span class="n"></span></a>
   <a class="it" href="#tab=ooc" data-vtab="ooc">OOC<span class="n"></span></a>
+  <a class="it" href="#tab=widget" data-vtab="widget">위젯<span class="n"></span></a>
   <a class="it" href="#tab=clip" data-vtab="clip">발췌 모음<span class="n"></span></a>
   <a class="it" href="#tab=gallery" data-vtab="gallery">갤러리<span class="n"></span></a>
   <a class="it" href="logs.html">로그</a>
@@ -642,6 +727,7 @@
         <button class="tab" data-tab="prompt">✨ 프롬프트</button>
         <button class="tab" data-tab="clip">📑 발췌 모음</button>
         <button class="tab" data-tab="ooc">💬 OOC</button>
+        <button class="tab" data-tab="widget">🧩 위젯</button>
         <button class="tab" data-tab="gallery">🖼 갤러리</button>
         <span class="sp"></span>
         <button id="v-export" type="button">💾 보관함 내보내기</button>
@@ -698,7 +784,7 @@ const imgDel=id=>tx('img','readwrite',s=>s.delete(id));
 const imgAll=()=>new Promise((res,rej)=>{ const out={}; const t=db.transaction('img','readonly'); const c=t.objectStore('img').openCursor(); c.onsuccess=()=>{ const cur=c.result; if(cur){ out[cur.key]=cur.value; cur.continue(); } }; t.oncomplete=()=>res(out); t.onerror=()=>rej(t.error); });
 const imgClear=()=>tx('img','readwrite',s=>s.clear());
 
-const BLANK=()=>({v:1, personas:[], prompts:[], pairs:[], gallery:[], clips:[], oocs:[], ocats:[], pcats:[], qcats:[], rcats:[], gcats:[]});
+const BLANK=()=>({v:1, personas:[], prompts:[], pairs:[], gallery:[], clips:[], oocs:[], ocats:[], widgets:[], wcats:[], pcats:[], qcats:[], rcats:[], gcats:[]});
 let D=BLANK();
 const IMG=new Map();
 async function img(id){ if(!id) return null; if(IMG.has(id)) return IMG.get(id); const v=await imgGet(id).catch(()=>null); IMG.set(id,v||null); return v||null; }
@@ -706,7 +792,7 @@ async function img(id){ if(!id) return null; if(IMG.has(id)) return IMG.get(id);
 let U={tab:'persona', cat:{persona:'all',prompt:'all',pair:'all'}, q:'', tag:null, sort:'old'};
 try{ Object.assign(U, JSON.parse(localStorage.getItem('vault-ui')||'{}')); }catch(e){}
 if(!U.cat||typeof U.cat!=='object') U.cat={persona:'all',prompt:'all',pair:'all'};
-if(!['persona','prompt','pair','gallery','clip','ooc'].includes(U.tab)) U.tab='persona';
+if(!['persona','prompt','pair','gallery','clip','ooc','widget'].includes(U.tab)) U.tab='persona';
 const saveUI=()=>{ try{ localStorage.setItem('vault-ui',JSON.stringify({tab:U.tab,cat:U.cat,sort:U.sort,catClosed:U.catClosed||[],nsfw:U.nsfw||'all'})); }catch(e){} };
 /* NSFW: 19 체크(블러 해제)는 이 창을 닫으면 다시 잠겨요 */
 try{ U.adult=sessionStorage.getItem('vault-adult')==='1'; }catch(e){ U.adult=false; }
@@ -722,7 +808,7 @@ function paintNsfwBar(){
 
 async function save(){
   try{ await kvSet('data',D); }catch(e){ toast('저장하지 못했어요: '+(e&&e.name||'오류')); return; }
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length,o:(D.oocs||[]).length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length,o:(D.oocs||[]).length,w:(D.widgets||[]).length})); localStorage.setItem('studioTouch:vault',String(Date.now())); }catch(e){}
 }
 
 /* ---------- 원본 메타데이터 (PNG 텍스트 정보) ---------- */
@@ -809,7 +895,7 @@ async function copy(t,label){
 }
 
 /* ---------- 목록 ---------- */
-const TABS={persona:{list:'personas',cats:'pcats',ord:'porder'}, prompt:{list:'prompts',cats:'qcats',ord:'qorder'}, pair:{list:'pairs',cats:'rcats',ord:'rorder'}, gallery:{list:'gallery',cats:'gcats',ord:'gorder'}, clip:{list:'clips',cats:'ccats',ord:'corder'}, ooc:{list:'oocs',cats:'ocats',ord:'oorder'}};
+const TABS={persona:{list:'personas',cats:'pcats',ord:'porder'}, prompt:{list:'prompts',cats:'qcats',ord:'qorder'}, pair:{list:'pairs',cats:'rcats',ord:'rorder'}, gallery:{list:'gallery',cats:'gcats',ord:'gorder'}, clip:{list:'clips',cats:'ccats',ord:'corder'}, ooc:{list:'oocs',cats:'ocats',ord:'oorder'}, widget:{list:'widgets',cats:'wcats',ord:'worder'}};
 const items=()=>D[TABS[U.tab].list]||(D[TABS[U.tab].list]=[]);
 const cats=()=>D[TABS[U.tab].cats]||(D[TABS[U.tab].cats]=[]);
 /* 카테고리 트리: 단계 제한 없이 아래로 계속 넣을 수 있다 */
@@ -832,6 +918,7 @@ const curAU=()=>{ const c=(U.tab==='persona'||U.tab==='pair')&&U.cat[U.tab]; ret
 function hay(it){
   if(U.tab==='gallery') return [it.title,it.sub,it.memo,(it.tags||[]).join(' ')].join(' ').toLowerCase();
   if(U.tab==='ooc') return [it.text,(it.tags||[]).join(' ')].join(' ').toLowerCase();
+  if(U.tab==='widget') return [it.name,(it.tags||[]).join(' '),(it.fields||[]).map(f=>f.k+' '+f.d).join(' ')].join(' ').toLowerCase();
   if(U.tab==='persona') return [it.name,it.intro,it.age,it.height,it.gender,it.with,it.au,it.setting,it.memo,it.pos,(it.tags||[]).join(' '),(it.outfits||[]).map(o=>o.name+' '+o.desc).join(' '),(it.aus||[]).map(a=>[a.label,a.name,a.intro,a.setting,a.with].join(' ')).join(' ')].join(' ').toLowerCase();
   if(U.tab==='pair') return [it.name,pairName(it.a),pairName(it.b),it.dday,[it.ca,it.cb].map(c=>c?(c.pos+' '+(c.outfits||[]).map(o=>o.name+' '+o.pos).join(' ')):'').join(' '),it.rel,it.callAB,it.callBA,it.story,it.pos,it.memo,(it.tags||[]).join(' '),(it.aus||[]).map(a=>[a.label,a.name].join(' ')).join(' ')].join(' ').toLowerCase();
   return [it.title,it.pos,it.neg,it.memo,it.src,(it.tags||[]).join(' ')].join(' ').toLowerCase();
@@ -901,19 +988,20 @@ function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
 function render(){
   document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===U.tab));
   document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>{ const t=a.dataset.vtab, n=t==='gallery'?allPics().length:(D[TABS[t].list]||[]).length; a.classList.toggle('on',t===U.tab); a.querySelector('.n').textContent=n||''; });
-  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],ooc:['OOC','AI 채팅 진행 명령어(OOC)를 태그로 모아두는 곳이에요. 내용을 누르면 바로 복사돼요.'],gallery:['갤러리','직접 올린 이미지를 모아보는 곳이에요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
+  const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],widget:['위젯','상태값·지시사항과 HTML을 한 묶음으로 저장하고, 미리보기로 바로 확인해요.'],ooc:['OOC','AI 채팅 진행 명령어(OOC)를 태그로 모아두는 곳이에요. 내용을 누르면 바로 복사돼요.'],gallery:['갤러리','직접 올린 이미지를 모아보는 곳이에요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
   const hh=document.querySelector('.t-vault > header'); if(hh){ hh.querySelector('h1').textContent=H[0]; hh.querySelector('p').textContent=H[1]; }
-  $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어',gallery:'＋ 사진 올리기',clip:'＋ 발췌 올리기',ooc:'＋ 새 OOC'}[U.tab];
-  $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기',ooc:'OOC 내용, 태그로 찾기'}[U.tab];
-  const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'; const cn=$('sort').querySelector('option[value=name]'); if(cn){ cn.hidden=U.tab==='clip'; cn.textContent=U.tab==='ooc'?'내용순':'이름순'; }
-  $('sort').value=((U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
+  $('new').textContent={persona:'＋ 새 페르소나',prompt:'＋ 새 프롬프트',pair:'＋ 새 페어',gallery:'＋ 사진 올리기',clip:'＋ 발췌 올리기',ooc:'＋ 새 OOC',widget:'＋ 새 위젯'}[U.tab];
+  $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기',ooc:'OOC 내용, 태그로 찾기',widget:'위젯 이름, 상태값, 태그로 찾기'}[U.tab];
+  const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'||U.tab==='widget'; const cn=$('sort').querySelector('option[value=name]'); if(cn){ cn.hidden=U.tab==='clip'; cn.textContent=U.tab==='ooc'?'내용순':'이름순'; }
+  $('sort').value=((U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'||U.tab==='widget')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
   const noSide=U.tab==='ooc'; $('side').style.display=noSide?'none':''; $('side').parentElement.classList.toggle('noside',noSide);
   $('oocTop').style.display=U.tab==='ooc'?'':'none';
   if(!noSide) renderSide(); paintNsfwBar(); paintOrigNote();
   if(U.tab==='gallery'){ renderGallery(); return; }
   if(U.tab==='clip'){ renderClips(); return; }
   if(U.tab==='ooc'){ renderOOC(); return; }
-  $('grid').classList.remove('gallery','clips','oocs');
+  if(U.tab==='widget'){ renderWidgets(); return; }
+  $('grid').classList.remove('gallery','clips','oocs','widgets');
   const {arr,base}=filtered(); renderTags(base);
   const g=$('grid'); g.classList.toggle('prompts',U.tab==='prompt'); g.classList.toggle('pairs',U.tab==='pair');
   if(!arr.length){
@@ -1272,6 +1360,131 @@ function editOOC(o0){
   $('oesave').onclick=async()=>{ const text=ta.value.trim(); if(!text){ toast('내용을 적어 주세요'); return; }
     const x=D.oocs.find(y=>y.id===o.id); if(x) Object.assign(x,{text,tags:get(),pin:$('oe-pin').checked,updated:Date.now()});
     await save(); close(); render(); toast('저장했어요'); };
+}
+
+
+/* ---------- 위젯 ---------- */
+const WKEY_RE=/\{\{\s*([^{}\s]+)\s*\}\}/g, W_LIMIT=10000;
+const wKeys=h=>{ const st=new Set(); String(h||'').replace(WKEY_RE,(m,k)=>{ st.add(k); return m; }); return [...st]; };
+function wDoc(w,bg){
+  const map={}; (w.fields||[]).forEach(f=>{ if(f.k) map[f.k.trim()]=f.s; });
+  const html=String(w.html||'').replace(WKEY_RE,(m,k)=>esc(map[k]!=null&&map[k]!==''?map[k]:`[${k}]`));
+  return `<!DOCTYPE html><meta charset="utf-8"><style>html,body{margin:0;background:${bg==='dark'?'#1b1d22':'#eef1f5'}}</style>`+(html.trim()?html:`<div style="font-family:sans-serif;color:#9aa8b6;font-size:13px;display:flex;align-items:center;justify-content:center;height:90vh">HTML을 넣으면 여기에 보여요</div>`);
+}
+function renderWidgets(){
+  const {arr,base}=filtered(); renderTags(base);
+  const g=$('grid'); g.innerHTML=''; g.classList.remove('prompts','pairs','gallery','clips','oocs'); g.classList.add('widgets'); $('dragHint').style.display='none';
+  if(!arr.length){ g.innerHTML=`<div class="v-empty">${(D.widgets||[]).length?'조건에 맞는 위젯이 없어요.':'아직 저장한 위젯이 없어요.<br><b>＋ 새 위젯</b>을 눌러 상태값과 HTML을 저장해 보세요.'}</div>`; return; }
+  g.innerHTML=arr.map(w=>{ const fs=w.fields||[];
+    return `<div class="wc" data-id="${w.id}">${w.pin?'<span class="pin">📌</span>':''}
+      <div class="wc-pv">${(w.html||'').trim()?'<iframe sandbox="allow-scripts" tabindex="-1" loading="lazy"></iframe>':'<span>HTML 없음</span>'}</div>
+      <div class="wc-bd"><div class="nm">${esc(w.name||'이름 없는 위젯')}</div>
+      <div class="mt">상태값 ${fs.length}개${(w.html||'').trim()?' · HTML 있음':''}</div>
+      ${fs.length?`<div class="ks">${fs.slice(0,8).map(f=>`<span>${esc(f.k)}</span>`).join('')}${fs.length>8?`<span>+${fs.length-8}</span>`:''}</div>`:''}
+      ${(w.tags||[]).length?`<div class="tg">${w.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join('')}</div>`:''}</div></div>`; }).join('');
+  g.querySelectorAll('.wc').forEach(el=>{ const w=D.widgets.find(x=>x.id===el.dataset.id); el.onclick=()=>openWidget(w);
+    const f=el.querySelector('iframe'); if(f) f.srcdoc=wDoc(w,w.bg); });
+}
+let WE=null;
+function openWidget(w0){
+  const isNew=!w0; const w=JSON.parse(JSON.stringify(w0||{id:uid(),name:'',fields:[],html:'',tags:[],cat:curCat()||null,bg:'light'}));
+  if(!w.fields) w.fields=[];
+  let dirty=false, tab=w.html.trim()?'preview':'code', pvT=0;
+  if(WE) WE.remove();
+  WE=document.createElement('div'); WE.className='v-wed t-vault';
+  WE.innerHTML=`<div class="we-in">
+    <div class="we-top"><button type="button" class="we-back" title="목록으로">‹</button><input type="text" class="we-name" id="v-we-name" placeholder="위젯 이름" value="${esc(w.name)}">
+      <div class="we-btns">${isNew?'':'<button type="button" class="danger" id="v-we-del">삭제</button><button type="button" id="v-we-dup">복제</button>'}<button type="button" class="primary" id="v-we-save">저장</button></div></div>
+    <div class="we-meta"><div class="v-taginput" id="v-we-tags"></div><select id="v-we-cat">${catOptions(w.cat)}</select><label class="chk"><input type="checkbox" id="v-we-pin" ${w.pin?'checked':''}> 📌 고정</label></div>
+    <div class="we-grid">
+      <div class="we-col">
+        <div class="we-h"><b>상태값</b><span class="cnt" id="v-we-cnt">0</span><span class="we-len" id="v-we-len"></span></div>
+        <div class="we-tb"><button type="button" id="v-we-add">＋ 상태값 추가</button><button type="button" id="v-we-bulkT">여러 줄로 추가</button><button type="button" id="v-we-cpAll">전체 복사</button></div>
+        <div class="we-bulk" id="v-we-bulk" style="display:none"><label>한 줄에 하나씩 <b>상태값: 지시사항</b>으로 적어 주세요</label><textarea id="v-we-bulkIn" rows="5" placeholder="BGM: 현재 대화에 어울리는 노래를 '아티스트 - 곡명' 순으로 출력.&#10;DATE: 현재 날짜 (MM/DD)."></textarea><div class="we-tb"><span class="sp"></span><button type="button" id="v-we-bulkX">취소</button><button type="button" class="primary" id="v-we-bulkOk">추가</button></div></div>
+        <div class="we-miss" id="v-we-miss" style="display:none"></div>
+        <div class="we-fields" id="v-we-fields"></div>
+        <button type="button" class="we-add2" id="v-we-add2">＋ 상태값 추가</button>
+      </div>
+      <div class="we-col">
+        <div class="we-h"><b>HTML</b><span class="sp"></span><div class="we-seg" id="v-we-tab"><button type="button" data-t="preview">미리보기</button><button type="button" data-t="code">코드</button></div><div class="we-seg" id="v-we-bg"><button type="button" data-b="light">밝게</button><button type="button" data-b="dark">어둡게</button></div></div>
+        <div class="we-pv" id="v-we-pv"><iframe id="v-we-frame" sandbox="allow-scripts" title="위젯 미리보기"></iframe></div>
+        <textarea class="we-code" id="v-we-html" spellcheck="false" placeholder="위젯 HTML을 붙여넣으세요. {{BGM}}처럼 상태값 이름을 넣으면 그 자리에 값이 들어가요.">${esc(w.html)}</textarea>
+        <div class="we-tb"><button type="button" id="v-we-cpHtml">HTML 복사</button><button type="button" id="v-we-fill" title="비어 있는 미리보기 값을 상태값 이름으로 채워요">미리보기 값 채우기</button><span class="sp"></span><span class="we-note">미리보기 값은 화면 확인용이에요.</span></div>
+      </div>
+    </div></div>`;
+  document.body.appendChild(WE); document.body.style.overflow='hidden'; WE.scrollTop=0;
+  const getTags=tagInput($('we-tags'),w.tags||[],null,'태그 입력 후 Enter');
+  const mark=()=>{ $('we-save').textContent=dirty?'저장 •':'저장'; };
+  const setDirty=()=>{ dirty=true; mark(); };
+  const preview=()=>{ clearTimeout(pvT); pvT=setTimeout(()=>{ if(tab==='preview') $('we-frame').srcdoc=wDoc(w,w.bg); },200); };
+  const meta=()=>{
+    $('we-cnt').textContent=w.fields.length;
+    const n=w.fields.reduce((a,f)=>a+(f.k||'').length+(f.d||'').length,0), L=$('we-len'); L.textContent=`글자수 ${n.toLocaleString()} / ${W_LIMIT.toLocaleString()}`; L.classList.toggle('over',n>W_LIMIT);
+    const ks=new Set(w.fields.map(f=>(f.k||'').trim()).filter(Boolean)), miss=wKeys(w.html).filter(k=>!ks.has(k)), mb=$('we-miss');
+    mb.style.display=miss.length?'':'none';
+    if(miss.length){ mb.innerHTML=`<span>HTML에만 있는 이름: ${miss.map(k=>`<code>${esc(k)}</code>`).join(' ')}</span><button type="button" id="v-we-addMiss">상태값으로 추가</button>`;
+      $('we-addMiss').onclick=()=>{ miss.forEach(k=>w.fields.push({k,d:'',s:''})); setDirty(); paint(); toast('HTML에 있는 이름을 상태값으로 추가했어요. 지시사항을 채워 주세요.'); }; }
+    const used=new Set(wKeys(w.html));
+    WE.querySelectorAll('.we-f').forEach(el=>{ const f=w.fields[+el.dataset.i]; el.querySelector('.warn').style.display=(w.html.trim()&&f&&f.k&&!used.has(f.k.trim()))?'':'none'; });
+  };
+  const grow=t=>{ t.style.height='auto'; t.style.height=t.scrollHeight+2+'px'; };
+  const paint=focus=>{
+    const box=$('we-fields');
+    box.innerHTML=w.fields.map((f,i)=>`<div class="we-f" data-i="${i}"><div class="we-fr"><span class="ix">${i+1}</span>
+      <input class="k" data-k="k" value="${esc(f.k||'')}" placeholder="상태값" spellcheck="false"><input class="s" data-k="s" value="${esc(f.s||'')}" placeholder="미리보기 값">
+      <span class="ac"><button type="button" data-a="ck" title="{{상태값}} 복사" class="mono">{ }</button><button type="button" data-a="cd" title="지시사항 복사">${IC.copy}</button><button type="button" data-a="up" title="위로">▲</button><button type="button" data-a="dn" title="아래로">▼</button><button type="button" data-a="del" title="삭제">✕</button></span></div>
+      <textarea class="d" data-k="d" rows="1" placeholder="지시사항">${esc(f.d||'')}</textarea><span class="warn" style="display:none">HTML에 쓰이지 않는 상태값이에요</span></div>`).join('')
+      ||`<div class="we-empty">상태값이 없어요. ‘＋ 상태값 추가’나 ‘여러 줄로 추가’로 시작해요.</div>`;
+    box.querySelectorAll('textarea.d').forEach(grow); meta(); preview();
+    if(focus!=null){ const el=box.querySelector(`.we-f[data-i="${focus}"] .k`); if(el) el.focus(); }
+  };
+  $('we-fields').addEventListener('input',e=>{ const t=e.target, k=t.dataset.k; if(!k) return; const i=+t.closest('.we-f').dataset.i; w.fields[i][k]=t.value; if(k==='d') grow(t); setDirty(); meta(); if(k!=='d') preview(); });
+  $('we-fields').addEventListener('click',e=>{ const b=e.target.closest('[data-a]'); if(!b) return; const i=+b.closest('.we-f').dataset.i, a=b.dataset.a, f=w.fields[i];
+    if(a==='ck') return copy(`{{${(f.k||'').trim()}}}`,'상태값 이름을');
+    if(a==='cd') return copy(f.d||'','지시사항을');
+    if(a==='del'){ const go=()=>{ w.fields.splice(i,1); setDirty(); paint(); }; if(f.k||f.d){ if(confirm(`‘${f.k||'이름 없는'}’ 상태값을 지울까요?`)) go(); } else go(); return; }
+    const j=a==='up'?i-1:i+1; if(j<0||j>=w.fields.length) return; [w.fields[i],w.fields[j]]=[w.fields[j],w.fields[i]]; setDirty(); paint(); });
+  const add=()=>{ w.fields.push({k:'',d:'',s:''}); setDirty(); paint(w.fields.length-1); };
+  $('we-add').onclick=add; $('we-add2').onclick=add;
+  $('we-bulkT').onclick=()=>{ const b=$('we-bulk'); b.style.display=b.style.display==='none'?'':'none'; if(b.style.display!=='none') $('we-bulkIn').focus(); };
+  $('we-bulkX').onclick=()=>{ $('we-bulk').style.display='none'; };
+  $('we-bulkOk').onclick=()=>{ const rows=$('we-bulkIn').value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean); let n=0;
+    rows.forEach(l=>{ const m=l.match(/^\{?\{?\s*([^:：{}]+?)\s*\}?\}?\s*[:：]\s*([\s\S]*)$/); w.fields.push(m?{k:m[1].trim(),d:m[2].trim(),s:''}:{k:l,d:'',s:''}); n++; });
+    $('we-bulkIn').value=''; $('we-bulk').style.display='none'; setDirty(); paint(); if(n) toast(`상태값 ${n}개를 추가했어요`); };
+  $('we-cpAll').onclick=()=>copy(w.fields.filter(f=>f.k||f.d).map(f=>`${f.k}: ${f.d}`).join('\n'),'상태값 전체를');
+  $('we-cpHtml').onclick=()=>copy(w.html,'HTML을');
+  $('we-fill').onclick=()=>{ w.fields.forEach(f=>{ if(!f.s&&f.k) f.s=f.k; }); setDirty(); paint(); };
+  $('we-html').addEventListener('input',()=>{ w.html=$('we-html').value; setDirty(); meta(); preview(); });
+  $('we-html').addEventListener('keydown',e=>{ if(e.key==='Tab'){ e.preventDefault(); insAt(e.target,'  '); } });
+  $('we-name').addEventListener('input',setDirty);
+  ['we-cat','we-pin'].forEach(id=>$(id).addEventListener('change',setDirty)); $('we-tags').addEventListener('click',()=>setTimeout(setDirty,0)); $('we-tags').addEventListener('keydown',()=>setTimeout(setDirty,0));
+  const setTab=t=>{ tab=t; WE.querySelectorAll('#v-we-tab button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); $('we-pv').style.display=t==='preview'?'':'none'; $('we-html').style.display=t==='code'?'':'none'; $('we-bg').style.display=t==='preview'?'':'none'; if(t==='preview') preview(); };
+  const setBg=b=>{ w.bg=b; WE.querySelectorAll('#v-we-bg button').forEach(x=>x.classList.toggle('on',x.dataset.b===b)); $('we-pv').classList.toggle('dark',b==='dark'); preview(); };
+  WE.querySelectorAll('#v-we-tab button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  WE.querySelectorAll('#v-we-bg button').forEach(b=>b.onclick=()=>{ setBg(b.dataset.b); setDirty(); });
+  const shut=()=>{ if(WE){ WE.remove(); WE=null; } document.removeEventListener('keydown',onKey,true); if(!(modalEl&&modalEl.classList.contains('on'))) document.body.style.overflow=''; };
+  const back=()=>{ if(dirty) confirmBox('저장하지 않은 내용이 있어요. 목록으로 갈까요?','나가기',()=>{ close(); shut(); }); else shut(); };
+  const onKey=e=>{ if(modalEl&&modalEl.classList.contains('on')) return; if(e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); back(); } else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); $('we-save').click(); } };
+  document.addEventListener('keydown',onKey,true);
+  WE.querySelector('.we-back').onclick=back;
+  $('we-save').onclick=async()=>{
+    w.name=$('we-name').value.trim(); w.html=$('we-html').value;
+    w.fields=w.fields.map(f=>({k:(f.k||'').trim(),d:(f.d||'').trim(),s:f.s||''})).filter(f=>f.k||f.d);
+    if(!w.name&&!w.fields.length&&!w.html.trim()){ toast('내용을 입력해 주세요'); return; }
+    if(!w.name) w.name='이름 없는 위젯';
+    Object.assign(w,{tags:getTags(),cat:$('we-cat').value||null,pin:$('we-pin').checked,updated:Date.now()}); if(!w.created) w.created=Date.now();
+    if(!D.widgets) D.widgets=[]; const i=D.widgets.findIndex(x=>x.id===w.id); if(i<0) D.widgets.push(JSON.parse(JSON.stringify(w))); else D.widgets[i]=JSON.parse(JSON.stringify(w));
+    await save(); render(); dirty=false; mark(); $('we-name').value=w.name; paint(); toast('위젯을 저장했어요');
+    if(isNew){ const cur=D.widgets.find(x=>x.id===w.id); shut(); openWidget(cur); }
+  };
+  if(!isNew){
+    $('we-del').onclick=()=>confirmBox(`‘${w.name||'이름 없는 위젯'}’ 위젯을 삭제할까요?`,'삭제',async()=>{ D.widgets=D.widgets.filter(x=>x.id!==w.id); await save(); close(); shut(); render(); toast('삭제했어요'); });
+    $('we-dup').onclick=()=>{ const c=JSON.parse(JSON.stringify(D.widgets.find(x=>x.id===w.id)||w)); Object.assign(c,{id:uid(),name:(c.name||'이름 없는 위젯')+' 사본',created:Date.now(),updated:Date.now(),pin:false});
+      const go=async()=>{ D.widgets.push(c); await save(); render(); shut(); openWidget(c); toast('사본을 만들었어요'); };
+      if(dirty) confirmBox('저장하지 않은 내용은 사본에 들어가지 않아요. 계속할까요?','복제',()=>{ close(); go(); }); else go(); };
+  }
+  setBg(w.bg||'light'); setTab(tab); paint();
+  if(isNew) setTimeout(()=>$('we-name').focus(),60);
 }
 
 /* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
@@ -1821,8 +2034,8 @@ $('export').onclick=async()=>{
 $('import').onclick=()=>$('importFile').click();
 $('importFile').onchange=()=>{ const f=$('importFile').files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $('importFile').value=''; let o; try{ o=JSON.parse(r.result); }catch(e){ toast('파일을 읽지 못했어요'); return; }
   if(!o||o.app!=='studio-vault'||!o.data){ toast('보관함 백업 파일이 아니에요'); return; }
-  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length, nr=(o.data.pairs||[]).length, ng=(o.data.gallery||[]).length, nc=(o.data.clips||[]).length, no=(o.data.oocs||[]).length;
-  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개${nr?`, 페어 <b>${nr}</b>개`:''}${ng?`, 갤러리 사진 <b>${ng}</b>장`:''}${nc?`, 발췌 <b>${nc}</b>장`:''}${no?`, OOC <b>${no}</b>개`:''}가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
+  const np=(o.data.personas||[]).length, nq=(o.data.prompts||[]).length, nr=(o.data.pairs||[]).length, ng=(o.data.gallery||[]).length, nc=(o.data.clips||[]).length, no=(o.data.oocs||[]).length, nw=(o.data.widgets||[]).length;
+  modal(`<div class="v-dh"><b>📂 보관함 불러오기</b><button class="x" type="button">×</button></div><div class="v-db" style="line-height:1.8">페르소나 <b>${np}</b>개, 프롬프트 <b>${nq}</b>개${nr?`, 페어 <b>${nr}</b>개`:''}${ng?`, 갤러리 사진 <b>${ng}</b>장`:''}${nc?`, 발췌 <b>${nc}</b>장`:''}${no?`, OOC <b>${no}</b>개`:''}${nw?`, 위젯 <b>${nw}</b>개`:''}가 들어 있어요.<br>· <b>합치기</b>: 지금 보관함은 그대로 두고, 없는 항목만 더해요.<br>· <b>바꾸기</b>: 지금 보관함을 지우고 파일 내용으로 바꿔요.</div><div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" id="v-imMerge">합치기</button><button type="button" class="primary" id="v-imReplace">바꾸기</button></div>`,{sm:true});
   $('imMerge').onclick=()=>importData(o,false); $('imReplace').onclick=()=>importData(o,true);
 }; r.readAsText(f); };
 async function importData(o,replace){
@@ -1830,7 +2043,7 @@ async function importData(o,replace){
     const inc=Object.assign(BLANK(),o.data), ims=o.images||{};
     if(replace){ await imgClear(); IMG.clear(); D=inc; for(const [k,v] of Object.entries(ims)) await imgSet(k,v); }
     else {
-      for(const key of ['pcats','qcats','rcats','gcats','ocats','personas','prompts','pairs','gallery','clips','oocs']){ if(!D[key]) D[key]=[]; const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
+      for(const key of ['pcats','qcats','rcats','gcats','ocats','wcats','personas','prompts','pairs','gallery','clips','oocs','widgets']){ if(!D[key]) D[key]=[]; const have=new Set(D[key].map(x=>x.id)); (inc[key]||[]).forEach(x=>{ if(!have.has(x.id)){ D[key].push(x); if(x.img && ims[x.img]){ imgSet(x.img,ims[x.img]); if(ims[ORIG(x.img)]) imgSet(ORIG(x.img),ims[ORIG(x.img)]); } } }); }
     }
     await save(); close(); render(); toast(replace?'보관함을 바꿨어요':'보관함에 합쳤어요');
   }catch(e){ toast('불러오지 못했어요: '+(e&&e.name||'오류')); }
@@ -1841,14 +2054,14 @@ document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.pr
 document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.itags=[]; U.xtags=[]; U.q=''; $('q').value=''; saveUI(); render(); });
 let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').value; render(); },120); };
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
-$('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):U.tab==='ooc'?(()=>{ const t=$('oc-text'); t.focus(); t.scrollIntoView({block:'center',behavior:'smooth'}); })():editPrompt(null);
+$('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):U.tab==='widget'?openWidget(null):U.tab==='ooc'?(()=>{ const t=$('oc-text'); t.focus(); t.scrollIntoView({block:'center',behavior:'smooth'}); })():editPrompt(null);
 (async()=>{
   try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d);
     /* 예전에 블러만 켜둔 프롬프트에도 #NSFW 태그 달아주기 (한 번만) */
     let fixed=0; (D.prompts||[]).forEach(q=>{ if(q.nsfw&&!(q.tags||[]).some(t=>/^nsfw$/i.test(t))){ q.tags=[...(q.tags||[]),'NSFW']; fixed++; } }); if(fixed) await kvSet('data',D).catch(()=>{}); }
   catch(e){ $('grid').innerHTML='<div class="v-empty">이 브라우저에서는 보관함 저장소를 열 수 없어요.<br>시크릿 모드라면 일반 창에서 열어 주세요.</div>'; return; }
   try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
-  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length,o:(D.oocs||[]).length})); }catch(e){}
+  try{ localStorage.setItem('vault-summary',JSON.stringify({p:D.personas.length,q:D.prompts.length,r:(D.pairs||[]).length,g:allPics().length,c:(D.clips||[]).length,o:(D.oocs||[]).length,w:(D.widgets||[]).length})); }catch(e){}
   const hm=(location.hash||'').match(/^#(p|q|r|tab)=([\w-]+)$/);
   if(hm){ U.tab=hm[1]==='tab'?(TABS[hm[2]]?hm[2]:'persona'):{p:'persona',q:'prompt',r:'pair'}[hm[1]]; saveUI(); }
   render();

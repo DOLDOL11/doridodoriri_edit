@@ -508,7 +508,11 @@
   .v-taginput:focus-within{border-color:#9cc8ee}
 
   /* OOC */
+  .t-vault .v-body.noside{grid-template-columns:1fr}
   .oc-top{background:#fff;border:1px solid #dfeaf4;border-radius:18px;padding:12px 14px;margin:0 0 14px;box-shadow:0 4px 16px rgba(90,159,216,.06)}
+  .oc-reply{display:flex;align-items:center;gap:8px;background:#eef6fd;border:1px solid #d3e5f5;color:#3f6a92;border-radius:10px;padding:6px 10px;font-size:12.5px;margin-bottom:8px}
+  .oc-reply span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oc-reply button{border:0;background:none;color:#7d8fa1;font-size:16px;cursor:pointer;line-height:1}
   .oc-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
   .oc-tools .sp{flex:1}
   .oc-tools button{border:1px solid #d2e0ed;background:#f7fbff;color:#3f6a92;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;cursor:pointer}
@@ -517,37 +521,33 @@
   .oc-hint{font-size:11.5px;color:#a9b6c3}
   .oc-top textarea{width:100%;min-height:72px;resize:vertical;border:1px solid #dfe8f1;border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;line-height:1.6;outline:none;box-sizing:border-box}
   .oc-top textarea:focus{border-color:#9cc8ee}
-  .oc-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-  .oc-row .v-taginput{flex:1 1 220px;min-width:0}
-  .oc-row select{flex:0 1 170px;min-width:0}
-  .oc-row .oc-n{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-  .t-vault .v-grid.oocs{display:flex;flex-direction:column;gap:8px}
-  .oc-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
-  .oc-bar .sp{flex:1}
-  .oc-n2{font-size:12.5px;color:#8ea2b5;margin-right:4px}
-  .t-vault .np.ocs.on,.t-vault .np.ocw.on{background:#eaf3fc;border-color:#9cc8ee;color:#2f6ea6}
-  .t-vault .np.ocs,.t-vault .np.ocw{height:30px;font-size:12px;padding:0 12px}
-  .oc-all{border:1px solid #d2e0ed;background:#fff;color:#3f6a92;border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer}
-  .oc-all:hover{background:#eaf3fc}
-  .oc-li{position:relative;background:#fff;border:1px solid #dfeaf4;border-radius:16px;padding:13px 118px 11px 16px;transition:border-color .15s}
-  .oc-li:hover{border-color:#b9d6f0}
-  .oc-li.pinned{border-color:#cfe2f3;background:#fbfdff}
-  .oc-tx{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.65;cursor:copy;color:#2a323d}
-  .oc-li.blur .oc-tx{filter:blur(5px);cursor:pointer;user-select:none}
+  .oc-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .oc-row .v-taginput{flex:1 1 auto;min-width:0}
+  .t-vault .v-grid.oocs{display:flex;flex-direction:column;gap:14px;padding-top:6px}
+  .oc-li{position:relative;background:#fff;border:1px solid #dfeaf4;border-radius:16px;padding:13px 16px 11px;transition:border-color .15s}
+  .oc-li:hover{border-color:#9cc8ee}
+  .oc-li.pinned{background:#fbfdff}
+  .oc-li.reply{border-left:3px solid #cfe2f3}
+  .oc-par{font-size:11.5px;color:#8ea2b5;margin-bottom:4px}
+  .oc-tx{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.65;cursor:copy;color:#2a323d;max-height:calc(1.65em * 6);overflow:hidden;position:relative}
+  .oc-li.long:not(.open) .oc-tx{-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+  .oc-li.open .oc-tx{max-height:none}
+  .oc-more{border:0;background:none;color:#5a9fd8;font-size:12px;padding:4px 0 0;cursor:pointer}
   .oc-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:7px}
   .oc-meta:empty{display:none}
   .oc-tag{border:0;background:#eef5fc;color:#3f6a92;border-radius:999px;padding:2px 9px;font-size:11.5px;cursor:pointer}
   .oc-tag:hover{background:#dcebf8}
-  .oc-tag.n{background:#fbeeec;color:#c0594b}
-  .oc-cat{font-size:11.5px;color:#5b7088;border:1px solid #dfe8f1;border-radius:6px;padding:1px 7px}
   .oc-pin{font-size:11.5px;color:#5b7088}
   .oc-uses{font-size:11px;color:#a9b6c3;margin-left:auto}
-  .oc-acts{position:absolute;top:8px;right:8px;display:flex;gap:2px;opacity:.5;transition:opacity .15s}
-  .oc-li:hover .oc-acts,.oc-li:focus-within .oc-acts{opacity:1}
-  @media (hover:none){ .oc-acts{opacity:1} }
-  .oc-acts button{width:26px;height:26px;border:0;background:transparent;border-radius:8px;cursor:pointer;font-size:13px;color:#5b7088;padding:0}
-  .oc-acts button:hover{background:#eef5fc}
-  @media (max-width:600px){ .oc-li{padding:38px 12px 10px 14px} .oc-row select{flex:1 1 120px} }
+  .oc-acts{position:absolute;top:-17px;right:12px;display:flex;gap:4px;padding:3px;background:#fff;border:1px solid #dfeaf4;border-radius:12px;box-shadow:0 6px 18px rgba(30,60,90,.12);opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .15s,transform .15s;z-index:5}
+  .oc-li:hover .oc-acts,.oc-li:focus-within .oc-acts{opacity:1;pointer-events:auto;transform:none}
+  .oc-acts button{width:30px;height:30px;border:1px solid #e6edf4;background:#f8fafc;border-radius:8px;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;color:#6b7c8d}
+  .oc-acts button:hover{background:#eaf3fc;color:#2f6ea6;border-color:#c9ddef}
+  .oc-acts button.on{color:#2f6ea6;background:#eaf3fc}
+  .oc-acts svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .oc-prev{font-size:12.5px;color:#7d8fa1;background:#f7fafd;border-radius:10px;padding:8px 10px;margin-bottom:10px;white-space:pre-wrap;max-height:90px;overflow:hidden}
+  /* 터치 화면: 마우스를 올릴 수 없으니 버튼 줄을 카드 아래에 늘 보여줘요 */
+  @media (hover:none){ .oc-acts{position:static;opacity:1;pointer-events:auto;transform:none;box-shadow:none;border:0;padding:0;margin-top:8px;justify-content:flex-end;background:none} }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -707,7 +707,7 @@ try{ U.adult=sessionStorage.getItem('vault-adult')==='1'; }catch(e){ U.adult=fal
 if(!['all','only','hide'].includes(U.nsfw)) U.nsfw='all';
 const isN=q=>!!(q&&(q.nsfw||(q.tags||[]).some(t=>/^nsfw$/i.test(t))));
 function paintNsfwBar(){
-  const b=$('nsfwBar'); if(!b) return; const showF=U.tab==='prompt'||U.tab==='ooc', show19=showF;
+  const b=$('nsfwBar'); if(!b) return; const showF=U.tab==='prompt', show19=showF;
   b.style.display=show19?'':'none';
   b.innerHTML=`<button type="button" class="np np19 ${U.adult?'on':''}" id="v-np19" title="${U.adult?'다시 블러 처리':'NSFW 블러 한 번에 풀기'}"><span class="bx">${U.adult?'✓':''}</span>19</button>${showF?`<button type="button" class="np npN ${U.nsfw}" id="v-npN" title="누를 때마다 전체 → NSFW만 → NSFW 제외">${U.nsfw==='only'?'NSFW만':U.nsfw==='hide'?'NSFW 제외':'NSFW'}</button>`:''}`;
   $('np19').onclick=()=>{ U.adult=!U.adult; try{ sessionStorage.setItem('vault-adult',U.adult?'1':'0'); }catch(e){} render(); };
@@ -833,7 +833,7 @@ function hay(it){
 function filtered(){
   const c=U.cat[U.tab]||'all';
   let arr=pool().filter(it=>inCat(it,c));
-  if((U.tab==='prompt'||U.tab==='ooc')&&U.nsfw!=='all') arr=arr.filter(it=>U.nsfw==='only'?isN(it):!isN(it));
+  if(U.tab==='prompt'&&U.nsfw!=='all') arr=arr.filter(it=>U.nsfw==='only'?isN(it):!isN(it));
   const base=arr;
   const ws=U.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   if(ws.length) arr=arr.filter(it=>{ const h=hay(it); return ws.every(w=>h.includes(w)); });
@@ -901,7 +901,8 @@ function render(){
   $('q').placeholder={persona:'이름, 태그, 설정, 의상으로 찾기',prompt:'제목, 태그, 프롬프트 내용으로 찾기',pair:'페어 이름, 캐릭터, 관계, 서사로 찾기',gallery:'제목, 메모, 태그로 찾기',clip:'캐릭터, 메모로 찾기',ooc:'OOC 내용, 태그로 찾기'}[U.tab];
   const co=$('sort').querySelector('option[value=custom]'); if(co) co.hidden=U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc'; const cn=$('sort').querySelector('option[value=name]'); if(cn){ cn.hidden=U.tab==='clip'; cn.textContent=U.tab==='ooc'?'내용순':'이름순'; }
   $('sort').value=((U.tab==='gallery'||U.tab==='clip'||U.tab==='ooc')&&U.sort==='custom')||(U.tab==='clip'&&U.sort==='name')?'old':U.sort;
-  renderSide(); paintNsfwBar(); paintOrigNote();
+  const noSide=U.tab==='ooc'; $('side').style.display=noSide?'none':''; $('side').parentElement.classList.toggle('noside',noSide);
+  if(!noSide) renderSide(); paintNsfwBar(); paintOrigNote();
   if(U.tab==='gallery'){ renderGallery(); return; }
   if(U.tab==='clip'){ renderClips(); return; }
   $('oocTop').style.display=U.tab==='ooc'?'':'none';
@@ -1139,65 +1140,106 @@ async function editClip(c0){
 
 
 /* ---------- OOC ---------- */
-/* PC ⇄ NPC 맞바꾸기: NPC 안에 PC가 들어 있으니 NPC를 먼저 감춰두고 바꿔요 */
-function swapPN(t){ const K='\u0000\u0001'; return String(t||'').replace(/NPC/gi,m=>K+(m===m.toLowerCase()?'l':'u')).replace(/PC/gi,m=>m===m.toLowerCase()?'npc':'NPC').replace(/\u0000\u0001([lu])/g,(_,c)=>c==='l'?'pc':'PC'); }
+/* PC ⇄ NPC, {{char}} ⇄ {{user}} 를 한 번에 맞바꾸기 (NPC 안에 PC가 들어 있어서 먼저 감춰둬요) */
+function swapPN(t){
+  const A='\u0000a\u0000', B='\u0000b\u0000';
+  let s=String(t||'').replace(/\{\{\s*char\s*\}\}/gi,A).replace(/\{\{\s*user\s*\}\}/gi,B);
+  s=s.replace(/NPC/gi,m=>'\u0001'+(m===m.toLowerCase()?'l':'u')).replace(/PC/gi,m=>m===m.toLowerCase()?'npc':'NPC').replace(/\u0001([lu])/g,(_,c)=>c==='l'?'pc':'PC');
+  return s.split(A).join('{{user}}').split(B).join('{{char}}');
+}
 /* *[OOC: … ]* 로 감싸기 (이미 있는 표시는 겹치지 않게) */
 function wrapOOC(t){ let s=String(t||'').trim(); if(!s) return ''; const hm=s.match(/^(\s*\*\s*)?(\[\s*)?(OOC\s*:)/i); let h=''; if(hm){ if(!hm[1]) h+='*'; if(!hm[2]) h+='['; } else h='*[OOC: '; const tm=s.match(/(\]\s*)?(\*\s*)?$/); let tl=''; if(!(tm&&tm[1])) tl+=']'; if(!(tm&&tm[2])) tl+='*'; return h+s+tl; }
-const oocOut=o=>{ let t=o.text||''; if(U.oocSwap) t=swapPN(t); return U.oocWrap!==false?wrapOOC(t):t; };
 function insAt(ta,txt){ const a=ta.selectionStart??ta.value.length, b=ta.selectionEnd??a; ta.value=ta.value.slice(0,a)+txt+ta.value.slice(b); const p=a+txt.length; ta.focus(); ta.setSelectionRange(p,p); ta.dispatchEvent(new Event('input')); }
-function oocTools(ta){ return {
-  pc:()=>insAt(ta,'PC'), npc:()=>insAt(ta,'NPC'),
-  swap:()=>{ ta.value=swapPN(ta.value); ta.dispatchEvent(new Event('input')); toast('PC ⇄ NPC를 바꿨어요'); },
+function oocTools(ta){ return { pc:()=>insAt(ta,'PC'), npc:()=>insAt(ta,'NPC'), ch:()=>insAt(ta,'{{char}}'), us:()=>insAt(ta,'{{user}}'),
+  swap:()=>{ ta.value=swapPN(ta.value); ta.dispatchEvent(new Event('input')); toast('PC ⇄ NPC, {{char}} ⇄ {{user}}를 바꿨어요'); },
   wrap:()=>{ ta.value=wrapOOC(ta.value); ta.dispatchEvent(new Event('input')); } }; }
-const toolHTML=pre=>`<button type="button" data-${pre}="pc" title="커서 자리에 PC 넣기">PC</button><button type="button" data-${pre}="npc" title="커서 자리에 NPC 넣기">NPC</button><button type="button" data-${pre}="swap" class="sw" title="글 속 PC와 NPC를 서로 바꾸기">PC ⇄ NPC</button><button type="button" data-${pre}="wrap" title="*[OOC: … ]* 로 감싸기">*[OOC: ]*</button>`;
-let ocGetTags=null;
+const toolHTML=pre=>`<button type="button" data-${pre}="pc" title="커서 자리에 PC 넣기">PC</button><button type="button" data-${pre}="npc" title="커서 자리에 NPC 넣기">NPC</button><button type="button" data-${pre}="ch" title="커서 자리에 {{char}} 넣기">{{char}}</button><button type="button" data-${pre}="us" title="커서 자리에 {{user}} 넣기">{{user}}</button><button type="button" data-${pre}="swap" class="sw" title="PC ⇄ NPC, {{char}} ⇄ {{user}} 서로 바꾸기">⇄ 바꾸기</button><button type="button" data-${pre}="wrap" title="*[OOC: … ]* 로 감싸기">*[OOC: ]*</button>`;
+const IC={
+  pin:'<svg viewBox="0 0 24 24"><path d="M16 3l5 5-2 2-1-1-4 4v4l-2 2-3-3-4 4-1-1 4-4-3-3 2-2h4l4-4-1-1z"/></svg>',
+  copy:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>',
+  swap:'<svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
+  reply:'<svg viewBox="0 0 24 24"><path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>',
+  tag:'<svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.5"/></svg>',
+  edit:'<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  del:'<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'};
+let ocGetTags=null, ocReply=null;
+const ocTagsInit=ts=>{ ocGetTags=tagInput($('oc-tags'),ts||[],null,'태그 입력 후 Enter'); };
+function setOcReply(id){
+  ocReply=id||null; const bar=$('oc-reply'), p=id&&D.oocs.find(x=>x.id===id);
+  if(p){ bar.innerHTML=`<span>↳ 후속 OOC: "${esc(p.text.replace(/\s+/g,' ').slice(0,40))}${p.text.length>40?'…':''}"에 이어 쓰는 중</span><button type="button" id="v-oc-rx" title="후속 작성 취소">×</button>`; bar.style.display='';
+    $('oc-rx').onclick=()=>{ setOcReply(null); ocTagsInit([]); };
+    ocTagsInit([...(p.tags||[])]); const ta=$('oc-text'); ta.focus(); $('oocTop').scrollIntoView({block:'start',behavior:'smooth'}); }
+  else { bar.style.display='none'; bar.innerHTML=''; }
+}
 function buildOOCTop(){
   const box=$('oocTop'); if(!box||box.dataset.built) return; box.dataset.built='1';
-  box.innerHTML=`<div class="oc-tools">${toolHTML('t')}<span class="sp"></span><span class="oc-hint">Ctrl+Enter로 추가</span></div>
-    <textarea id="v-oc-text" rows="3" placeholder="OOC 내용을 적어 주세요. 예) 이전 RP 중지. PC와 NPC가 처음 만난 날로 돌아가 다시 전개."></textarea>
-    <div class="oc-row"><div class="v-taginput" id="v-oc-tags"></div><select id="v-oc-cat"></select><label class="chk oc-n"><input type="checkbox" id="v-oc-nsfw"> <span class="nb">NSFW</span></label><button type="button" class="primary" id="v-oc-add">추가</button></div>`;
+  box.innerHTML=`<div class="oc-reply" id="v-oc-reply" style="display:none"></div><div class="oc-tools">${toolHTML('t')}<span class="sp"></span><span class="oc-hint">Ctrl+Enter로 추가</span></div>
+    <textarea id="v-oc-text" rows="3" placeholder="OOC 내용을 적어 주세요. 예) 이전 RP 중지. {{char}}와 {{user}}가 처음 만난 날로 돌아가 다시 전개."></textarea>
+    <div class="oc-row"><div class="v-taginput" id="v-oc-tags"></div><button type="button" class="primary" id="v-oc-add">추가</button></div>`;
   const ta=$('oc-text'), T=oocTools(ta);
   try{ ta.value=localStorage.getItem('vault-ooc-draft')||''; }catch(e){}
   ta.addEventListener('input',()=>{ try{ ta.value?localStorage.setItem('vault-ooc-draft',ta.value):localStorage.removeItem('vault-ooc-draft'); }catch(e){} ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight+2,360)+'px'; });
   box.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>T[b.dataset.t]());
   ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); $('oc-add').click(); } });
-  $('oc-nsfw').onchange=()=>{ let ts=ocGetTags().filter(t=>!/^nsfw$/i.test(t)); if($('oc-nsfw').checked) ts.push('NSFW'); ocGetTags=tagInput($('oc-tags'),ts,null,'태그 입력 후 Enter'); };
   $('oc-add').onclick=async()=>{
     const text=ta.value.trim(); if(!text){ toast('내용을 적어 주세요'); ta.focus(); return; }
-    const nsfw=$('oc-nsfw').checked; let tags=ocGetTags().filter(t=>!/^nsfw$/i.test(t)); if(nsfw) tags.push('NSFW');
     const now=Date.now(); if(!D.oocs) D.oocs=[];
-    D.oocs.push({id:uid(),text,tags,cat:$('oc-cat').value||null,nsfw,pin:false,uses:0,created:now,updated:now});
-    ta.value=''; ta.dispatchEvent(new Event('input')); $('oc-nsfw').checked=false;
-    ocGetTags=tagInput($('oc-tags'),[],null,'태그 입력 후 Enter');
+    D.oocs.push({id:uid(),text,tags:ocGetTags(),parent:ocReply&&D.oocs.some(x=>x.id===ocReply)?ocReply:null,pin:false,uses:0,created:now,updated:now});
+    ta.value=''; ta.dispatchEvent(new Event('input')); setOcReply(null); ocTagsInit([]);
     await save(); render(); toast('OOC를 추가했어요');
   };
 }
+function ocTagModal(o){
+  modal(`<div class="v-dh"><b>🏷 태그</b><button class="x" type="button">×</button></div>
+    <div class="v-db"><div class="oc-prev">${esc(o.text.length>120?o.text.slice(0,120)+'…':o.text)}</div><div class="v-taginput" id="v-ot-tags"></div></div>
+    <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-otsave">저장</button></div>`,{sm:true});
+  const get=tagInput($('ot-tags'),[...(o.tags||[])],null,'태그 입력 후 Enter');
+  setTimeout(()=>{ const i=$('ot-tags')&&$('ot-tags').querySelector('input'); if(i) i.focus(); },50);
+  $('otsave').onclick=async()=>{ o.tags=get(); o.updated=Date.now(); await save(); close(); render(); toast('태그를 저장했어요'); };
+}
 function renderOOC(){
-  buildOOCTop();
-  const cs=$('oc-cat'); if(cs){ const v=curCat()||''; cs.innerHTML=catOptions(v||null); cs.value=v; }
-  if(!ocGetTags) ocGetTags=tagInput($('oc-tags'),[],null,'태그 입력 후 Enter');
-  const {arr,base}=filtered(); renderTags(base);
+  buildOOCTop(); if(!ocGetTags) ocTagsInit([]);
+  let {arr,base}=filtered(); renderTags(base);
+  /* 걸러보는 중이 아니면 후속 OOC를 원래 OOC 바로 아래에 붙여 보여줘요 */
+  const plain=!U.q.trim()&&!(U.itags||[]).length&&!(U.xtags||[]).length;
+  const byId=new Map((D.oocs||[]).map(x=>[x.id,x]));
+  if(plain){ const inArr=new Set(arr.map(x=>x.id)), kids=new Map(); arr.forEach(x=>{ if(x.parent&&inArr.has(x.parent)){ if(!kids.has(x.parent)) kids.set(x.parent,[]); kids.get(x.parent).push(x); } });
+    const out=[], walk=(x,d)=>{ out.push({o:x,d}); (kids.get(x.id)||[]).sort((a,b)=>(a.created||0)-(b.created||0)).forEach(k=>walk(k,d+1)); };
+    arr.filter(x=>!(x.parent&&inArr.has(x.parent))).forEach(x=>walk(x,0)); arr=out; }
+  else arr=arr.map(o=>({o,d:0}));
   const g=$('grid'); g.innerHTML=''; g.classList.remove('prompts','pairs','gallery','clips'); g.classList.add('oocs'); $('dragHint').style.display='none';
-  const bar=`<div class="oc-bar"><span class="oc-n2">${arr.length}개</span><button type="button" class="np ocs ${U.oocSwap?'on':''}" id="v-ocSwap" title="모든 OOC를 PC ⇄ NPC 바꾼 상태로 보고 복사">PC ⇄ NPC 보기</button><button type="button" class="np ocw ${U.oocWrap!==false?'on':''}" id="v-ocWrap" title="복사할 때 *[OOC: … ]* 로 감싸기">*[OOC: ]* 붙여 복사</button><span class="sp"></span>${arr.length?'<button type="button" class="oc-all" id="v-ocAll">보이는 것 전체 복사</button>':''}</div>`;
-  if(!arr.length){ g.innerHTML=bar+`<div class="v-empty">${(D.oocs||[]).length?'조건에 맞는 OOC가 없어요.':'아직 저장한 OOC가 없어요.<br>위 칸에 적고 <b>추가</b>를 눌러 보세요. 태그를 달아두면 태그를 눌러 관련 OOC만 모아볼 수 있어요.'}</div>`; }
-  else g.innerHTML=bar+arr.map(o=>{ const t=U.oocSwap?swapPN(o.text):o.text; const c=o.cat&&cats().find(x=>x.id===o.cat);
-    return `<div class="oc-li${o.pin?' pinned':''}${isN(o)&&!U.adult?' blur':''}" data-id="${o.id}">
-      <div class="oc-tx" title="누르면 복사">${esc(t)}</div>
-      <div class="oc-meta">${o.pin?'<span class="oc-pin">📌 고정</span>':''}${c?`<span class="oc-cat">${esc(c.name)}</span>`:''}${(o.tags||[]).map(x=>`<button type="button" class="oc-tag${/^nsfw$/i.test(x)?' n':''}" data-tag="${esc(x)}">#${esc(x)}</button>`).join('')}${o.uses?`<span class="oc-uses">복사 ${o.uses}회</span>`:''}</div>
-      <div class="oc-acts"><button type="button" data-a="pin" title="${o.pin?'고정 해제':'맨 앞에 고정'}">${o.pin?'📌':'📍'}</button><button type="button" data-a="sw" title="PC ⇄ NPC 바꿔서 복사">⇄</button><button type="button" data-a="ed" title="수정">✎</button><button type="button" data-a="del" title="삭제">🗑</button></div>
+  if(!arr.length){ g.innerHTML=`<div class="v-empty">${(D.oocs||[]).length?'조건에 맞는 OOC가 없어요.':'아직 저장한 OOC가 없어요.<br>위 칸에 적고 <b>추가</b>를 눌러 보세요. 태그를 달아두면 태그를 눌러 관련 OOC만 모아볼 수 있어요.'}</div>`; return; }
+  g.innerHTML=arr.map(({o,d})=>{ const p=o.parent&&byId.get(o.parent);
+    return `<div class="oc-li${o.pin?' pinned':''}${d?' reply':''}" data-id="${o.id}" style="${d?`margin-left:${Math.min(d,4)*22}px`:''}">
+      <div class="oc-acts">
+        <button type="button" data-a="pin" class="${o.pin?'on':''}" title="${o.pin?'고정 해제':'맨 앞에 고정'}">${IC.pin}</button>
+        <button type="button" data-a="cp" title="복사">${IC.copy}</button>
+        <button type="button" data-a="sw" title="PC ⇄ NPC · {{char}} ⇄ {{user}} 바꿔서 복사">${IC.swap}</button>
+        <button type="button" data-a="re" title="후속 OOC 작성 (태그도 같이 달려요)">${IC.reply}</button>
+        <button type="button" data-a="tg" title="태그">${IC.tag}</button>
+        <button type="button" data-a="ed" title="수정">${IC.edit}</button>
+        <button type="button" data-a="del" title="삭제">${IC.del}</button>
+      </div>
+      ${p&&!d?`<div class="oc-par">↳ 후속: ${esc(p.text.replace(/\s+/g,' ').slice(0,30))}${p.text.length>30?'…':''}</div>`:''}
+      <div class="oc-tx" title="누르면 복사">${esc(o.text)}</div>
+      <button type="button" class="oc-more" style="display:none">펼치기 ▾</button>
+      <div class="oc-meta">${o.pin?'<span class="oc-pin">📌 고정</span>':''}${(o.tags||[]).map(x=>`<button type="button" class="oc-tag" data-tag="${esc(x)}">#${esc(x)}</button>`).join('')}${o.uses?`<span class="oc-uses">복사 ${o.uses}회</span>`:''}</div>
     </div>`; }).join('');
-  $('ocSwap').onclick=()=>{ U.oocSwap=!U.oocSwap; render(); };
-  $('ocWrap').onclick=()=>{ U.oocWrap=U.oocWrap===false; try{ localStorage.setItem('vault-ooc-wrap',U.oocWrap?'1':'0'); }catch(e){} render(); };
-  const all=$('ocAll'); if(all) all.onclick=()=>copy(arr.map(oocOut).join('\n\n'),`OOC ${arr.length}개를`);
-  const bump=async o=>{ o.uses=(o.uses||0)+1; await save(); const el=g.querySelector(`.oc-li[data-id="${o.id}"] .oc-uses`); if(el) el.textContent=`복사 ${o.uses}회`; else render(); };
-  g.querySelectorAll('.oc-li').forEach(el=>{ const o=D.oocs.find(x=>x.id===el.dataset.id); if(!o) return;
-    el.querySelector('.oc-tx').onclick=()=>{ if(el.classList.contains('blur')){ el.classList.remove('blur'); return; } copy(oocOut(o),'OOC를'); bump(o); };
-    el.querySelectorAll('.oc-tag').forEach(b=>b.onclick=()=>{ const t=b.dataset.tag; if(!U.itags.includes(t)){ U.itags=[t]; U.xtags=(U.xtags||[]).filter(x=>x!==t); render(); window.scrollTo({top:0,behavior:'smooth'}); } });
-    el.querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{ const a=b.dataset.a;
-      if(a==='pin'){ o.pin=!o.pin; o.updated=Date.now(); await save(); render(); }
-      else if(a==='sw'){ let t=U.oocSwap?o.text:swapPN(o.text); copy(U.oocWrap!==false?wrapOOC(t):t,'PC ⇄ NPC를 바꿔서'); bump(o); }
+  const bump=async o=>{ o.uses=(o.uses||0)+1; await save(); const el=g.querySelector(`.oc-li[data-id="${o.id}"]`); if(!el) return; let u=el.querySelector('.oc-uses'); if(!u){ u=document.createElement('span'); u.className='oc-uses'; el.querySelector('.oc-meta').appendChild(u); } u.textContent=`복사 ${o.uses}회`; };
+  g.querySelectorAll('.oc-li').forEach(el=>{ const o=byId.get(el.dataset.id); if(!o) return;
+    const tx=el.querySelector('.oc-tx'), mb=el.querySelector('.oc-more');
+    requestAnimationFrame(()=>{ if(tx.scrollHeight>tx.clientHeight+4){ el.classList.add('long'); mb.style.display=''; } });
+    mb.onclick=()=>{ const op=el.classList.toggle('open'); mb.textContent=op?'접기 ▴':'펼치기 ▾'; };
+    tx.onclick=()=>{ if(window.getSelection&&String(window.getSelection()).length) return; copy(wrapOOC(o.text),'OOC를'); bump(o); };
+    el.querySelectorAll('.oc-tag').forEach(b=>b.onclick=()=>{ const t=b.dataset.tag; U.itags=[t]; U.xtags=[]; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+    el.querySelectorAll('[data-a]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const a=b.dataset.a;
+      if(a==='pin'){ o.pin=!o.pin; o.updated=Date.now(); await save(); render(); toast(o.pin?'맨 앞에 고정했어요':'고정을 풀었어요'); }
+      else if(a==='cp'){ copy(wrapOOC(o.text),'OOC를'); bump(o); }
+      else if(a==='sw'){ copy(wrapOOC(swapPN(o.text)),'바꿔서'); bump(o); }
+      else if(a==='re'){ setOcReply(o.id); }
+      else if(a==='tg') ocTagModal(o);
       else if(a==='ed') editOOC(o);
-      else if(a==='del') confirmBox('이 OOC를 삭제할까요?','삭제',async()=>{ D.oocs=D.oocs.filter(x=>x.id!==o.id); await save(); close(); render(); toast('삭제했어요'); });
+      else if(a==='del') confirmBox('이 OOC를 삭제할까요?'+(D.oocs.some(x=>x.parent===o.id)?'\n이어 쓴 후속 OOC는 지워지지 않고 그대로 남아요.':''),'삭제',async()=>{ D.oocs=D.oocs.filter(x=>x.id!==o.id); D.oocs.forEach(x=>{ if(x.parent===o.id) x.parent=o.parent||null; }); await save(); close(); render(); toast('삭제했어요'); });
     });
   });
 }
@@ -1207,19 +1249,16 @@ function editOOC(o0){
     <div class="v-db"><div class="v-fields">
       <div class="oc-tools">${toolHTML('e')}</div>
       <textarea id="v-oe-text" style="min-height:160px">${esc(o.text)}</textarea>
-      <div class="v-row2"><div><label>카테고리</label><select id="v-oe-cat">${catOptions(o.cat)}</select></div><div><label>태그</label><div class="v-taginput" id="v-oe-tags"></div></div></div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap"><label class="chk"><input type="checkbox" id="v-oe-pin" ${o.pin?'checked':''}> 📌 맨 앞에 고정</label><label class="chk nsfw-chk"><input type="checkbox" id="v-oe-nsfw" ${isN(o)?'checked':''}> <span class="nb">NSFW</span> 블러 처리</label></div>
+      <div><label>태그</label><div class="v-taginput" id="v-oe-tags"></div></div>
+      <label class="chk"><input type="checkbox" id="v-oe-pin" ${o.pin?'checked':''}> 📌 맨 앞에 고정</label>
     </div></div>
     <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-oesave">저장</button></div>`,{cls:'wide'});
   const ta=$('oe-text'), T=oocTools(ta); modalEl.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>T[b.dataset.e]());
-  let get=tagInput($('oe-tags'),o.tags||[],null,'태그 입력 후 Enter');
-  $('oe-nsfw').onchange=()=>{ let ts=get().filter(t=>!/^nsfw$/i.test(t)); if($('oe-nsfw').checked) ts.push('NSFW'); get=tagInput($('oe-tags'),ts,null,'태그 입력 후 Enter'); };
+  const get=tagInput($('oe-tags'),o.tags||[],null,'태그 입력 후 Enter');
   $('oesave').onclick=async()=>{ const text=ta.value.trim(); if(!text){ toast('내용을 적어 주세요'); return; }
-    const nsfw=$('oe-nsfw').checked; let tags=get().filter(t=>!/^nsfw$/i.test(t)); if(nsfw) tags.push('NSFW');
-    const x=D.oocs.find(y=>y.id===o.id); if(x) Object.assign(x,{text,tags,nsfw,cat:$('oe-cat').value||null,pin:$('oe-pin').checked,updated:Date.now()});
+    const x=D.oocs.find(y=>y.id===o.id); if(x) Object.assign(x,{text,tags:get(),pin:$('oe-pin').checked,updated:Date.now()});
     await save(); close(); render(); toast('저장했어요'); };
 }
-try{ U.oocWrap=localStorage.getItem('vault-ooc-wrap')!=='0'; }catch(e){ U.oocWrap=true; }
 
 /* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
 let drag=null, justDragged=0;

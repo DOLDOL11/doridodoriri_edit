@@ -534,9 +534,10 @@
   .oc-thr.on{background:#f3f6f9;color:#7d8fa1}
   .oc-li.reply{padding:10px 14px 9px;background:#fbfdff}
   .oc-li.reply .oc-tx{font-size:13.5px}
-  .oc-tx{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.65;cursor:copy;color:#2a323d;max-height:calc(1.65em * 6);overflow:hidden;position:relative}
+  .oc-tx{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.65;cursor:text;color:#2a323d;max-height:calc(1.65em * 6);overflow:hidden;position:relative}
   .oc-li.long:not(.open) .oc-tx{-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
   .oc-li.open .oc-tx{max-height:none}
+  .oc-tx.tg{cursor:pointer}
   .oc-more{border:0;background:none;color:#5a9fd8;font-size:12px;padding:4px 0 0;cursor:pointer}
   .oc-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:7px}
   .oc-meta:empty{display:none}
@@ -1221,6 +1222,7 @@ function renderOOC(){
     return `<div class="oc-li${o.pin?' pinned':''}${d?' reply':''}" data-id="${o.id}" style="${d?`margin-left:${Math.min(d,4)*22}px`:''}">
       <div class="oc-acts">
         <button type="button" data-a="pin" class="${o.pin?'on':''}" title="${o.pin?'고정 해제':'맨 앞에 고정'}">${IC.pin}</button>
+        <button type="button" data-a="cp" title="복사">${IC.copy}</button>
         <button type="button" data-a="sw" title="PC ⇄ NPC · {{char}} ⇄ {{user}} 바꿔서 복사">${IC.swap}</button>
         <button type="button" data-a="re" title="후속 OOC 작성 (태그도 같이 달려요)">${IC.reply}</button>
         <button type="button" data-a="tg" title="태그">${IC.tag}</button>
@@ -1229,7 +1231,7 @@ function renderOOC(){
       </div>
       ${nk?`<button type="button" class="oc-thr${op?' on':''}" data-thr="${o.id}">${op?'후속 OOC 접기 ▴':`↳ 후속 OOC ${nk}개 · 펼쳐보기 ▾`}</button>`:''}
       ${p&&!d?`<div class="oc-par">↳ 후속: ${esc(p.text.replace(/\s+/g,' ').slice(0,30))}${p.text.length>30?'…':''}</div>`:''}
-      <div class="oc-tx" title="누르면 복사">${esc(o.text)}</div>
+      <div class="oc-tx">${esc(o.text)}</div>
       <button type="button" class="oc-more" style="display:none">펼치기 ▾</button>
       <div class="oc-meta">${o.pin?'<span class="oc-pin">📌 고정</span>':''}${(o.tags||[]).map(x=>`<button type="button" class="oc-tag" data-tag="${esc(x)}">#${esc(x)}</button>`).join('')}${o.uses?`<span class="oc-uses">복사 ${o.uses}회</span>`:''}</div>
     </div>`; }).join('');
@@ -1237,9 +1239,12 @@ function renderOOC(){
   const bump=async o=>{ o.uses=(o.uses||0)+1; await save(); const el=g.querySelector(`.oc-li[data-id="${o.id}"]`); if(!el) return; let u=el.querySelector('.oc-uses'); if(!u){ u=document.createElement('span'); u.className='oc-uses'; el.querySelector('.oc-meta').appendChild(u); } u.textContent=`복사 ${o.uses}회`; };
   g.querySelectorAll('.oc-li').forEach(el=>{ const o=byId.get(el.dataset.id); if(!o) return;
     const tx=el.querySelector('.oc-tx'), mb=el.querySelector('.oc-more');
-    requestAnimationFrame(()=>{ if(tx.scrollHeight>tx.clientHeight+4){ el.classList.add('long'); mb.style.display=''; } });
+    requestAnimationFrame(()=>{ if(tx.scrollHeight>tx.clientHeight+4){ el.classList.add('long'); mb.style.display=''; } if(el.classList.contains('long')||el.querySelector('[data-thr]')) tx.classList.add('tg'); });
     mb.onclick=()=>{ const op=el.classList.toggle('open'); mb.textContent=op?'접기 ▴':'펼치기 ▾'; };
-    tx.onclick=()=>{ if(window.getSelection&&String(window.getSelection()).length) return; copy(wrapOOC(o.text),'OOC를'); bump(o); };
+    /* 내용을 누르면 펼치기·접기 (긴 글이면 글을, 아니면 후속 OOC를) */
+    tx.onclick=()=>{ if(window.getSelection&&String(window.getSelection()).length) return;
+      if(el.classList.contains('long')) mb.click();
+      else { const t=el.querySelector('[data-thr]'); if(t) t.click(); } };
     el.querySelectorAll('.oc-tag').forEach(b=>b.onclick=()=>{ const t=b.dataset.tag; U.itags=[t]; U.xtags=[]; render(); window.scrollTo({top:0,behavior:'smooth'}); });
     el.querySelectorAll('[data-a]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const a=b.dataset.a;
       if(a==='pin'){ o.pin=!o.pin; o.updated=Date.now(); await save(); render(); toast(o.pin?'맨 앞에 고정했어요':'고정을 풀었어요'); }

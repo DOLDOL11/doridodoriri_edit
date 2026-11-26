@@ -1221,7 +1221,6 @@ function renderOOC(){
     return `<div class="oc-li${o.pin?' pinned':''}${d?' reply':''}" data-id="${o.id}" style="${d?`margin-left:${Math.min(d,4)*22}px`:''}">
       <div class="oc-acts">
         <button type="button" data-a="pin" class="${o.pin?'on':''}" title="${o.pin?'고정 해제':'맨 앞에 고정'}">${IC.pin}</button>
-        <button type="button" data-a="cp" title="복사">${IC.copy}</button>
         <button type="button" data-a="sw" title="PC ⇄ NPC · {{char}} ⇄ {{user}} 바꿔서 복사">${IC.swap}</button>
         <button type="button" data-a="re" title="후속 OOC 작성 (태그도 같이 달려요)">${IC.reply}</button>
         <button type="button" data-a="tg" title="태그">${IC.tag}</button>

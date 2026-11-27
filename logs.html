@@ -348,6 +348,32 @@
   .pr-sum{margin:12px 0 2px;font-size:12.5px;color:#7d8fa1;background:#f5f9fd;border-radius:10px;padding:8px 11px}
   .pr-sum b{color:#2f6ea6}
   .pr-row input{border:1px solid #d6e2ee!important;box-shadow:none!important;border-radius:10px!important;padding:8px!important}
+
+  /* 챕터 */
+  .ch-div{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;margin:26px 0 14px;padding:16px 12px 14px;text-align:center;border-top:1px solid #d9e6f2;border-bottom:1px solid #d9e6f2;background:linear-gradient(180deg,#f3f8fd,#fff)}
+  .ch-div .no{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:#5a9fd8}
+  .ch-div b{font-size:17px;color:#2a323d}
+  .ch-div small{font-size:11.5px;color:#8ea2b5}
+  .ch-div button{position:absolute;right:8px;top:8px;width:28px;height:28px;border:0;background:transparent;border-radius:8px;color:#9aabbb;cursor:pointer;opacity:0;transition:opacity .15s}
+  .ch-div:hover button{opacity:1}
+  .ch-div button:hover{background:#eaf3fc;color:#2f6ea6}
+  @media (hover:none){ .ch-div button{opacity:1} }
+  .lk-sub.lk-chp{padding-left:34px}
+  .lk-sub.lk-chp .em{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:#5a9fd8;min-width:14px;text-align:center}
+  .lk-sub.lk-chp .n{font-size:10.5px}
+  .ch-list{display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow:auto;margin:4px 0 10px}
+  .ch-row{display:flex;align-items:stretch;gap:4px}
+  .ch-row .go{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;text-align:left;border:1px solid #dfeaf4;background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer}
+  .ch-row .go:hover{background:#f5f9fd;border-color:#b9d6f0}
+  .ch-row .go .no{grid-row:1/3;align-self:center;font-family:'Outfit',sans-serif;font-weight:700;color:#5a9fd8;font-size:15px}
+  .ch-row .go b{font-size:14px;color:#2a323d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ch-row .go small{font-size:11.5px;color:#8ea2b5}
+  .ch-row .cp,.ch-row .ed{width:40px;border:1px solid #dfeaf4;background:#fff;border-radius:12px;color:#5b7088;cursor:pointer}
+  .ch-row .cp:hover,.ch-row .ed:hover{background:#eef6fd;color:#2f6ea6}
+  .pr-chs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:-4px 0 12px}
+  .pr-chs span{font-size:11.5px;color:#8ea2b5;margin-right:2px}
+  .pr-chs button{border:1px solid #cfe2f3;background:#f3f8fd;color:#2f6ea6;border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pr-chs button:hover{background:#e4f0fb}
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -584,7 +610,7 @@ window.addEventListener('message',e=>{ const d=e.data; if(!d||!d.lkH) return; co
 
 /* ---------- 사이드바 ---------- */
 const COLORS=['#8db9e6','#a58bea','#f0a3c4','#f4b183','#8fd1b5','#e6c86e','#9aa8b6'];
-function chatItem(c){ const nb=(c.turns||[]).filter(t=>t.bm).length; return `<div class="lk-ch${c.id===UI.active?(UI.bmView?' half':' on'):''}" data-id="${c.id}" draggable="true"><span class="em">${esc(c.emoji||'💬')}</span><span class="nm">${esc(c.title||'제목 없음')}</span><span class="n">${(c.turns||[]).length}</span></div>`+(nb?`<div class="lk-sub${c.id===UI.active&&UI.bmView?' on':''}" data-bmc="${c.id}"><span class="em">🔖</span><span class="nm">책갈피 모아보기</span><span class="n">${nb}</span></div>`:''); }
+function chatItem(c){ const nb=(c.turns||[]).filter(t=>t.bm).length; const chs=c.id===UI.active&&!UI.bmView?chapters(c):[]; return `<div class="lk-ch${c.id===UI.active?(UI.bmView?' half':' on'):''}" data-id="${c.id}" draggable="true"><span class="em">${esc(c.emoji||'💬')}</span><span class="nm">${esc(c.title||'제목 없음')}</span><span class="n">${(c.turns||[]).length}</span></div>`+(nb?`<div class="lk-sub${c.id===UI.active&&UI.bmView?' on':''}" data-bmc="${c.id}"><span class="em">🔖</span><span class="nm">책갈피 모아보기</span><span class="n">${nb}</span></div>`:'')+chs.map(h=>`<div class="lk-sub lk-chp" data-chj="${h.t.id}"><span class="em">${h.no}</span><span class="nm">${esc(h.title)}</span><span class="n">${h.a}~</span></div>`).join(''); }
 function renderSide(){
   const q=UI.q.trim().toLowerCase(); const hit=c=>!q||(c.title||'').toLowerCase().includes(q);
   let h='';
@@ -601,7 +627,8 @@ function renderSide(){
     el.ondragstart=e=>{ el.classList.add('drag'); e.dataTransfer.setData('text/lk-chat',el.dataset.id); e.dataTransfer.effectAllowed='move'; };
     el.ondragend=()=>el.classList.remove('drag');
   });
-  L.querySelectorAll('.lk-sub').forEach(el=>el.onclick=()=>{ if(UI.bmView&&UI.active!==el.dataset.bmc){} UI.active=el.dataset.bmc; UI.bmView=true; saveUI(); renderAll(); const sc=$('scroll'); if(sc) sc.scrollTop=0; closeSide(); });
+  L.querySelectorAll('.lk-chp').forEach(el=>el.onclick=e=>{ e.stopPropagation(); closeSide(); jumpChap(el.dataset.chj); });
+  L.querySelectorAll('.lk-sub:not(.lk-chp)').forEach(el=>el.onclick=()=>{ if(UI.bmView&&UI.active!==el.dataset.bmc){} UI.active=el.dataset.bmc; UI.bmView=true; saveUI(); renderAll(); const sc=$('scroll'); if(sc) sc.scrollTop=0; closeSide(); });
   L.querySelectorAll('.lk-fd').forEach(el=>{ el.onclick=e=>{ if(e.target.closest('.ed')) return; const f=S.folders.find(x=>x.id===el.dataset.fid); if(f){ f.collapsed=!f.collapsed; save(); renderSide(); } }; });
   L.querySelectorAll('[data-fe]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); folderModal(S.folders.find(f=>f.id===b.dataset.fe)); });
   L.querySelectorAll('.lk-fd, .lk-loose').forEach(el=>{
@@ -630,9 +657,9 @@ function renderMain(keepScroll){
   const style=(c.dialogueColor?`--dlg:${c.dialogueColor};`:'')+(c.userColor?`--udlg:${c.userColor};`:'');
   M.innerHTML=`<div class="lk-head"><button type="button" class="menu" id="lk-menu" title="채팅 목록">☰</button>
       <div class="tt" id="lk-title" title="채팅 정보 바꾸기"><b>${esc((c.emoji||'💬')+' '+(c.title||'제목 없음'))}</b><small>${turns.length}턴 · ${ymd(c.updatedAt||c.createdAt||now())} 수정</small></div>
-      <button type="button" class="st-tog${UI.hideSt?'':' on'}" id="lk-stTog" title="상태창 보이기/접기"><span class="sw"></span>상태창</button><div class="acts"><button type="button" id="lk-goto" title="턴 번호로 바로 가기">#</button><button type="button" id="lk-bms" title="책갈피 모아 보기">🔖</button><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-copyPart" class="cp-part" title="부분 복사 (몇 턴부터 몇 턴까지)">⧉<small>부분</small></button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
+      <button type="button" class="st-tog${UI.hideSt?'':' on'}" id="lk-stTog" title="상태창 보이기/접기"><span class="sw"></span>상태창</button><div class="acts"><button type="button" id="lk-goto" title="턴 번호로 바로 가기">#</button><button type="button" id="lk-bms" title="책갈피 모아 보기">🔖</button><button type="button" id="lk-chs" title="챕터 목록">📑</button><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-copyPart" class="cp-part" title="부분 복사 (몇 턴부터 몇 턴까지)">⧉<small>부분</small></button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
     <div class="lk-sbar" id="lk-sbar"><input type="search" id="lk-sq" placeholder="이 채팅에서 찾기"><span class="cnt" id="lk-scnt"></span><button type="button" id="lk-sprev" title="이전">↑</button><button type="button" id="lk-snext" title="다음">↓</button><button type="button" id="lk-sx" title="닫기">✕</button></div>
-    <div class="lk-scroll" id="lk-scroll">${UI.bmView?`<div class="bmv-bar"><span>🔖 <b>책갈피만 모아 보는 중</b> · ${VIEW.length}개</span><button type="button" id="lk-bmExit">전체 로그 보기</button></div>`:''}<div class="lk-turns${UI.hideSt?' hide-st':''}" style="${style}">${VIEW.length?VIEW.map(({t,i})=>`<article class="tn" data-tid="${t.id}"><div class="tn-h"><span class="tn-no" data-no="${t.id}" title="턴 번호 바꾸기">${esc(effNo(c,t,i))}턴</span><button type="button" class="tn-bm${t.bm?' on':''}" data-bm="${t.id}" title="${t.bm?'책갈피 빼기':'책갈피 꽂기'}">${t.bm?'★':'☆'}</button>${t.bm&&t.bmNote?`<span class="tn-bmn">${esc(t.bmNote)}</span>`:''}<span class="sp"></span><span class="tb">${UI.bmView?'<button type="button" data-a="orig">원래 위치로 →</button>':''}<button type="button" data-a="copy">복사</button><button type="button" data-a="edit">수정</button><button type="button" data-a="up" title="위로">↑</button><button type="button" data-a="down" title="아래로">↓</button><button type="button" data-a="merge" title="바로 위 턴에 합치기">↥ 합치기</button>${String(t.raw).includes(CONT)?'<button type="button" data-a="split" title="합쳐진 턴을 다시 나누기">↧ 나누기</button>':''}<button type="button" data-a="del">삭제</button></span></div><div class="tn-body">${renderBlocks(parseTurn(t.raw))}</div></article>`).join(''):`<div class="lk-empty" style="padding:60px 10px"><div class="ic">✍️</div><h2>아직 턴이 없어요</h2><p>아래 칸에 로그를 붙여넣고 <b>추가하기</b>를 눌러 주세요.</p></div>`}</div></div>
+    <div class="lk-scroll" id="lk-scroll">${UI.bmView?`<div class="bmv-bar"><span>🔖 <b>책갈피만 모아 보는 중</b> · ${VIEW.length}개</span><button type="button" id="lk-bmExit">전체 로그 보기</button></div>`:''}<div class="lk-turns${UI.hideSt?' hide-st':''}" style="${style}">${VIEW.length?VIEW.map(({t,i})=>`${t.ch&&!UI.bmView?chDiv(c,t,i):''}<article class="tn" data-tid="${t.id}"><div class="tn-h"><span class="tn-no" data-no="${t.id}" title="턴 번호 바꾸기">${esc(effNo(c,t,i))}턴</span><button type="button" class="tn-bm${t.bm?' on':''}" data-bm="${t.id}" title="${t.bm?'책갈피 빼기':'책갈피 꽂기'}">${t.bm?'★':'☆'}</button>${t.bm&&t.bmNote?`<span class="tn-bmn">${esc(t.bmNote)}</span>`:''}<span class="sp"></span><span class="tb">${UI.bmView?'<button type="button" data-a="orig">원래 위치로 →</button>':''}<button type="button" data-a="copy">복사</button><button type="button" data-a="chap" title="${t.ch?'챕터 이름 바꾸기·빼기':'여기서부터 새 챕터 시작'}">${t.ch?'📑 챕터':'📑 챕터 시작'}</button><button type="button" data-a="edit">수정</button><button type="button" data-a="up" title="위로">↑</button><button type="button" data-a="down" title="아래로">↓</button><button type="button" data-a="merge" title="바로 위 턴에 합치기">↥ 합치기</button>${String(t.raw).includes(CONT)?'<button type="button" data-a="split" title="합쳐진 턴을 다시 나누기">↧ 나누기</button>':''}<button type="button" data-a="del">삭제</button></span></div><div class="tn-body">${renderBlocks(parseTurn(t.raw))}</div></article>`).join(''):`<div class="lk-empty" style="padding:60px 10px"><div class="ic">✍️</div><h2>아직 턴이 없어요</h2><p>아래 칸에 로그를 붙여넣고 <b>추가하기</b>를 눌러 주세요.</p></div>`}</div></div>
     <div class="lk-fab" id="lk-fab"><button type="button" id="lk-goTop" title="맨 위로">▲</button><button type="button" id="lk-goBot" title="맨 아래로">▼</button></div>
     <div class="lk-comp${UI.min?' min':''}${UI.bmView?' bmhide':''}" id="lk-comp"><div class="in">
       <div class="cm"><div class="seg" id="lk-mode"><button type="button" data-m="one">턴 하나 추가</button><button type="button" data-m="bulk">통째로 붙여넣기</button></div>
@@ -651,6 +678,8 @@ function renderMain(keepScroll){
   $('del').onclick=()=>confirmModal(`'${c.title||'제목 없음'}' 채팅을 삭제할까요?`,`턴 ${turns.length}개가 함께 지워지고 되돌릴 수 없어요.`,'삭제',()=>{ S.chats=S.chats.filter(x=>x.id!==c.id); UI.active=S.chats[0]?S.chats[0].id:null; saveUI(); save(); renderAll(); toast('삭제했어요'); });
   $('copyAll').onclick=()=>copyText(chatTxt(c),'채팅 전체를 복사했어요');
   $('copyPart').onclick=()=>partModal(c);
+  $('chs').onclick=()=>chapList(c);
+  $('scroll').querySelectorAll('[data-chd]').forEach(b=>b.onclick=()=>{ const t=c.turns.find(x=>x.id===b.dataset.chd); if(t) chapModal(c,t); });
   $('txt').onclick=()=>download(fileName(c.title)+'.txt',chatTxt(c));
   if($('bmExit')) $('bmExit').onclick=()=>{ UI.bmView=false; renderAll(); restorePos(c); };
   /* 상태창 접기 칩 */
@@ -743,11 +772,42 @@ function turnAction(c,t,a){
   if(a==='orig'){ UI.bmView=false; renderAll(); jumpTurn(t.id); return; }
   if(a==='copy') return copyText(clean(t.raw),'이 턴을 복사했어요');
   if(a==='edit') return editModal(c,t);
+  if(a==='chap') return chapModal(c,t);
   if(a==='del') return confirmModal('이 턴을 삭제할까요?','','삭제',()=>{ c.turns.splice(i,1); c.updatedAt=now(); save(); renderAll(true); toast('삭제했어요'); });
   if(a==='split'){ const ps=String(t.raw).split(CONT).map(x=>x.trim()).filter(Boolean); if(ps.length<2) return; const base=+effNo(c,t,i); const nt=ps.slice(1).map((r,k)=>({id:uid(),raw:r,createdAt:now(),turnNo:isNaN(base)?null:base+k+1,turnNoManual:!isNaN(base)})); t.raw=ps[0]; c.turns.splice(i+1,0,...nt); c.updatedAt=now(); save(); renderMain(true); toast(`${ps.length}개 턴으로 다시 나눴어요`); return; }
   if(a==='merge'&&i>0){ const pv=c.turns[i-1]; pv.raw=joinCont(pv.raw,t.raw); c.turns.splice(i,1); c.updatedAt=now(); save(); renderMain(true); toast('위 턴과 합쳤어요'); return; }
   if(a==='up'&&i>0){ [c.turns[i-1],c.turns[i]]=[c.turns[i],c.turns[i-1]]; save(); renderMain(true); }
   if(a==='down'&&i<c.turns.length-1){ [c.turns[i+1],c.turns[i]]=[c.turns[i],c.turns[i+1]]; save(); renderMain(true); }
+}
+/* ---------- 챕터 ---------- */
+function chapters(c){
+  const ts=c.turns||[], out=[];
+  ts.forEach((t,i)=>{ if(t.ch) out.push({t,i,title:t.ch}); });
+  out.forEach((h,k)=>{ h.no=k+1; const end=k+1<out.length?out[k+1].i-1:ts.length-1; const ns=[]; for(let j=h.i;j<=end;j++){ const n=+effNo(c,ts[j],j); if(!isNaN(n)) ns.push(n); } h.a=ns.length?Math.min(...ns):'?'; h.b=ns.length?Math.max(...ns):'?'; h.count=end-h.i+1; });
+  return out;
+}
+function chDiv(c,t,i){ const h=chapters(c).find(x=>x.t===t); if(!h) return ''; return `<div class="ch-div" id="ch-${t.id}"><span class="no">CHAPTER ${h.no}</span><b>${esc(h.title)}</b><small>${h.a}턴 ~ ${h.b}턴 · ${h.count}턴</small><button type="button" data-chd="${t.id}" title="챕터 이름 바꾸기·빼기">✎</button></div>`; }
+function jumpChap(tid){ const sc=$('scroll'), el=document.getElementById('ch-'+tid); if(!sc||!el){ jumpTurn(tid); return; } const go=()=>{ sc.scrollTop+=el.getBoundingClientRect().top-sc.getBoundingClientRect().top-12; }; go(); setTimeout(go,60); setTimeout(go,250); }
+function chapModal(c,t){
+  const i=c.turns.indexOf(t), had=!!t.ch;
+  modal(`<h3>📑 ${had?'챕터 고치기':'새 챕터 시작'}</h3><p class="desc">${esc(effNo(c,t,i))}턴부터 다음 챕터 전까지가 한 챕터가 돼요.</p><div class="f"><input type="text" id="lk-chn" maxlength="40" value="${esc(t.ch||'')}" placeholder="예: 1부 · 첫 만남"></div>
+    <div class="ft">${had?'<button type="button" id="lk-chdel">챕터 빼기</button>':''}<span class="sp"></span><button type="button" id="lk-mc">취소</button><button type="button" class="primary" id="lk-mo">${had?'저장':'시작하기'}</button></div>`);
+  setTimeout(()=>{ const e=$('chn'); if(e){ e.focus(); e.select(); } },30);
+  $('mc').onclick=closeModal;
+  const ok=()=>{ const v=$('chn').value.trim(); if(!v){ toast('챕터 이름을 적어 주세요'); return; } t.ch=v; c.updatedAt=now(); save(); closeModal(); renderAll(true); toast(had?'챕터 이름을 바꿨어요':'챕터를 만들었어요'); };
+  $('mo').onclick=ok; $('chn').onkeydown=e=>{ if(e.key==='Enter'&&!e.isComposing) ok(); };
+  if(had) $('chdel').onclick=()=>{ delete t.ch; c.updatedAt=now(); save(); closeModal(); renderAll(true); toast('챕터를 뺐어요 (턴은 그대로예요)'); };
+}
+function chapList(c){
+  const hs=chapters(c);
+  if(!hs.length){ modal(`<h3>📑 챕터</h3><p class="desc">아직 챕터가 없어요.<br>턴 위쪽의 <b>📑 챕터 시작</b>을 누르면 그 턴부터 새 챕터가 시작돼요. 긴 로그를 "1부 · 첫 만남"처럼 구간으로 나눠두면 이동하기 편해요.</p><div class="ft"><span class="sp"></span><button type="button" class="primary" id="lk-mc">알겠어요</button></div>`); $('mc').onclick=closeModal; return; }
+  modal(`<h3>📑 챕터 ${hs.length}개</h3><p class="desc">눌러서 이동하거나, 챕터 단위로 복사할 수 있어요.</p>
+    <div class="ch-list">${hs.map(h=>`<div class="ch-row"><button type="button" class="go" data-go="${h.t.id}"><span class="no">${h.no}</span><b>${esc(h.title)}</b><small>${h.a}턴 ~ ${h.b}턴 · ${h.count}턴</small></button><button type="button" class="cp" data-cp="${h.no}" title="이 챕터 복사">⧉</button><button type="button" class="ed" data-ed="${h.t.id}" title="이름 바꾸기·빼기">✎</button></div>`).join('')}</div>
+    <div class="ft"><span class="sp"></span><button type="button" id="lk-mc">닫기</button></div>`);
+  $('mc').onclick=closeModal;
+  $('md').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ closeModal(); if(UI.bmView){ UI.bmView=false; renderAll(); } jumpChap(b.dataset.go); });
+  $('md').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const t=c.turns.find(x=>x.id===b.dataset.ed); if(t) chapModal(c,t); });
+  $('md').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{ const h=hs[+b.dataset.cp-1]; partModal(c,{a:h.a,b:h.b}); });
 }
 /* ---------- 부분 복사 ---------- */
 function partTxt(c,a,b,o){
@@ -757,15 +817,17 @@ function partTxt(c,a,b,o){
     out.push(o.head?`──── ${n}턴 ────\n${body}`:body); });
   return {n:out.length, text:out.join('\n\n')};
 }
-function partModal(c){
+function partModal(c,preset){
   const ts=c.turns||[]; if(!ts.length){ toast('아직 턴이 없어요'); return; }
   const nums=ts.map((t,i)=>+effNo(c,t,i)).filter(n=>!isNaN(n)); const lo=Math.min(...nums), hi=Math.max(...nums);
   /* 지금 화면에 보이는 턴을 시작값으로 */
   let cur=lo; const sc=$('scroll'); if(sc){ const top=sc.getBoundingClientRect().top; const el=[...sc.querySelectorAll('.tn')].find(x=>x.getBoundingClientRect().bottom>top+40); if(el){ const k=ts.findIndex(t=>t.id===el.dataset.tid); if(k>=0&&!isNaN(+effNo(c,ts[k],k))) cur=+effNo(c,ts[k],k); } }
-  const P=UI.part||(UI.part={head:true,noSt:false});
+  const P=UI.part||(UI.part={head:true,noSt:false}); const hs=chapters(c);
+  let A0=cur, B0=hi; if(preset){ A0=preset.a; B0=preset.b; }
   modal(`<h3>⧉ 부분 복사</h3><p class="desc">이 채팅은 ${esc(lo)}턴 ~ ${esc(hi)}턴이에요. 복사할 범위를 골라 주세요.</p>
-    <div class="f pr-row"><input type="number" id="lk-pa" value="${cur}" min="${lo}" max="${hi}"><span>턴부터</span><input type="number" id="lk-pb" value="${hi}" min="${lo}" max="${hi}"><span>턴까지</span></div>
+    <div class="f pr-row"><input type="number" id="lk-pa" value="${A0}" min="${lo}" max="${hi}"><span>턴부터</span><input type="number" id="lk-pb" value="${B0}" min="${lo}" max="${hi}"><span>턴까지</span></div>
     <div class="pr-quick"><button type="button" data-q="first">처음부터</button><button type="button" data-q="last">끝까지</button><button type="button" data-q="l10">최근 10턴</button><button type="button" data-q="l30">최근 30턴</button></div>
+    ${hs.length?`<div class="pr-chs"><span>챕터</span>${hs.map(h=>`<button type="button" data-ch="${h.no}" title="${h.a}턴 ~ ${h.b}턴">${h.no}. ${esc(h.title)}</button>`).join('')}</div>`:''}
     <label class="pr-ck"><input type="checkbox" id="lk-ph" ${P.head?'checked':''}> 턴 번호 줄(──── 12턴 ────) 넣기</label>
     <label class="pr-ck"><input type="checkbox" id="lk-ps" ${P.noSt?'checked':''}> 상태창은 빼고 복사</label>
     <p class="pr-sum" id="lk-psum"></p>
@@ -776,6 +838,7 @@ function partModal(c){
   $('md').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ const q=b.dataset.q;
     if(q==='first') $('pa').value=lo; else if(q==='last') $('pb').value=hi;
     else { const k=q==='l10'?10:30; const sorted=[...nums].sort((x,y)=>x-y); $('pb').value=hi; $('pa').value=sorted[Math.max(0,sorted.length-k)]; } sum(); });
+  $('md').querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{ const h=hs[+b.dataset.ch-1]; $('pa').value=h.a; $('pb').value=h.b; sum(); });
   $('mc').onclick=closeModal;
   $('mo').onclick=()=>{ const {a,b,r}=get(); if(!r.n) return; copyText(r.text,`${a}턴 ~ ${b}턴(${r.n}개)을 복사했어요`); closeModal(); };
   $('ptxt').onclick=()=>{ const {a,b,r}=get(); if(!r.n) return; download(fileName(c.title)+`_${a}-${b}턴.txt`,r.text); closeModal(); };

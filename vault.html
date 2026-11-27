@@ -652,6 +652,40 @@
   @media (min-width:981px){ .v-wed .we-right{position:sticky;top:132px} }
   .v-wed .we-pv iframe{height:420px;transition:height .15s}
   @media (max-width:600px){ .v-wed .we-head{margin:-14px -12px 12px;padding:12px 12px 2px} }
+
+  /* 캐릭터 보기: 편집 버튼을 위쪽 탭 줄로, 탭 줄은 스크롤해도 위에 고정 */
+  .v-dialog.pview .pv-tabs{position:sticky;top:0;z-index:6}
+  .pv-acts{display:flex;gap:6px;margin-right:4px}
+  .pv-acts button{border:1px solid #d6e2ee;background:#fff;color:#3f5a74;border-radius:10px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .pv-acts button:hover{background:#eef6fd}
+  .pv-acts button.primary{background:#5a9fd8;border-color:#5a9fd8;color:#fff}
+  .pv-acts button.primary:hover{background:#4b8fc8}
+  @media (max-width:600px){ .pv-acts #v-pAll{display:none} }
+  .v-dialog.pview{overflow:clip}
+
+  /* 일괄 선택 */
+  .t-vault .v-selbtn{border:1px solid #d6e2ee;background:#fff;color:#3f5a74;border-radius:10px;padding:0 12px;height:36px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .t-vault .v-selbtn:hover{background:#eef6fd}
+  .t-vault .v-selbtn.on{background:#eaf3fc;border-color:#9cc8ee;color:#2f6ea6}
+  .v-selable{position:relative;cursor:pointer!important}
+  .v-selable .oc-acts,.v-selable .wc-q{display:none!important}
+  .v-ck{position:absolute;top:8px;right:8px;z-index:8;width:22px;height:22px;border-radius:7px;border:2px solid #fff;background:rgba(255,255,255,.75);box-shadow:0 1px 4px rgba(0,0,0,.25);pointer-events:none}
+  .v-sel{outline:3px solid #5a9fd8;outline-offset:-1px}
+  .v-sel>.v-ck{background:#5a9fd8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/14px no-repeat}
+  .v-selbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:calc(100vw - 32px);background:#fff;border:1px solid #d6e2ee;border-radius:16px;box-shadow:0 10px 30px rgba(30,60,90,.2);padding:9px 12px}
+  .v-selbar b{font-size:13.5px;color:#2f6ea6;margin-right:4px;white-space:nowrap}
+  .v-selbar .sp{flex:1;min-width:6px}
+  .v-selbar button{border:1px solid #d6e2ee;background:#fff;color:#3f5a74;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .v-selbar button:hover:not(:disabled){background:#eef6fd}
+  .v-selbar button:disabled{opacity:.4;cursor:default}
+  .v-selbar button.primary{background:#5a9fd8;border-color:#5a9fd8;color:#fff}
+  .v-selbar button.danger{color:#c0594b;border-color:#efc9c3}
+  body.v-selecting .v-fab{bottom:86px}
+  .b-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .b-tags .chip.off{background:#fbeeec;border-color:#e9b3ab;color:#c0594b;text-decoration:line-through}
+  @media (max-width:600px){ .v-selbar{bottom:12px;padding:8px} .v-selbar button{padding:5px 9px;font-size:12px} }
+  @media (min-width:900px){ .v-selbar{flex-wrap:nowrap} }
+  body.v-selecting .v-drag-hint,body.v-selecting #v-dragHint{visibility:hidden}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
 <style>
@@ -760,6 +794,7 @@
               <option value="name">이름순</option>
               <option value="custom">내 순서 (끌어서 옮기기)</option>
             </select>
+            <button type="button" class="v-selbtn" id="v-selBtn" title="여러 개를 골라 카테고리·태그를 한 번에 바꿔요">☑ 선택</button>
             <div class="nsfw-bar" id="v-nsfwBar"></div>
             <button class="primary" id="v-new" type="button">＋ 새 페르소나</button>
           </div>
@@ -1001,7 +1036,9 @@ function renderTags(base){
   const tc=$('tagbar').querySelector('.tg-clear'); if(tc) tc.onclick=()=>{ U.itags=[]; U.xtags=[]; render(); };
 }
 function initial(n){ return esc(([...String(n||'?').trim()][0]||'?')); }
-function render(){
+function render(){ renderCore(); paintSel(); }
+function renderCore(){
+  if(U.selMode&&U._selTab&&U._selTab!==U.tab){ U.selMode=false; SEL.clear(); document.body.classList.remove('v-selecting'); $('selBtn').classList.remove('on'); $('selBtn').textContent='☑ 선택'; } U._selTab=U.tab;
   document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===U.tab));
   document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>{ const t=a.dataset.vtab, n=t==='gallery'?allPics().length:(D[TABS[t].list]||[]).length; a.classList.toggle('on',t===U.tab); a.querySelector('.n').textContent=n||''; });
   const H={persona:['캐릭터','AI 채팅 페르소나를 사진, AU, 의상과 함께 모아두는 곳이에요.'],pair:['페어','두 캐릭터의 관계, 호칭, 서사를 정리해두는 곳이에요.'],clip:['발췌 모음','발췌 이미지 메이커에서 만든 이미지를 캐릭터별로 모아봐요.'],widget:['위젯','상태값·지시사항과 HTML을 한 묶음으로 저장하고, 미리보기로 바로 확인해요.'],ooc:['OOC','AI 채팅 진행 명령어(OOC)를 태그로 모아두는 곳이에요. 내용을 누르면 바로 복사돼요.'],gallery:['갤러리','직접 올린 이미지를 모아보는 곳이에요.'],prompt:['프롬프트','노벨AI 프롬프트를 결과 이미지(원본)와 함께 모아두는 곳이에요.']}[U.tab];
@@ -1509,6 +1546,85 @@ function openWidget(w0){
   if(isNew) setTimeout(()=>$('we-name').focus(),60);
 }
 
+
+/* ---------- 여러 개 골라서 한 번에 (일괄 지정) ---------- */
+const SEL=new Set(); let selBar=null;
+const CARD_Q='.pc,.gc,.oc-li,.wc';
+const tagField=()=>U.tab==='clip'?'chars':'tags';
+const hasCats=()=>['persona','prompt','pair','gallery'].includes(U.tab);
+const cardId=el=>el.dataset.id||((GV[+el.dataset.i]||{}).id);
+const selItems=()=>items().filter(x=>SEL.has(x.id));
+function selMode(on){
+  U.selMode=on; SEL.clear(); document.body.classList.toggle('v-selecting',on);
+  $('selBtn').classList.toggle('on',on); $('selBtn').textContent=on?'✕ 선택 끝내기':'☑ 선택';
+  render();
+}
+function paintSel(){
+  const g=$('grid'); if(!g) return;
+  const vis=[...g.querySelectorAll(CARD_Q)];
+  vis.forEach(el=>{ const id=cardId(el); el.classList.toggle('v-sel',U.selMode&&SEL.has(id)); el.classList.toggle('v-selable',!!U.selMode);
+    if(U.selMode&&!el.querySelector(':scope > .v-ck')){ const c=document.createElement('span'); c.className='v-ck'; el.appendChild(c); }
+    if(!U.selMode){ const c=el.querySelector(':scope > .v-ck'); if(c) c.remove(); } });
+  if(!U.selMode){ if(selBar){ selBar.remove(); selBar=null; } return; }
+  if(!selBar){ selBar=document.createElement('div'); selBar.className='v-selbar'; document.body.appendChild(selBar); }
+  const n=SEL.size, allOn=vis.length&&vis.every(el=>SEL.has(cardId(el)));
+  selBar.innerHTML=`<b>${n}개 선택</b><button type="button" data-s="all">${allOn?'전체 해제':'보이는 것 전체 선택'}</button><span class="sp"></span>
+    ${hasCats()?`<button type="button" data-s="cat" ${n?'':'disabled'}>📁 카테고리 옮기기</button>`:''}
+    <button type="button" data-s="tadd" ${n?'':'disabled'}>＋ ${U.tab==='clip'?'캐릭터 태그':'태그'} 달기</button>
+    <button type="button" data-s="tdel" ${n?'':'disabled'}>－ ${U.tab==='clip'?'캐릭터 태그':'태그'} 빼기</button>
+    <button type="button" data-s="del" class="danger" ${n?'':'disabled'}>삭제</button>
+    <button type="button" data-s="done" class="primary">완료</button>`;
+  selBar.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>selAct(b.dataset.s,vis));
+}
+document.addEventListener('click',e=>{
+  if(!U.selMode) return; const g=$('grid'); if(!g||!g.contains(e.target)) return;
+  const el=e.target.closest(CARD_Q); if(!el||!g.contains(el)) return;
+  e.preventDefault(); e.stopPropagation();
+  const id=cardId(el); if(!id) return; SEL.has(id)?SEL.delete(id):SEL.add(id); paintSel();
+},true);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&U.selMode&&!(modalEl&&modalEl.classList.contains('on'))) selMode(false); });
+async function selAct(a,vis){
+  const L=selItems(), tf=tagField(), lbl=U.tab==='clip'?'캐릭터 태그':'태그';
+  if(a==='done') return selMode(false);
+  if(a==='all'){ const ids=vis.map(cardId).filter(Boolean); const allOn=ids.every(i=>SEL.has(i)); ids.forEach(i=>allOn?SEL.delete(i):SEL.add(i)); return paintSel(); }
+  if(!L.length) return;
+  const now=Date.now();
+  if(a==='cat'){
+    modal(`<div class="v-dh"><b>📁 ${L.length}개를 어느 카테고리로 옮길까요?</b><button class="x" type="button">×</button></div>
+      <div class="v-db"><select id="v-bcat" style="width:100%">${catOptions(null)}</select></div>
+      <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-bok">옮기기</button></div>`,{sm:true});
+    $('bok').onclick=async()=>{ const c=$('bcat').value||null; L.forEach(x=>{ x.cat=c; x.updated=now; }); await save(); close(); SEL.clear(); render(); toast(`${L.length}개를 옮겼어요`); };
+  } else if(a==='tadd'){
+    modal(`<div class="v-dh"><b>＋ ${L.length}개에 ${lbl} 달기</b><button class="x" type="button">×</button></div>
+      <div class="v-db"><div class="v-taginput" id="v-btags"></div><p class="v-note" style="margin-top:10px">이미 달린 ${lbl}는 그대로 두고, 적은 것만 더해요.</p></div>
+      <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-bok">달기</button></div>`,{sm:true});
+    const get=tagInput($('btags'),[],U.tab==='clip'?charSugg():null,`${lbl} 입력 후 Enter`);
+    setTimeout(()=>{ const i=$('btags')&&$('btags').querySelector('input'); if(i) i.focus(); },50);
+    $('bok').onclick=async()=>{ const ts=get(); if(!ts.length){ toast(`${lbl}를 적어 주세요`); return; }
+      L.forEach(x=>{ const cur=x[tf]||[]; ts.forEach(t=>{ if(!cur.includes(t)) cur.push(t); }); x[tf]=cur; if(U.tab==='prompt'&&ts.some(t=>/^nsfw$/i.test(t))) x.nsfw=true; x.updated=now; });
+      await save(); close(); render(); toast(`${L.length}개에 ${lbl}를 달았어요`); };
+  } else if(a==='tdel'){
+    const cnt={}; L.forEach(x=>(x[tf]||[]).forEach(t=>cnt[t]=(cnt[t]||0)+1));
+    const ks=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]); if(!ks.length){ toast(`고른 것들에 ${lbl}가 없어요`); return; }
+    const pick=new Set();
+    modal(`<div class="v-dh"><b>－ ${L.length}개에서 뺄 ${lbl}</b><button class="x" type="button">×</button></div>
+      <div class="v-db"><div class="b-tags">${ks.map(t=>`<button type="button" class="chip" data-t="${esc(t)}">#${esc(t)} <span style="opacity:.6">${cnt[t]}</span></button>`).join('')}</div><p class="v-note" style="margin-top:10px">뺄 ${lbl}를 눌러서 고르세요.</p></div>
+      <div class="v-df"><span class="sp"></span><button type="button" data-close>취소</button><button type="button" class="primary" id="v-bok">빼기</button></div>`,{sm:true});
+    modalEl.querySelectorAll('.b-tags .chip').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; pick.has(t)?pick.delete(t):pick.add(t); b.classList.toggle('off',pick.has(t)); });
+    $('bok').onclick=async()=>{ if(!pick.size){ toast(`뺄 ${lbl}를 골라 주세요`); return; }
+      L.forEach(x=>{ x[tf]=(x[tf]||[]).filter(t=>!pick.has(t)); if(U.tab==='prompt'&&[...pick].some(t=>/^nsfw$/i.test(t))) x.nsfw=false; x.updated=now; });
+      await save(); close(); render(); toast(`${lbl}를 뺐어요`); };
+  } else if(a==='del'){
+    confirmBox(`고른 ${L.length}개를 삭제할까요?\n되돌릴 수 없어요.`,'삭제',async()=>{
+      const ids=new Set(L.map(x=>x.id)), imgs=[];
+      L.forEach(x=>{ [x.img,x.imgA,x.imgB].forEach(i=>i&&imgs.push(i)); (x.aus||[]).forEach(a=>[a.img,a.imgA,a.imgB].forEach(i=>i&&imgs.push(i))); });
+      const key=TABS[U.tab].list; D[key]=(D[key]||[]).filter(x=>!ids.has(x.id));
+      if(U.tab==='ooc') D.oocs.forEach(x=>{ if(ids.has(x.parent)) x.parent=null; });
+      for(const i of imgs){ await imgDel(i).catch(()=>{}); await imgDel(ORIG(i)).catch(()=>{}); IMG.delete(i); }
+      await save(); close(); SEL.clear(); render(); toast(`${L.length}개를 삭제했어요`); });
+  }
+}
+
 /* ---------- 끌어서 순서 바꾸기 (마우스: 끌기 / 터치: 꾹 누른 뒤 끌기) ---------- */
 let drag=null, justDragged=0;
 function enableDrag(g){
@@ -1516,6 +1632,7 @@ function enableDrag(g){
     el.querySelectorAll('img').forEach(i=>i.draggable=false);
     el.addEventListener('contextmenu',e=>{ if(drag||el._hold) e.preventDefault(); });
     el.addEventListener('pointerdown',e=>{
+      if(U.selMode) return;
       if(e.button>0 || e.target.closest('button')) return;
       const st={el, x:e.clientX, y:e.clientY, id:e.pointerId, touch:e.pointerType!=='mouse', on:false};
       el._hold=true;
@@ -1694,7 +1811,7 @@ async function viewPersona(p,auId){
   const stats=[['나이',v.age],['키',v.height],['성별',v.gender]].filter(s=>s[1]);
   const outs=(v.outfits||[]).filter(o=>o.name||o.desc||o.pos);
   const pills=[cat&&`<span class="pill">${esc(cat.name)}</span>`, au&&`<span class="pill au">${esc(au.label)}</span>`, p.au&&!aus.length&&`<span class="pill">${esc(p.au)}</span>`].filter(Boolean);
-  const m=modal(`<div class="pv-tabs"><button type="button" class="pt ${au?'':'on'}" data-au="">★ 오리지널</button>${aus.map(a=>`<button type="button" class="pt ${au&&au.id===a.id?'on':''}" data-au="${a.id}">${esc(a.label)}</button>`).join('')}<button type="button" class="pt add" id="v-auAdd">＋ AU 추가</button><span class="sp"></span><button class="x" type="button">×</button></div>
+  const m=modal(`<div class="pv-tabs"><button type="button" class="pt ${au?'':'on'}" data-au="">★ 오리지널</button>${aus.map(a=>`<button type="button" class="pt ${au&&au.id===a.id?'on':''}" data-au="${a.id}">${esc(a.label)}</button>`).join('')}<button type="button" class="pt add" id="v-auAdd">＋ AU 추가</button><span class="sp"></span><span class="pv-acts"><button type="button" id="v-pAll" title="전체 복사">📋 전체 복사</button><button type="button" class="primary" id="v-pEdit">✏️ ${au?`'${esc(au.label)}' 편집`:'편집'}</button></span><button class="x" type="button">×</button></div>
     <div class="pview2"><div class="pl"><div class="hero ${src?'':'noimg'}">${src?`<img src="${src}" alt="">`:`<span>${initial(v.name)}</span>`}</div></div>
     <div class="v-db pview">
       ${pills.length?`<div class="pills">${pills.join('')}</div>`:''}
@@ -1712,7 +1829,7 @@ async function viewPersona(p,auId){
       ${v.memo?`<div class="sec"><div class="sh"><b>메모</b></div><div class="box">${esc(v.memo)}</div></div>`:''}
       <div style="height:10px"></div>
     </div></div>
-    <div class="v-df"><button type="button" id="v-pAll">📋 전체 복사</button><span class="sp"></span><button type="button" data-close>닫기</button><button type="button" class="primary" id="v-pEdit">✏️ ${au?`'${esc(au.label)}' 편집`:'편집'}</button></div>`,{cls:'wide'});
+`,{cls:'wide pview'});
   m.querySelectorAll('[data-ci]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); copy(C[+b.dataset.ci][0],C[+b.dataset.ci][1]); });
   /* 의상 고르기 · 일괄 복사 */
   if($('cpAll')){
@@ -2076,6 +2193,7 @@ document.querySelectorAll('#v-vside [data-vtab]').forEach(a=>a.onclick=e=>{ e.pr
 document.querySelectorAll('.t-vault .v-tabs .tab').forEach(b=>b.onclick=()=>{ U.tab=b.dataset.tab; U.itags=[]; U.xtags=[]; U.q=''; $('q').value=''; saveUI(); render(); });
 let qt; $('q').oninput=()=>{ clearTimeout(qt); qt=setTimeout(()=>{ U.q=$('q').value; render(); },120); };
 $('sort').onchange=()=>{ U.sort=$('sort').value; saveUI(); render(); };
+$('selBtn').onclick=()=>selMode(!U.selMode);
 $('new').onclick=()=>U.tab==='persona'?editPersona(null):U.tab==='pair'?editPair(null):U.tab==='gallery'?pickPics():U.tab==='clip'?pickPics(true):U.tab==='widget'?openWidget(null):U.tab==='ooc'?(()=>{ const t=$('oc-text'); t.focus(); t.scrollIntoView({block:'center',behavior:'smooth'}); })():editPrompt(null);
 (async()=>{
   try{ db=await openDB(); const d=await kvGet('data'); if(d && typeof d==='object') D=Object.assign(BLANK(),d);

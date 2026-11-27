@@ -511,14 +511,17 @@
   @media (max-width:860px){ .blog,.bcol,.br{gap:14px!important} .bhero{margin-bottom:14px} .bhero-nav{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none} .bhero-nav a{flex:none} .blog{grid-template-columns:minmax(0,1fr)} .bhero-img{height:180px} .bhero-lbl{top:90px;padding:12px 22px} .bhero-lbl b{font-size:22px} .post-img{height:210px} .deco-btn{height:36px;padding:0 12px;font-size:12.5px} }
 
   /* 블럭 격자 (고른 블럭만, 고른 순서대로) */
-  .blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start;grid-auto-flow:dense}
-  .blocks>[data-blk="note"],.blocks>[data-blk="short"],.blocks>[data-blk="gal"]{grid-column:span 2}
+  .blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:22px;row-gap:0;grid-auto-rows:1px;align-items:start;grid-auto-flow:row dense;--bg:22px}
   .blocks .w{position:relative;min-height:0;padding:20px 22px;border-radius:22px;margin:0}
   .blocks .wh{margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #dbe6f0}
-  .blocks .dds,.blocks .lks{grid-template-columns:1fr}
+  .blocks .dds,.blocks .lks{grid-template-columns:minmax(0,1fr)}
+  .dds>.dd{min-width:0}
+  #home-dday{min-width:0}
+  #home-dday .ddt b{text-overflow:clip}
+  #home-dday .ddt b.wrap{white-space:normal;word-break:keep-all;overflow-wrap:anywhere;line-height:1.3}
   .blocks [data-blk="dday"] .dd{padding:10px 12px 10px 10px}
   .blocks [data-blk="dday"] .ddp{width:52px;height:52px;border-radius:14px}
-  .memo-tx{width:100%;box-sizing:border-box;min-height:180px;border:0;background:repeating-linear-gradient(transparent 0 27px,#eef3f8 27px 28px);font:inherit;font-size:14px;line-height:28px;color:#3a4450;resize:vertical;outline:none;padding:0 2px}
+  .memo-tx{flex:1;width:100%;box-sizing:border-box;min-height:180px;border:0;background:repeating-linear-gradient(transparent 0 27px,#eef3f8 27px 28px);font:inherit;font-size:14px;line-height:28px;color:#3a4450;resize:vertical;outline:none;padding:0 2px}
   .gal-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .gal-g a{aspect-ratio:1;border-radius:14px;background:var(--soft) center/cover no-repeat;transition:transform .15s}
   .gal-g a:hover{transform:scale(1.03)}
@@ -537,7 +540,7 @@
   .blk-add .none{font-size:12.5px;color:#9aa8b6}
   .decor .blocks{padding-top:10px}
   @media (max-width:1100px){ .blocks{grid-template-columns:repeat(2,minmax(0,1fr))} }
-  @media (max-width:860px){ .blocks{grid-template-columns:minmax(0,1fr);gap:14px} .blocks>[data-blk]{grid-column:auto!important} .gal-g{grid-template-columns:repeat(3,1fr)} }
+  @media (max-width:860px){ .blocks{grid-template-columns:minmax(0,1fr);--bg:14px} .gal-g{grid-template-columns:repeat(3,1fr)} }
 
   /* 갤러리 블럭 (모자이크) */
   .gal-g{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(0,1fr);gap:8px}
@@ -555,7 +558,6 @@
   .gal-g.n3{grid-template-columns:2fr 1fr} .gal-g.n3 .gt.big{grid-column:1;grid-row:span 2}
   .gal-g.n4{grid-template-columns:2fr 1fr 1fr} .gal-g.n4 .gt.big{grid-column:1;grid-row:span 2} .gal-g.n4 .gt:nth-child(4){grid-column:span 2;aspect-ratio:2/1}
   /* 음악 */
-  .blocks>[data-blk="music"]{grid-column:span 2}
   .mu-now{display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px;align-items:center}
   /* CD */
   .mu-cd{position:relative;width:270px;height:180px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -635,6 +637,34 @@
   .mu-mini .eq i:nth-child(2){animation-delay:.2s} .mu-mini .eq i:nth-child(3){animation-delay:.4s}
   @keyframes eq{0%,100%{height:4px}50%{height:14px}}
   @media (max-width:860px){ .mu-now{grid-template-columns:1fr} .mu-cd{margin:0 auto} .mu-vol input{width:70px} }
+
+
+  @media (max-width:420px){ .blocks [data-blk="dday"] .ddn b{font-size:19px} .blocks [data-blk="dday"] .ddp{width:44px;height:44px} .blocks .w{padding:16px} }
+
+  /* 디데이 순서 */
+  .dd-ord{margin-left:auto;margin-right:10px;border:1px solid var(--ln);background:#fff;color:#8ea2b5;border-radius:999px;padding:3px 11px;font-size:11.5px;font-weight:700;cursor:pointer}
+  .dd-ord:hover{color:var(--deep);border-color:#9cc8ee;background:var(--soft)}
+  [data-blk="dday"] .wh .more{margin-left:0}
+  .dd-om-h{margin:0 0 10px;font-size:12.5px;color:#8ea2b5}
+  .dd-ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto}
+  .dd-ol li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--ln);border-radius:14px;background:#fff;transition:border-color .15s,background .15s,opacity .15s}
+  .dd-ol li.off{opacity:.5}
+  .dd-ol li.drag{opacity:.35}
+  .dd-ol li.over{border-color:#7fb6e6;background:#f3f9ff}
+  .dd-ol li.none{justify-content:center;color:#a3b0bd;font-size:13px}
+  .dd-ol .hd{cursor:grab;color:#b8c5d2;font-size:12px;letter-spacing:-2px;user-select:none}
+  .dd-ol label{flex:1;min-width:0;display:flex;align-items:center;gap:10px;cursor:pointer}
+  .dd-ol input{accent-color:var(--deep);flex:none}
+  .dd-ol .t{min-width:0;display:flex;flex-direction:column}
+  .dd-ol .t b{font-size:13.5px;color:#1d2430;word-break:keep-all;overflow-wrap:anywhere}
+  .dd-ol .t small{font-size:11.5px;color:#8ea2b5}
+  .dd-ol .ac{display:flex;gap:2px;flex:none}
+  .dd-ol .ac button{width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#8ea2b5;font-size:11px;cursor:pointer}
+  .dd-ol .ac button:hover:not(:disabled){background:var(--soft);color:var(--deep)}
+  .dd-ol .ac button:disabled{opacity:.3;cursor:default}
+  .dd-om-f{display:flex;justify-content:space-between;margin-top:14px}
+  .dd-om-f button{border:1px solid var(--ln);background:#fff;color:#6b7c8d;border-radius:12px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .dd-om-f .ok{border:0;background:var(--deep);color:#fff;font-weight:700;padding:8px 20px}
 </style>
 </head>
 <body>
@@ -694,7 +724,7 @@
           <div class="cal-ev" id="home-calEv"></div>
         </section>
         <section class="w card" data-blk="dday">
-          <div class="wh"><h2>D-DAY</h2><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
+          <div class="wh"><h2>D-DAY</h2><button type="button" class="dd-ord" id="home-ddOrd" title="디데이 순서 정하기">⇅ 순서</button><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
           <div id="home-dday" style="display:flex;flex-direction:column"></div>
         </section>
         <section class="w card" data-blk="links">
@@ -993,7 +1023,11 @@ function dayDiff(s){ const t=new Date(s+'T00:00:00'); if(isNaN(t)) return null; 
 const ddText=n=>n===0?'D-Day':n>0?'D+'+n:'D'+n;
 function sideOf(x){ x=x||{}; const p=x.pid&&V.personas.find(y=>y.id===x.pid); return {name:(p&&p.name)||x.name||'', img:(p&&p.img)||''}; }
 function pairImgs(r){ const A=sideOf(r.a), B=sideOf(r.b); return r.mode==='two'?[r.imgA||A.img, r.imgB||B.img]:r.img?[r.img]:[A.img,B.img]; }
-function ddPairs(){ return V.pairs.filter(r=>r.dday && dayDiff(r.dday)!==null).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||(b.updated||0)-(a.updated||0)); }
+function ddAll(){ return V.pairs.filter(r=>r.dday && dayDiff(r.dday)!==null).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||(b.updated||0)-(a.updated||0)); }
+/* 직접 정한 순서(P.ddOrder)가 있으면 그 순서대로, 새로 생긴 페어는 뒤에 붙어요. 숨긴 페어(P.ddHide)는 빼요 */
+function ddSorted(){ const L=ddAll(); if(!Array.isArray(P.ddOrder)) return L; const ix=new Map(P.ddOrder.map((id,i)=>[id,i]));
+  return L.map((r,i)=>[r,ix.has(r.id)?ix.get(r.id):1e6+i]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]); }
+function ddPairs(){ const L=ddSorted(); if(!Array.isArray(P.ddOrder)) return L; const h=new Set(P.ddHide||[]); return L.filter(r=>!h.has(r.id)); }
 function nextMark(s){
   const n=dayDiff(s); if(n===null) return '';
   if(n<0) return `시작까지 ${-n}일`;
@@ -1008,7 +1042,7 @@ function nextMark(s){
 }
 function paintDday(){
   const box=$h('dday'); if(!box) return;
-  const list=ddPairs().slice(0,6);
+  const list=Array.isArray(P.ddOrder)?ddPairs():ddPairs().slice(0,6);
   if(!list.length){ box.innerHTML=`<div class="empty2">페어 정리함에서 기준일을 넣으면 여기 디데이가 떠요.<a class="pill" href="vault.html#tab=pair" data-link>페어 정리하러 가기</a></div>`; applyOpen(); return; }
   box.innerHTML=`<div class="dds">${list.map(r=>{ const A=sideOf(r.a), B=sideOf(r.b), n=dayDiff(r.dday), ims=pairImgs(r);
     const pic=ims.length===1?`<span class="ddp one" style="${V.img[ims[0]]?`background-image:url('${V.img[ims[0]]}')`:''}"></span>`
@@ -1364,6 +1398,7 @@ function paintBlocks(){
         DECO.blocks=l; savePref(); paintBlocks(); }); }
     else if(t) t.remove(); });
   L.forEach(k=>{ const el=box.querySelector(`:scope > [data-blk="${k}"]`); if(el) box.appendChild(el); });
+  msLater();
   const ad=$h('blkAdd'), hid=Object.keys(BLKS).filter(k=>!L.includes(k));
   ad.innerHTML=decoOn?`<span class="lb">홈에 띄울 블럭</span>${hid.length?hid.map(k=>`<button type="button" data-k="${k}">＋ ${BLKS[k]}</button>`).join(''):'<span class="none">모든 블럭을 띄우고 있어요</span>'}`:'';
   ad.style.display=decoOn?'':'none';
@@ -1475,6 +1510,77 @@ function muInit(){
   if(MU.auto&&MU.list.length){ muLoadApi(); const go=e=>{ if(e.target.closest&&e.target.closest('#home-muPlay,#home-muCd,.mu-list,.mu-ctl')) return; document.removeEventListener('pointerdown',go,true); if(ytState!==1) muToggle(); }; document.addEventListener('pointerdown',go,true); }
 }
 if(blkList().includes('music')) muInit();
+/* 디데이 순서 정하기 */
+function ddOrderModal(){
+  let ov=document.getElementById('home-ddOv'); if(!ov){ ov=document.createElement('div'); ov.className='hm-ov'; ov.id='home-ddOv'; document.body.appendChild(ov);
+    ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('on'); }); }
+  const all=ddSorted(); let ord=all.map(r=>r.id); const hide=new Set(Array.isArray(P.ddOrder)?(P.ddHide||[]):all.slice(6).map(r=>r.id));
+  const byId=Object.fromEntries(all.map(r=>[r.id,r]));
+  const nm=r=>{ const A=sideOf(r.a), B=sideOf(r.b); return r.name||((A.name||'?')+' × '+(B.name||'?')); };
+  const apply=()=>{ P.ddOrder=ord.slice(); P.ddHide=[...hide].filter(id=>byId[id]); savePref(); paintDday(); };
+  const draw=()=>{
+    ov.innerHTML=`<div class="hm dd-om" role="dialog" aria-label="디데이 순서"><div class="wh"><h2>디데이 순서</h2><button type="button" class="x" data-a="x" aria-label="닫기">✕</button></div>
+      <p class="dd-om-h">끌어서 옮기거나 ▲▼로 순서를 바꿔요. 체크를 끄면 홈에서 숨겨요.</p>
+      <ol class="dd-ol">${ord.map((id,i)=>{ const r=byId[id], A=sideOf(r.a), B=sideOf(r.b);
+        return `<li draggable="true" data-i="${i}" class="${hide.has(id)?'off':''}"><span class="hd" aria-hidden="true">⋮⋮</span><label><input type="checkbox" ${hide.has(id)?'':'checked'}><span class="t"><b>${esc(nm(r))}</b><small>${esc(A.name||'?')} × ${esc(B.name||'?')} · ${ddText(dayDiff(r.dday))}</small></span></label><span class="ac"><button type="button" data-a="up" ${i?'':'disabled'} title="위로">▲</button><button type="button" data-a="dn" ${i<ord.length-1?'':'disabled'} title="아래로">▼</button></span></li>`; }).join('')||'<li class="none">기준일이 있는 페어가 없어요</li>'}</ol>
+      <div class="dd-om-f"><button type="button" data-a="reset">기본 순서로</button><button type="button" class="ok" data-a="x">완료</button></div></div>`;
+    ov.querySelectorAll('[data-a=x]').forEach(b=>b.onclick=()=>ov.classList.remove('on'));
+    ov.querySelector('[data-a=reset]').onclick=()=>{ delete P.ddOrder; delete P.ddHide; savePref(); paintDday(); ddOrderModal(); };
+    let from=-1;
+    ov.querySelectorAll('.dd-ol li[data-i]').forEach(li=>{ const i=+li.dataset.i, id=ord[i];
+      li.querySelector('input').onchange=e=>{ e.target.checked?hide.delete(id):hide.add(id); apply(); draw(); };
+      li.querySelectorAll('.ac button').forEach(b=>b.onclick=()=>{ const j=i+(b.dataset.a==='up'?-1:1); [ord[i],ord[j]]=[ord[j],ord[i]]; apply(); draw(); });
+      li.addEventListener('dragstart',e=>{ from=i; li.classList.add('drag'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain',''); }catch(_){} });
+      li.addEventListener('dragend',()=>li.classList.remove('drag'));
+      li.addEventListener('dragover',e=>{ e.preventDefault(); li.classList.add('over'); });
+      li.addEventListener('dragleave',()=>li.classList.remove('over'));
+      li.addEventListener('drop',e=>{ e.preventDefault(); if(from<0||from===i) return; const [m]=ord.splice(from,1); ord.splice(i,0,m); from=-1; apply(); draw(); });
+    });
+  };
+  draw(); ov.classList.add('on');
+}
+{ const b=document.getElementById('home-ddOrd'); if(b) b.onclick=e=>{ e.preventDefault(); ddOrderModal(); }; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ const o=document.getElementById('home-ddOv'); if(o) o.classList.remove('on'); } });
+/* 디데이 페어 이름: 자르지 않고 칸에 맞게 글자 크기를 줄이고, 그래도 길면 두 줄로 */
+function fitDD(){ document.querySelectorAll('#home-dday .ddt b').forEach(b=>{
+  b.classList.remove('wrap'); b.style.fontSize=''; let fs=parseFloat(getComputedStyle(b).fontSize)||15;
+  while(b.scrollWidth>b.clientWidth+1&&fs>12){ fs-=.5; b.style.fontSize=fs+'px'; }
+  if(b.scrollWidth>b.clientWidth+1){ b.classList.add('wrap'); } }); }
+(function(){ const bx=document.getElementById('home-dday'); if(!bx) return; let r=0; const go=()=>{ cancelAnimationFrame(r); r=requestAnimationFrame(fitDD); };
+  new MutationObserver(go).observe(bx,{childList:true}); if(window.ResizeObserver) new ResizeObserver(go).observe(bx); go(); })();
+/* 벽돌 쌓기: 블럭을 순서대로 가장 위쪽 빈자리에 채워 넣고, 옆에 구멍이 남으면 좁은 블럭을 넓혀서 메워요 */
+const WIDE={note:1,short:1,gal:1,music:1};
+var msRaf=0, msT=0, msN=0, msTo=0;
+function masonry(){ const box=$h('blocks'); if(!box) return; const now=Date.now(); if(now-msT>1000){ msT=now; msN=0; } if(++msN>12){ clearTimeout(msTo); msTo=setTimeout(masonry,1100); return; }
+  try{
+    const g=parseFloat(getComputedStyle(box).getPropertyValue('--bg'))||22;
+    [...box.children].forEach(s=>{ s.style.gridColumn=''; s.style.gridRow=''; });
+    const n=Math.max(1,getComputedStyle(box).gridTemplateColumns.split(' ').filter(Boolean).length);
+    const els=[...box.children].filter(s=>s.dataset&&s.dataset.blk&&s.style.display!=='none');
+    els.forEach(s=>{ s.style.minHeight=''; });
+    const H=new Array(n).fill(0), last=new Array(n).fill(null), at=(c,w)=>Math.max(...H.slice(c,c+w));
+    /* 옆 칸보다 짧게 끝난 좁은 블럭은 아래로 늘려서 틈을 메워요 */
+    const fill=(c,to)=>{ const e=last[c]; if(!e||H[c]>=to-1||e.dataset.w!=='1') return; const add=to-H[c];
+      e.style.minHeight=(e.getBoundingClientRect().height+add)+'px'; const r=e.dataset.top|0; const h=Math.ceil(e.getBoundingClientRect().height);
+      e.style.gridRow=`${r+1} / span ${h+g}`; H[c]=r+h+g; };
+    els.forEach((s,i)=>{
+      let w=WIDE[s.dataset.blk]?Math.min(2,n):1, best=0, top=Infinity;
+      for(let c=0;c+w<=n;c++){ const t=at(c,w); if(t<top-1){ top=t; best=c; } }
+      if(w===1&&n>1){ const nx=els[i+1], nxW=!nx||WIDE[nx.dataset.blk];
+        if(nxW){ for(const c of [best-1,best+1]){ if(c>=0&&c<n&&Math.abs(H[c]-H[best])<48){ best=Math.min(c,best); w=2; top=at(best,2); break; } } } }
+      if(w>1) for(let c=best;c<best+w;c++) fill(c,top);
+      s.style.gridColumn=`${best+1} / span ${w}`; s.dataset.w=w; s.dataset.top=top;
+      const h=Math.ceil(s.getBoundingClientRect().height);
+      s.style.gridRow=`${top+1} / span ${h+g}`;
+      for(let c=best;c<best+w;c++){ H[c]=top+h+g; last[c]=s; }
+    });
+    if(n>1){ const mx=Math.max(...H); for(let c=0;c<n;c++) fill(c,mx); }
+  } catch(e){}
+}
+function msLater(){ cancelAnimationFrame(msRaf); msRaf=requestAnimationFrame(()=>masonry()); }
+(function(){ const box=$h('blocks'); if(!box) return;
+  if(window.ResizeObserver){ const ro=new ResizeObserver(msLater); [...box.children].forEach(s=>ro.observe(s)); ro.observe(box); }
+  window.addEventListener('resize',msLater); masonry(); })();
 function paintDeco(){
   home.classList.toggle('decor',decoOn);
   $h('decoBtn').classList.toggle('on',decoOn); $h('decoBtn').textContent=decoOn?'✓ 꾸미기 끝':'✎ 꾸미기';

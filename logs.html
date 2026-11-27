@@ -334,6 +334,20 @@
   .hide-st .tn.show-st .st-chip .tri{transform:rotate(90deg)}
   .hide-st .st-chip{display:flex;width:max-content;margin:6px 0 2px}
   .hide-st .tn.show-st .st-tail{margin-top:4px}
+
+  /* 부분 복사 */
+  .lk-head .acts button.cp-part{width:auto!important;padding:0 10px!important;display:inline-flex;align-items:center;gap:3px}
+  .lk-head .acts button.cp-part small{font-size:11.5px;font-weight:700}
+  .pr-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pr-row input{width:96px!important;flex:none;text-align:center;font-size:16px;font-weight:700}
+  .pr-row span{font-size:13.5px;color:#5b7088}
+  .pr-quick{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 12px}
+  .pr-quick button{border:1px solid #d6e2ee;background:#fff;color:#3f6a92;border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer}
+  .pr-quick button:hover{background:#eef6fd}
+  .pr-ck{display:flex;align-items:center;gap:7px;font-size:13px;color:#3a4654;margin:6px 0;cursor:pointer}
+  .pr-sum{margin:12px 0 2px;font-size:12.5px;color:#7d8fa1;background:#f5f9fd;border-radius:10px;padding:8px 11px}
+  .pr-sum b{color:#2f6ea6}
+  .pr-row input{border:1px solid #d6e2ee!important;box-shadow:none!important;border-radius:10px!important;padding:8px!important}
 </style>
 <!--studio-unify:start-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap">
@@ -404,7 +418,7 @@ const md=t=>{ const d=new Date(t); return `${d.getMonth()+1}.${d.getDate()}`; };
 let S={v:1, chats:[], folders:[]};
 let UI={active:null, q:'', mode:'one', zero:false, min:false};
 try{ Object.assign(UI, JSON.parse(localStorage.getItem('logs-ui')||'{}')); }catch(e){}
-const saveUI=()=>{ try{ localStorage.setItem('logs-ui',JSON.stringify({active:UI.active,mode:UI.mode,zero:UI.zero,min:UI.min,hideSt:UI.hideSt})); }catch(e){} };
+const saveUI=()=>{ try{ localStorage.setItem('logs-ui',JSON.stringify({active:UI.active,mode:UI.mode,zero:UI.zero,min:UI.min,hideSt:UI.hideSt,part:UI.part})); }catch(e){} };
 function db(){ return new Promise((res,rej)=>{ const r=indexedDB.open('studio-logs',1); r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 async function load(){ try{ const d=await db(); const v=await new Promise(res=>{ const g=d.transaction('kv').objectStore('kv').get('state'); g.onsuccess=()=>res(g.result); g.onerror=()=>res(null); }); d.close(); if(v&&Array.isArray(v.chats)) S=v; }catch(e){ toast('저장소를 열지 못했어요'); } if(!S.folders) S.folders=[]; }
 let _st=null;
@@ -616,7 +630,7 @@ function renderMain(keepScroll){
   const style=(c.dialogueColor?`--dlg:${c.dialogueColor};`:'')+(c.userColor?`--udlg:${c.userColor};`:'');
   M.innerHTML=`<div class="lk-head"><button type="button" class="menu" id="lk-menu" title="채팅 목록">☰</button>
       <div class="tt" id="lk-title" title="채팅 정보 바꾸기"><b>${esc((c.emoji||'💬')+' '+(c.title||'제목 없음'))}</b><small>${turns.length}턴 · ${ymd(c.updatedAt||c.createdAt||now())} 수정</small></div>
-      <button type="button" class="st-tog${UI.hideSt?'':' on'}" id="lk-stTog" title="상태창 보이기/접기"><span class="sw"></span>상태창</button><div class="acts"><button type="button" id="lk-goto" title="턴 번호로 바로 가기">#</button><button type="button" id="lk-bms" title="책갈피 모아 보기">🔖</button><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
+      <button type="button" class="st-tog${UI.hideSt?'':' on'}" id="lk-stTog" title="상태창 보이기/접기"><span class="sw"></span>상태창</button><div class="acts"><button type="button" id="lk-goto" title="턴 번호로 바로 가기">#</button><button type="button" id="lk-bms" title="책갈피 모아 보기">🔖</button><button type="button" id="lk-find" title="로그 안에서 찾기">🔍</button><button type="button" id="lk-copyAll" title="전체 복사">⧉</button><button type="button" id="lk-copyPart" class="cp-part" title="부분 복사 (몇 턴부터 몇 턴까지)">⧉<small>부분</small></button><button type="button" id="lk-txt" title="TXT로 저장">⬇</button><button type="button" id="lk-edit" title="채팅 정보 바꾸기">✎</button><button type="button" id="lk-del" title="채팅 삭제">🗑</button></div></div>
     <div class="lk-sbar" id="lk-sbar"><input type="search" id="lk-sq" placeholder="이 채팅에서 찾기"><span class="cnt" id="lk-scnt"></span><button type="button" id="lk-sprev" title="이전">↑</button><button type="button" id="lk-snext" title="다음">↓</button><button type="button" id="lk-sx" title="닫기">✕</button></div>
     <div class="lk-scroll" id="lk-scroll">${UI.bmView?`<div class="bmv-bar"><span>🔖 <b>책갈피만 모아 보는 중</b> · ${VIEW.length}개</span><button type="button" id="lk-bmExit">전체 로그 보기</button></div>`:''}<div class="lk-turns${UI.hideSt?' hide-st':''}" style="${style}">${VIEW.length?VIEW.map(({t,i})=>`<article class="tn" data-tid="${t.id}"><div class="tn-h"><span class="tn-no" data-no="${t.id}" title="턴 번호 바꾸기">${esc(effNo(c,t,i))}턴</span><button type="button" class="tn-bm${t.bm?' on':''}" data-bm="${t.id}" title="${t.bm?'책갈피 빼기':'책갈피 꽂기'}">${t.bm?'★':'☆'}</button>${t.bm&&t.bmNote?`<span class="tn-bmn">${esc(t.bmNote)}</span>`:''}<span class="sp"></span><span class="tb">${UI.bmView?'<button type="button" data-a="orig">원래 위치로 →</button>':''}<button type="button" data-a="copy">복사</button><button type="button" data-a="edit">수정</button><button type="button" data-a="up" title="위로">↑</button><button type="button" data-a="down" title="아래로">↓</button><button type="button" data-a="merge" title="바로 위 턴에 합치기">↥ 합치기</button>${String(t.raw).includes(CONT)?'<button type="button" data-a="split" title="합쳐진 턴을 다시 나누기">↧ 나누기</button>':''}<button type="button" data-a="del">삭제</button></span></div><div class="tn-body">${renderBlocks(parseTurn(t.raw))}</div></article>`).join(''):`<div class="lk-empty" style="padding:60px 10px"><div class="ic">✍️</div><h2>아직 턴이 없어요</h2><p>아래 칸에 로그를 붙여넣고 <b>추가하기</b>를 눌러 주세요.</p></div>`}</div></div>
     <div class="lk-fab" id="lk-fab"><button type="button" id="lk-goTop" title="맨 위로">▲</button><button type="button" id="lk-goBot" title="맨 아래로">▼</button></div>
@@ -636,6 +650,7 @@ function renderMain(keepScroll){
   $('title').onclick=()=>chatModal(c); $('edit').onclick=()=>chatModal(c);
   $('del').onclick=()=>confirmModal(`'${c.title||'제목 없음'}' 채팅을 삭제할까요?`,`턴 ${turns.length}개가 함께 지워지고 되돌릴 수 없어요.`,'삭제',()=>{ S.chats=S.chats.filter(x=>x.id!==c.id); UI.active=S.chats[0]?S.chats[0].id:null; saveUI(); save(); renderAll(); toast('삭제했어요'); });
   $('copyAll').onclick=()=>copyText(chatTxt(c),'채팅 전체를 복사했어요');
+  $('copyPart').onclick=()=>partModal(c);
   $('txt').onclick=()=>download(fileName(c.title)+'.txt',chatTxt(c));
   if($('bmExit')) $('bmExit').onclick=()=>{ UI.bmView=false; renderAll(); restorePos(c); };
   /* 상태창 접기 칩 */
@@ -733,6 +748,39 @@ function turnAction(c,t,a){
   if(a==='merge'&&i>0){ const pv=c.turns[i-1]; pv.raw=joinCont(pv.raw,t.raw); c.turns.splice(i,1); c.updatedAt=now(); save(); renderMain(true); toast('위 턴과 합쳤어요'); return; }
   if(a==='up'&&i>0){ [c.turns[i-1],c.turns[i]]=[c.turns[i],c.turns[i-1]]; save(); renderMain(true); }
   if(a==='down'&&i<c.turns.length-1){ [c.turns[i+1],c.turns[i]]=[c.turns[i],c.turns[i+1]]; save(); renderMain(true); }
+}
+/* ---------- 부분 복사 ---------- */
+function partTxt(c,a,b,o){
+  const ts=c.turns||[], out=[];
+  ts.forEach((t,i)=>{ const n=+effNo(c,t,i); if(isNaN(n)||n<a||n>b) return;
+    let body=clean(t.raw); if(o.noSt){ const sp=splitStatus(body); if(sp) body=sp.body.trim(); }
+    out.push(o.head?`──── ${n}턴 ────\n${body}`:body); });
+  return {n:out.length, text:out.join('\n\n')};
+}
+function partModal(c){
+  const ts=c.turns||[]; if(!ts.length){ toast('아직 턴이 없어요'); return; }
+  const nums=ts.map((t,i)=>+effNo(c,t,i)).filter(n=>!isNaN(n)); const lo=Math.min(...nums), hi=Math.max(...nums);
+  /* 지금 화면에 보이는 턴을 시작값으로 */
+  let cur=lo; const sc=$('scroll'); if(sc){ const top=sc.getBoundingClientRect().top; const el=[...sc.querySelectorAll('.tn')].find(x=>x.getBoundingClientRect().bottom>top+40); if(el){ const k=ts.findIndex(t=>t.id===el.dataset.tid); if(k>=0&&!isNaN(+effNo(c,ts[k],k))) cur=+effNo(c,ts[k],k); } }
+  const P=UI.part||(UI.part={head:true,noSt:false});
+  modal(`<h3>⧉ 부분 복사</h3><p class="desc">이 채팅은 ${esc(lo)}턴 ~ ${esc(hi)}턴이에요. 복사할 범위를 골라 주세요.</p>
+    <div class="f pr-row"><input type="number" id="lk-pa" value="${cur}" min="${lo}" max="${hi}"><span>턴부터</span><input type="number" id="lk-pb" value="${hi}" min="${lo}" max="${hi}"><span>턴까지</span></div>
+    <div class="pr-quick"><button type="button" data-q="first">처음부터</button><button type="button" data-q="last">끝까지</button><button type="button" data-q="l10">최근 10턴</button><button type="button" data-q="l30">최근 30턴</button></div>
+    <label class="pr-ck"><input type="checkbox" id="lk-ph" ${P.head?'checked':''}> 턴 번호 줄(──── 12턴 ────) 넣기</label>
+    <label class="pr-ck"><input type="checkbox" id="lk-ps" ${P.noSt?'checked':''}> 상태창은 빼고 복사</label>
+    <p class="pr-sum" id="lk-psum"></p>
+    <div class="ft"><button type="button" id="lk-ptxt">TXT로 저장</button><span class="sp"></span><button type="button" id="lk-mc">취소</button><button type="button" class="primary" id="lk-mo">복사</button></div>`);
+  const get=()=>{ let a=parseInt($('pa').value,10), b=parseInt($('pb').value,10); if(isNaN(a)) a=lo; if(isNaN(b)) b=hi; if(a>b) [a,b]=[b,a]; P.head=$('ph').checked; P.noSt=$('ps').checked; saveUI(); return {a,b,r:partTxt(c,a,b,P)}; };
+  const sum=()=>{ const {a,b,r}=get(); $('psum').innerHTML=r.n?`<b>${a}턴 ~ ${b}턴</b> · ${r.n}개 턴 · 약 ${r.text.length.toLocaleString()}자`:'이 범위에는 턴이 없어요'; $('mo').disabled=!r.n; $('ptxt').disabled=!r.n; };
+  ['pa','pb','ph','ps'].forEach(id=>{ $(id).addEventListener('input',sum); $(id).addEventListener('change',sum); });
+  $('md').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ const q=b.dataset.q;
+    if(q==='first') $('pa').value=lo; else if(q==='last') $('pb').value=hi;
+    else { const k=q==='l10'?10:30; const sorted=[...nums].sort((x,y)=>x-y); $('pb').value=hi; $('pa').value=sorted[Math.max(0,sorted.length-k)]; } sum(); });
+  $('mc').onclick=closeModal;
+  $('mo').onclick=()=>{ const {a,b,r}=get(); if(!r.n) return; copyText(r.text,`${a}턴 ~ ${b}턴(${r.n}개)을 복사했어요`); closeModal(); };
+  $('ptxt').onclick=()=>{ const {a,b,r}=get(); if(!r.n) return; download(fileName(c.title)+`_${a}-${b}턴.txt`,r.text); closeModal(); };
+  [$('pa'),$('pb')].forEach(e=>e.onkeydown=ev=>{ if(ev.key==='Enter') $('mo').click(); });
+  sum(); setTimeout(()=>{ const e=$('pa'); if(e){ e.focus(); e.select(); } },30);
 }
 function chatTxt(c){ return [`${c.emoji||''} ${c.title||''}`.trim(),''].concat((c.turns||[]).map((t,i)=>`──── ${effNo(c,t,i)}턴 ────\n${clean(t.raw)}`)).join('\n\n'); }
 const fileName=s=>String(s||'로그').replace(/[\\/:*?"<>|]/g,'_').slice(0,60);

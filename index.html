@@ -413,6 +413,228 @@
   .side .lk-c{margin-left:auto;font-size:11px;letter-spacing:0;color:#b3c0cc;font-weight:400}
   .side .it.lk-more{display:block;width:100%;border:0;background:none;padding:6px 12px 8px 24px;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit;font-size:12.5px;color:#9aa8b6}
   .side .it.lk-more:hover{color:var(--deep)}
+
+  /* ===== 블로그형 홈 ===== */
+  .home-main{max-width:1440px}
+  .deco-btn{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--ln);background:#fff;color:#3a4450;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .deco-btn:hover{background:#f3f7fb}
+  .deco-btn.on{background:var(--deep);border-color:var(--deep);color:#fff}
+  /* 배너 */
+  .bhero{position:relative;border-radius:28px;overflow:hidden;border:1px solid var(--ln);background:#fff;margin-bottom:22px}
+  .bhero-img{position:relative;height:250px;overflow:hidden;background:linear-gradient(160deg,#dff0fd 0%,#c4e1f8 45%,#e9f4fd 100%)}
+  .bhero-img img.dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .bhero-def{position:absolute;inset:0}
+  .bhero-img.has .bhero-def{display:none}
+  .bhero-def i{position:absolute;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 10%,rgba(255,255,255,.4) 24%,rgba(191,224,250,.55) 55%,rgba(140,196,240,.35) 80%);box-shadow:inset -4px -6px 14px rgba(120,170,220,.2)}
+  .bhero-def i:nth-child(1){width:120px;height:120px;left:8%;top:30px}
+  .bhero-def i:nth-child(2){width:54px;height:54px;left:22%;top:150px}
+  .bhero-def i:nth-child(3){width:170px;height:170px;right:7%;top:-30px}
+  .bhero-def i:nth-child(4){width:70px;height:70px;right:24%;top:140px}
+  .bhero-def i:nth-child(5){width:36px;height:36px;left:46%;top:24px}
+  .bhero-lbl{position:absolute;left:50%;top:125px;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 34px 14px;background:rgba(255,255,255,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 8px 28px rgba(40,80,120,.12),inset 0 0 0 4px rgba(255,255,255,.5);max-width:80%;text-align:center}
+  .bhero-lbl b{font-family:var(--en);font-size:30px;font-weight:700;letter-spacing:-.5px;color:#1d2430;line-height:1.1}
+  .bhero-lbl small{font-family:var(--en);font-size:12px;letter-spacing:.18em;color:#7a8ea2;text-transform:uppercase}
+  .bhero-nav{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;padding:10px 12px;border-top:1px solid var(--ln);background:#fbfdff}
+  .bhero-nav a{padding:6px 14px;border-radius:999px;font-family:var(--en);font-size:13px;font-weight:600;color:#5b6d80;text-decoration:none;letter-spacing:.02em}
+  .bhero-nav a:hover{background:var(--soft);color:var(--deep)}
+  .bhero-nav a.on{background:var(--deep);color:#fff}
+  /* 3단 */
+  .blog{display:grid;grid-template-columns:280px minmax(0,1fr) 300px;gap:22px;align-items:start}
+  .bcol{display:flex;flex-direction:column;gap:22px;min-width:0}
+  .blog .w{min-height:0;padding:20px 22px;border-radius:22px}
+  .blog .wh{margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #dbe6f0}
+  /* 프로필 */
+  .pf-top{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+  .pf-av{position:relative;flex:none;width:84px;height:84px;border-radius:50%;overflow:hidden;background:var(--soft);display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 0 0 1px var(--ln)}
+  .pf-av img.dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .pf-av.has .bub{display:none}
+  .bub.big{width:44px;height:44px}
+  .pf-tx{min-width:0}
+  .pf-tx b{display:block;font-size:16px;font-weight:700;color:#1d2430}
+  .pf-tx p{margin:4px 0 0;font-size:13px;line-height:1.55;color:#6b7785;white-space:pre-wrap}
+  .kv{display:flex;flex-direction:column}
+  .kv-r{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px dotted #e3ebf2;font-size:13px}
+  .kv-r:last-of-type{border-bottom:0}
+  .kv-r .k{flex:none;min-width:64px;font-family:var(--en);font-weight:700;color:var(--deep);font-size:12.5px}
+  .kv-r .v{flex:1;min-width:0;color:#3a4450;word-break:keep-all}
+  .kv-x{border:0;background:none;color:#b3c0cc;cursor:pointer;font-size:11px;padding:0 2px}
+  .kv-x:hover{color:#c0594b}
+  .kv-add{margin-top:8px;border:1px dashed #c9ddef;background:transparent;color:var(--deep);border-radius:10px;padding:6px;font-size:12px;cursor:pointer}
+  /* 글 */
+  .post .post-date{margin-left:auto;font-family:var(--en);font-size:12px;color:#a3b0bd}
+  .post-img{position:relative;height:300px;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(45deg,#f3f8fd 0 12px,#eef5fc 12px 24px);margin-bottom:16px;display:flex;align-items:center;justify-content:center}
+  .post-img::before{content:"사진 넣기를 눌러 메인 사진을 골라 주세요";font-size:13px;color:#9aabbb}
+  .post-img.has::before{display:none}
+  .post-img img.dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .post h3{margin:0 0 8px;font-size:19px;color:#1d2430}
+  .post-body{font-size:14px;line-height:1.8;color:#4a5563;white-space:pre-wrap;min-height:1.8em}
+  .post-sign{display:flex;align-items:baseline;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:10px;border-top:1px dashed #e3ebf2}
+  .post-sign span{font-family:var(--en);font-size:10.5px;letter-spacing:.16em;color:#a3b0bd;text-transform:uppercase}
+  .post-sign b{font-family:var(--en);font-size:15px;font-style:italic;color:var(--deep)}
+  .sc-card .scs{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+  /* 달력 */
+  .cal-nav{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--en);font-size:12.5px;font-weight:600;color:#5b6d80}
+  .cal-nav button{width:24px;height:24px;border:1px solid var(--ln);background:#fff;border-radius:7px;color:#5b6d80;cursor:pointer;padding:0;line-height:1}
+  .cal-nav button:hover{background:var(--soft)}
+  .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-family:var(--en);font-size:12.5px}
+  .cal-g span{padding:5px 0;border-radius:8px;color:#4a5563}
+  .cal-g .dw{font-size:10.5px;font-weight:700;color:#a3b0bd}
+  .cal-g .su{color:#d08a8a} .cal-g .sa{color:#6f9fd0}
+  .cal-g .cd.today{background:var(--deep);color:#fff;font-weight:700}
+  .cal-g .cd.ev{position:relative;font-weight:700}
+  .cal-g .cd.ev::after{content:"";position:absolute;left:50%;bottom:1px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#e58fa6}
+  .cal-g .cd.today.ev::after{background:#fff}
+  .cal-ev{margin-top:10px;display:flex;flex-direction:column;gap:4px;font-size:12px;color:#5b6d80}
+  .cal-ev b{display:inline-block;min-width:38px;font-family:var(--en);color:#e07893;margin-right:4px}
+  .cal-ev .none{color:#a3b0bd}
+  .br .dds{grid-template-columns:1fr}
+  .br .dd{padding:10px 12px 10px 10px}
+  .br .ddp{width:52px;height:52px;border-radius:14px}
+  .br .lks{grid-template-columns:1fr}
+  /* 꾸미기 모드 */
+  .decor .ed.is-def{color:#a3b0bd!important}
+  .decor .ed{outline:1.5px dashed #9cc8ee;outline-offset:3px;border-radius:6px;cursor:text;min-width:40px}
+  .decor .ed:focus{outline:2px solid #5a9fd8;background:rgba(255,255,255,.6)}
+  .decor .kv-r .k,.decor .kv-r .v{outline:1px dashed #c9ddef;outline-offset:2px;border-radius:4px;cursor:text}
+  .img-tools{position:absolute;right:12px;bottom:12px;display:flex;gap:6px;z-index:3}
+  .img-tools:empty{display:none}
+  .img-tools button{white-space:nowrap;border:0;background:rgba(255,255,255,.94);color:#2f6ea6;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+  .pf-avw{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .img-tools.mini{position:static;flex-direction:column;gap:3px}
+  .img-tools.mini button{padding:3px 9px;font-size:10.5px;white-space:nowrap;box-shadow:none;border:1px solid #d6e2ee}
+  .decor .bhero-img,.decor .post-img{outline:2px dashed #9cc8ee;outline-offset:-6px}
+  .posing{cursor:grab;outline:3px solid #5a9fd8!important;outline-offset:-3px}
+  .posing:active{cursor:grabbing}
+  .posing .img-tools{display:none}
+  @media (max-width:1280px){ .blog{grid-template-columns:260px minmax(0,1fr)} .br{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;align-items:start} }
+  .blog .w{margin:0}
+  @media (max-width:860px){ .blog,.bcol,.br{gap:14px!important} .bhero{margin-bottom:14px} .bhero-nav{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none} .bhero-nav a{flex:none} .blog{grid-template-columns:minmax(0,1fr)} .bhero-img{height:180px} .bhero-lbl{top:90px;padding:12px 22px} .bhero-lbl b{font-size:22px} .post-img{height:210px} .deco-btn{height:36px;padding:0 12px;font-size:12.5px} }
+
+  /* 블럭 격자 (고른 블럭만, 고른 순서대로) */
+  .blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start;grid-auto-flow:dense}
+  .blocks>[data-blk="note"],.blocks>[data-blk="short"],.blocks>[data-blk="gal"]{grid-column:span 2}
+  .blocks .w{position:relative;min-height:0;padding:20px 22px;border-radius:22px;margin:0}
+  .blocks .wh{margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #dbe6f0}
+  .blocks .dds,.blocks .lks{grid-template-columns:1fr}
+  .blocks [data-blk="dday"] .dd{padding:10px 12px 10px 10px}
+  .blocks [data-blk="dday"] .ddp{width:52px;height:52px;border-radius:14px}
+  .memo-tx{width:100%;box-sizing:border-box;min-height:180px;border:0;background:repeating-linear-gradient(transparent 0 27px,#eef3f8 27px 28px);font:inherit;font-size:14px;line-height:28px;color:#3a4450;resize:vertical;outline:none;padding:0 2px}
+  .gal-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .gal-g a{aspect-ratio:1;border-radius:14px;background:var(--soft) center/cover no-repeat;transition:transform .15s}
+  .gal-g a:hover{transform:scale(1.03)}
+  .gal-g .empty2{grid-column:1/-1}
+  .blk-tools{position:absolute;top:-14px;right:14px;z-index:4;display:flex;align-items:center;gap:3px;background:#fff;border:1px solid #c9ddef;border-radius:999px;padding:3px 4px 3px 10px;box-shadow:0 4px 12px rgba(30,60,90,.1)}
+  .blk-tools span{font-size:11.5px;font-weight:700;color:var(--deep);margin-right:4px}
+  .blk-tools button{border:0;background:transparent;border-radius:999px;padding:3px 8px;font-size:11px;color:#5b6d80;cursor:pointer}
+  .blk-tools button:hover:not(:disabled){background:var(--soft);color:var(--deep)}
+  .blk-tools button:disabled{opacity:.3}
+  .blk-tools button[data-m="x"]{color:#c0594b}
+  .decor .blocks>.w{outline:2px dashed #c9ddef;outline-offset:3px}
+  .blk-add{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:22px;padding:14px 18px;border:2px dashed #c9ddef;border-radius:20px;background:#fbfdff}
+  .blk-add .lb{font-size:13px;font-weight:700;color:var(--deep);margin-right:6px}
+  .blk-add button{border:1px solid #cfe2f3;background:#fff;color:var(--deep);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .blk-add button:hover{background:var(--soft)}
+  .blk-add .none{font-size:12.5px;color:#9aa8b6}
+  .decor .blocks{padding-top:10px}
+  @media (max-width:1100px){ .blocks{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:860px){ .blocks{grid-template-columns:minmax(0,1fr);gap:14px} .blocks>[data-blk]{grid-column:auto!important} .gal-g{grid-template-columns:repeat(3,1fr)} }
+
+  /* 갤러리 블럭 (모자이크) */
+  .gal-g{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(0,1fr);gap:8px}
+  .gal-g .gt{position:relative;display:block;aspect-ratio:1;border-radius:16px;overflow:hidden;background:var(--soft);box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+  .gal-g .gt.big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+  .gal-g .gi{position:absolute;inset:0;background:center/cover no-repeat;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+  .gal-g .gt:hover .gi{transform:scale(1.06)}
+  .gal-g .gt::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(20,35,55,.45));opacity:0;transition:opacity .2s}
+  .gal-g .gt:hover::after{opacity:1}
+  .gal-g .gc{position:absolute;left:10px;right:10px;bottom:8px;z-index:2;color:#fff;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(4px);transition:.2s}
+  .gal-g .gt:hover .gc{opacity:1;transform:none}
+  .gal-g .gm{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;background:rgba(30,50,75,.45);color:#fff;font-family:var(--en);font-size:20px;font-weight:700;backdrop-filter:blur(2px)}
+  .gal-g.n1{grid-template-columns:1fr} .gal-g.n1 .gt.big{grid-column:auto;grid-row:auto;aspect-ratio:16/9}
+  .gal-g.n2{grid-template-columns:1fr 1fr} .gal-g.n2 .gt.big{grid-column:auto;grid-row:auto;aspect-ratio:1}
+  .gal-g.n3{grid-template-columns:2fr 1fr} .gal-g.n3 .gt.big{grid-column:1;grid-row:span 2}
+  .gal-g.n4{grid-template-columns:2fr 1fr 1fr} .gal-g.n4 .gt.big{grid-column:1;grid-row:span 2} .gal-g.n4 .gt:nth-child(4){grid-column:span 2;aspect-ratio:2/1}
+  /* 음악 */
+  .blocks>[data-blk="music"]{grid-column:span 2}
+  .mu-now{display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px;align-items:center}
+  /* CD */
+  .mu-cd{position:relative;width:270px;height:180px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .mu-sleeve{position:absolute;left:0;top:0;width:180px;height:180px;border-radius:6px;overflow:hidden;z-index:3;background:linear-gradient(135deg,#d6ebfb,#a9d2f3);box-shadow:0 10px 24px rgba(40,90,140,.22),0 2px 4px rgba(40,90,140,.12);transition:transform .35s}
+  .mu-sleeve img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .mu-sleeve .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px;color:#fff;text-shadow:0 2px 8px rgba(40,90,140,.25)}
+  .mu-sleeve::before{content:"";position:absolute;left:0;top:0;bottom:0;width:13px;z-index:2;background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.15) 60%,rgba(0,0,0,.08));border-right:1px solid rgba(255,255,255,.5)}
+  .mu-sleeve::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(125deg,rgba(255,255,255,.42) 0,rgba(255,255,255,.08) 38%,transparent 39%,transparent 100%);pointer-events:none}
+  .mu-cd:hover .mu-sleeve{transform:translateY(-2px)}
+  .mu-disc{position:absolute;left:28px;top:6px;width:168px;height:168px;border-radius:50%;z-index:2;transition:left .6s cubic-bezier(.3,1.3,.5,1);
+    background:radial-gradient(circle at 50% 50%,transparent 0 31%,rgba(255,255,255,.7) 31% 32%,transparent 32% 96%,rgba(255,255,255,.9) 96%),
+      repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,0) 0 2px,rgba(255,255,255,.18) 2px 3px),
+      conic-gradient(from 20deg,#e6f1fb,#bfdcf5 12%,#f4f9ff 22%,#cfe4f8 34%,#e9dcf7 44%,#d3ecf7 52%,#f6fbff 62%,#b9d8f3 74%,#e2f0fb 86%,#e6f1fb);
+    box-shadow:0 6px 18px rgba(40,90,140,.22),inset 0 0 0 1px rgba(120,160,200,.25)}
+  .mu-cd.has .mu-disc{left:44px}
+  .mu-playing .mu-cd .mu-disc{left:96px}
+  .mu-disc .lb{position:absolute;left:50%;top:50%;width:38%;height:38%;margin:-19% 0 0 -19%;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#7fb6e6,#4d8ccc);animation:muSpin 4s linear infinite;animation-play-state:paused}
+  .mu-disc .lb img{width:100%;height:100%;object-fit:cover;display:block}
+  .mu-disc .lb::after{content:"";position:absolute;left:50%;top:50%;width:22%;height:22%;margin:-11% 0 0 -11%;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 2px #dbe9f6}
+  .mu-disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 8%,rgba(255,255,255,.55) 12%,transparent 18% 55%,rgba(255,255,255,.45) 61%,transparent 67%);animation:muSpin 4s linear infinite reverse;animation-play-state:paused;mix-blend-mode:screen}
+  .mu-playing .mu-cd .mu-disc .lb,.mu-playing .mu-cd .mu-disc::after{animation-play-state:running}
+  @keyframes muSpin{to{transform:rotate(360deg)}}
+  .mu-screen{position:absolute;left:2px;top:2px;width:176px;height:176px;z-index:1;opacity:0;pointer-events:none;border-radius:6px;overflow:hidden;background:#000;transition:opacity .25s}
+  .mu-screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .mu-cd.vid{cursor:default}
+  .mu-cd.vid .mu-screen{left:0;top:0;width:270px;height:180px;z-index:5;opacity:1;pointer-events:auto;border-radius:14px}
+  .mu-vbtn{margin-left:8px;border:1px solid var(--ln);background:#fff;color:#8ea2b5;border-radius:999px;padding:3px 11px;font-size:11.5px;font-weight:700;cursor:pointer}
+  .mu-vbtn:hover,.mu-vbtn.on{color:var(--deep);border-color:#9cc8ee;background:var(--soft)}
+  .mu-list .md{position:relative;width:38px;height:38px;border-radius:50%;flex:none;overflow:hidden;background:conic-gradient(#e6f1fb,#c4def5,#f4f9ff,#d6e2f7,#e6f1fb);box-shadow:inset 0 0 0 1px rgba(120,160,200,.3)}
+  .mu-list .md img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .mu-list .md::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.5),inset 0 0 0 1px #dbe9f6}
+  .mu-playing .mu-list li.on .md{animation:muSpin 4s linear infinite}
+  .mu-info{min-width:0;display:flex;flex-direction:column;gap:4px}
+  .mu-info b{font-size:16px;color:#1d2430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mu-info small{font-size:12.5px;color:#8ea2b5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mu-bar{display:flex;align-items:center;gap:8px;margin-top:8px;font-family:var(--en);font-size:11.5px;color:#8ea2b5}
+  .mu-bar input{flex:1}
+  .mu-ctl{display:flex;align-items:center;gap:6px;margin-top:4px}
+  .mu-ctl button{position:relative;width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:#4a5563;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .mu-ctl button:hover{background:var(--soft);color:var(--deep)}
+  .mu-ctl button.pp{width:46px;height:46px;background:var(--deep);color:#fff}
+  .mu-ctl button.pp:hover{background:#356fa3;color:#fff}
+  .mu-ctl button.sm{width:32px;height:32px;color:#a3b0bd}
+  .mu-ctl button.sm.on{color:var(--deep)}
+  .mu-ctl button i{position:absolute;right:3px;bottom:3px;font-style:normal;font-size:9px;font-weight:800}
+  .mu-ctl svg,.mu-vol svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .mu-ctl .pp svg{width:20px;height:20px}
+  .mu-vol{margin-left:auto;display:flex;align-items:center;gap:6px;color:#a3b0bd}
+  .mu-vol input{width:90px}
+  .mu-bar input[type=range],.mu-vol input[type=range]{accent-color:var(--deep);height:4px}
+  .mu-add{display:flex;gap:8px;margin:16px 0 10px}
+  .mu-add input{flex:1;min-width:0;border:1px solid var(--ln);border-radius:12px;padding:9px 12px;font-size:13.5px;outline:none}
+  .mu-add input:focus{border-color:#9cc8ee}
+  .mu-add button{border:0;background:var(--soft);color:var(--deep);border-radius:12px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .mu-list{list-style:none;margin:0;padding:0;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+  .mu-list li{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:12px;cursor:pointer}
+  .mu-list li:hover{background:#f5f9fd}
+  .mu-list li.on{background:var(--soft)}
+  .mu-list li.on b{color:var(--deep)}
+  .mu-list li.none{color:#a3b0bd;font-size:13px;cursor:default;justify-content:center;padding:14px}
+  .mu-list .t{flex:1;min-width:0;display:flex;flex-direction:column}
+  .mu-list .t b{font-size:13px;font-weight:600;color:#2a323d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mu-list .t small{font-size:11px;color:#9aa8b6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mu-list .ac{display:flex;gap:2px;opacity:0;transition:opacity .15s}
+  .mu-list li:hover .ac{opacity:1}
+  @media (hover:none){ .mu-list .ac{opacity:1} }
+  .mu-list .ac button{width:24px;height:24px;border:0;background:transparent;border-radius:6px;color:#9aa8b6;font-size:10px;cursor:pointer;padding:0}
+  .mu-list .ac button:hover{background:#fff;color:var(--deep)}
+  .mu-auto{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:#8ea2b5}
+  .mu-cnt{margin-left:auto;font-family:var(--en);font-size:12px;color:#a3b0bd}
+  .mu-mini{position:fixed;right:22px;bottom:22px;z-index:55;display:none;align-items:center;gap:10px;max-width:min(360px,calc(100vw - 44px));background:#fff;border:1px solid #c9ddef;border-radius:999px;padding:7px 8px 7px 16px;box-shadow:0 10px 30px rgba(30,60,90,.18)}
+  .mu-mini.on{display:flex}
+  .mu-mini b{flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:#2a323d}
+  .mu-mini button{width:32px;height:32px;border-radius:50%;border:0;background:var(--soft);color:var(--deep);cursor:pointer;font-size:11px;flex:none}
+  .mu-mini .eq{display:flex;align-items:flex-end;gap:2px;height:14px;flex:none}
+  .mu-mini .eq i{width:3px;background:var(--deep);border-radius:2px;animation:eq 1s ease-in-out infinite}
+  .mu-mini .eq i:nth-child(2){animation-delay:.2s} .mu-mini .eq i:nth-child(3){animation-delay:.4s}
+  @keyframes eq{0%,100%{height:4px}50%{height:14px}}
+  @media (max-width:860px){ .mu-now{grid-template-columns:1fr} .mu-cd{margin:0 auto} .mu-vol input{width:70px} }
 </style>
 </head>
 <body>
@@ -432,14 +654,27 @@
     <div class="topbar2">
       <h1>홈</h1><span class="m-brand"><span class="bub" aria-hidden="true"></span>Log Studio</span>
       <span class="sp"></span>
+      <button type="button" class="deco-btn" id="home-decoBtn" title="배너·사진·글 꾸미기">✎ 꾸미기</button>
       <button type="button" class="rbtn" id="home-editBtn" title="바로가기 순서 바꾸기"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>
       <button type="button" class="rbtn" id="home-cloud" title="GitHub 동기화" style="display:none"><svg viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9a4 4 0 0 1 0 9z"/><path d="M12 12v5M9.5 14.5 12 12l2.5 2.5"/></svg><i class="cdot" id="home-cdot"></i></button>
       <button type="button" class="rbtn" id="home-gear" title="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     </div>
 
     <div class="sync-banner" id="home-syncBanner" style="display:none"><span id="home-syncBannerTx">다른 기기에서 올린 새 백업이 있어요.</span><button type="button" class="pill blue" id="home-syncBannerGo">☁ 받아오기</button><button type="button" class="x" id="home-syncBannerX" title="닫기">✕</button></div>
-    <div class="dash">
-      <section class="w s3 short">
+    <!-- 배너 -->
+    <div class="bhero" id="home-hero">
+      <div class="bhero-img" id="home-bannerBox"><span class="bhero-def" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><div class="img-tools" data-img="banner"></div></div>
+      <div class="bhero-nav" id="home-heroNav"></div>
+    </div>
+
+    <div class="blocks" id="home-blocks">
+        <section class="w card post" data-blk="note">
+          <div class="wh"><h2 class="ed" data-k="postH" data-def="NOTE"></h2><span class="post-date" id="home-postDate"></span></div>
+          <div class="post-img" id="home-mainBox"><div class="img-tools" data-img="main"></div></div>
+          <h3 class="ed" data-k="postT" data-def="어서 와요!"></h3>
+          <div class="ed ml post-body" data-k="postB" data-def="오른쪽 위 ✎ 꾸미기를 누르면 배너와 이 글·사진을 바꾸고, 홈에 띄울 블럭도 고를 수 있어요."></div>
+        </section>
+      <section class="w card short sc-card" data-blk="short">
         <div class="wh"><h2>SHORTCUTS</h2></div>
         <div class="scs" id="home-scs">
           <a class="sc" data-ed="bubble" data-grp="create" data-nm="말풍선 만들기" href="bubble.html"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><span>말풍선</span></a>
@@ -453,20 +688,54 @@
         </div>
         <div class="edit-note" id="home-editNote">끌어다 놓거나 ◀ ▶ 버튼으로 순서를 바꿔요. 다 바꿨으면 오른쪽 위 버튼을 한 번 더 눌러 주세요.</div>
       </section>
-
-
-      <section class="w s3">
-        <div class="wh"><h2>D-DAY</h2><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
-        <div id="home-dday" style="flex:1;display:flex;flex-direction:column"></div>
-      </section>
-
-
-      <section class="w s3">
-        <div class="wh"><h2>LINKS</h2><button type="button" class="more" id="home-lkAdd">＋ 링크 추가</button></div>
-        <div class="lks" id="home-lks"></div>
-      </section>
-
-
+        <section class="w card cal" data-blk="cal">
+          <div class="wh"><h2>CALENDAR</h2><span class="cal-nav"><button type="button" id="home-calPrev" title="이전 달">‹</button><span id="home-calM"></span><button type="button" id="home-calNext" title="다음 달">›</button></span></div>
+          <div class="cal-g" id="home-cal"></div>
+          <div class="cal-ev" id="home-calEv"></div>
+        </section>
+        <section class="w card" data-blk="dday">
+          <div class="wh"><h2>D-DAY</h2><a class="more" href="vault.html#tab=pair" data-link>페어 전체</a></div>
+          <div id="home-dday" style="display:flex;flex-direction:column"></div>
+        </section>
+        <section class="w card" data-blk="links">
+          <div class="wh"><h2>LINKS</h2><button type="button" class="more" id="home-lkAdd">＋ 링크 추가</button></div>
+          <div class="lks" id="home-lks"></div>
+        </section>
+        <section class="w card memo" data-blk="memo">
+          <div class="wh"><h2 class="ed" data-k="memoH" data-def="MEMO"></h2></div>
+          <textarea class="memo-tx" id="home-memo" placeholder="생각나는 걸 적어두세요. 자동으로 저장돼요."></textarea>
+        </section>
+        <section class="w card music" data-blk="music">
+          <div class="wh"><h2>MUSIC</h2><span class="mu-cnt" id="home-muCnt"></span><button type="button" class="mu-vbtn" id="home-muVid" title="영상 보기">영상</button></div>
+          <div class="mu-now">
+            <div class="mu-cd" id="home-muCd" title="재생 / 일시정지">
+              <div class="mu-screen" id="home-muScreen"></div>
+              <div class="mu-disc"><span class="lb" id="home-muLabel"></span></div>
+              <div class="mu-sleeve" id="home-muCover"><span class="ph">♪</span></div>
+            </div>
+            <div class="mu-info">
+              <b id="home-muTitle">재생목록이 비어 있어요</b><small id="home-muSub">아래 칸에 유튜브 링크를 붙여넣어 보세요</small>
+              <div class="mu-bar"><span id="home-muCur">0:00</span><input type="range" id="home-muSeek" min="0" max="1000" value="0" aria-label="재생 위치"><span id="home-muDur">0:00</span></div>
+              <div class="mu-ctl">
+                <button type="button" id="home-muShuf" class="sm" title="섞어 듣기"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+                <button type="button" id="home-muPrev" title="이전 곡"><svg viewBox="0 0 24 24"><path d="M19 20 9 12l10-8z" fill="currentColor"/><path d="M5 19V5"/></svg></button>
+                <button type="button" id="home-muPlay" class="pp" title="재생"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></svg></button>
+                <button type="button" id="home-muNext" title="다음 곡"><svg viewBox="0 0 24 24"><path d="m5 4 10 8-10 8z" fill="currentColor"/><path d="M19 5v14"/></svg></button>
+                <button type="button" id="home-muRep" class="sm" title="반복"><svg viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg><i id="home-muRep1">1</i></button>
+                <span class="mu-vol"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg><input type="range" id="home-muVol" min="0" max="100" value="60" aria-label="소리 크기"></span>
+              </div>
+            </div>
+          </div>
+          <div class="mu-add"><input type="text" id="home-muUrl" placeholder="유튜브(뮤직) 링크 붙여넣기" autocomplete="off" spellcheck="false"><button type="button" id="home-muAdd">＋ 추가</button></div>
+          <ol class="mu-list" id="home-muList"></ol>
+          <label class="mu-auto"><input type="checkbox" id="home-muAuto"> 홈을 열고 아무 곳이나 처음 누르면 자동 재생</label>
+        </section>
+        <section class="w card gal" data-blk="gal">
+          <div class="wh"><h2>GALLERY</h2><a class="more" href="vault.html#tab=gallery" data-link>갤러리 전체</a></div>
+          <div class="gal-g" id="home-gal"></div>
+        </section>
+    </div>
+    <div class="blk-add" id="home-blkAdd"></div>
     </div>
   </div>
 </div>
@@ -537,7 +806,7 @@ const CFG=window.HOME_CFG||{newTab:true};
 const home=document.getElementById('view-home');
 if(!home) return;
 const PREF_KEY='studio-home';
-const STUDIO_RE=/^(logbubble-|log-editor-|report-editor-|maker|studioStatusExport$|studio-home$|studioTouch:|vault-|collage-settings)/;
+const STUDIO_RE=/^(logbubble-|log-editor-|report-editor-|maker|studioStatusExport$|studio-home$|studio-home-img-|studioTouch:|vault-|collage-settings)/;
 const $h=id=>document.getElementById('home-'+id);
 let P={sort:'default', order:[], open:'new'};
 try{ Object.assign(P, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch(e){}
@@ -663,11 +932,11 @@ async function loadVault(){
   await new Promise(res=>{
     try{
       const t=d.transaction(['kv'],'readonly'); const g=t.objectStore('kv').get('data');
-      g.onsuccess=()=>{ const v=g.result||{}; V.personas=v.personas||[]; V.prompts=v.prompts||[]; V.pairs=v.pairs||[]; };
+      g.onsuccess=()=>{ const v=g.result||{}; V.personas=v.personas||[]; V.prompts=v.prompts||[]; V.pairs=v.pairs||[]; V.gallery=(v.gallery||[]).slice().sort((a,b)=>(b.created||0)-(a.created||0)); };
       t.oncomplete=()=>res(); t.onerror=()=>res();
     }catch(e){ res(); }
   });
-  const ids=new Set(); ddPairs().forEach(r=>pairImgs(r).forEach(id=>id&&ids.add(id)));
+  const ids=new Set(); ddPairs().forEach(r=>pairImgs(r).forEach(id=>id&&ids.add(id))); (V.gallery||[]).slice(0,8).forEach(g=>g.img&&ids.add(g.img));
   const need=[...ids].filter(id=>!(id in V.img));
   if(need.length) await new Promise(res=>{
     try{ const t=d.transaction('img','readonly'), st=t.objectStore('img');
@@ -748,7 +1017,7 @@ function paintDday(){
   applyOpen();
 }
 function paintWidgets(){
-  paintSide(); paintDday();
+  paintSide(); paintDday(); if(typeof paintCal==='function') paintCal(); if(typeof paintGal==='function') paintGal();
 }
 async function copyText(t,msg){
   try{ await navigator.clipboard.writeText(t); toastH(msg); }
@@ -975,6 +1244,246 @@ if($h('syncConn')){
   $h('syncBannerX').onclick=()=>{ $h('syncBanner').style.display='none'; };
   paintSync(); syncCheck();
 }
+
+
+/* ---------- 홈 꾸미기: 배너 · 프로필 · 글 · 사진 (블로그형) ---------- */
+const IMG_KEY=k=>'studio-home-img-'+k;
+if(!P.deco) P.deco={};
+const DECO=P.deco;
+let decoOn=false;
+const decoImg=k=>get(IMG_KEY(k));
+
+/* 글자 칸 */
+function paintTexts(){
+  home.querySelectorAll('.ed[data-k]').forEach(el=>{
+    const k=el.dataset.k, v=DECO[k];
+    if(document.activeElement===el) return;
+    el.textContent=(v!=null&&v!=='')?v:el.dataset.def.replace(/&amp;/g,'&');
+    el.classList.toggle('is-def',!(v!=null&&v!==''));
+    el.contentEditable=decoOn?'plaintext-only':'false';
+    if(decoOn&&el.contentEditable!=='plaintext-only') el.contentEditable='true';
+  });
+}
+home.addEventListener('input',e=>{ const el=e.target.closest&&e.target.closest('.ed[data-k]'); if(!el||!decoOn) return; DECO[el.dataset.k]=el.innerText.replace(/\n{3,}/g,'\n\n').trim(); el.classList.remove('is-def'); savePref(); });
+home.addEventListener('keydown',e=>{ const el=e.target.closest&&e.target.closest('.ed[data-k]'); if(!el) return; if(e.key==='Enter'&&!el.classList.contains('ml')){ e.preventDefault(); el.blur(); } });
+home.addEventListener('focusin',e=>{ const el=e.target.closest&&e.target.closest('.ed[data-k]'); if(el&&decoOn&&el.classList.contains('is-def')){ el.textContent=''; } });
+home.addEventListener('focusout',e=>{ const el=e.target.closest&&e.target.closest('.ed[data-k]'); if(el) setTimeout(paintTexts,0); });
+
+/* 사진 (배너 · 프로필 · 글 사진) */
+const IMG_SPEC={banner:{max:1800,box:'bannerBox'},main:{max:1300,box:'mainBox'}};
+function paintImgs(){
+  Object.entries(IMG_SPEC).forEach(([k,sp])=>{
+    const box=$h(sp.box); if(!box) return; const src=decoImg(k);
+    let im=box.querySelector(':scope > img.dimg');
+    if(src){ if(!im){ im=document.createElement('img'); im.className='dimg'; im.alt=''; box.prepend(im); } if(im.getAttribute('src')!==src) im.src=src; im.style.objectPosition=DECO[k+'Pos']||'50% 50%'; }
+    else if(im) im.remove();
+    box.classList.toggle('has',!!src);
+  });
+  home.querySelectorAll('.img-tools[data-img]').forEach(t=>{
+    const k=t.dataset.img, has=!!decoImg(k);
+    t.innerHTML=decoOn?`<button type="button" data-a="pick">${has?'사진 바꾸기':'사진 넣기'}</button>${has?'<button type="button" data-a="pos" title="사진을 끌어서 보이는 부분 맞추기">✥ 위치</button>':''}${has?'<button type="button" data-a="rm">지우기</button>':''}`:'';
+    t.querySelectorAll('button').forEach(b=>b.onclick=e=>{ e.stopPropagation(); imgAct(k,b.dataset.a); });
+  });
+  const mb=$h('mainBox'); if(mb) mb.style.display=(decoImg('main')||decoOn)?'':'none';
+}
+function shrinkImg(file,max){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>{ const im=new Image(); im.onload=()=>{ const r=Math.min(1,max/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.round(im.width*r); c.height=Math.round(im.height*r); const x=c.getContext('2d'); x.drawImage(im,0,0,c.width,c.height);
+  let out=c.toDataURL('image/jpeg',.86); if(/png|gif|webp/.test(file.type)){ const png=c.toDataURL('image/png'); if(png.length<out.length*1.3) out=png; } res(out); }; im.onerror=rej; im.src=fr.result; }; fr.onerror=rej; fr.readAsDataURL(file); }); }
+function imgAct(k,a){
+  if(a==='rm'){ try{ localStorage.removeItem(IMG_KEY(k)); }catch(e){} delete DECO[k+'Pos']; savePref(); paintImgs(); return; }
+  if(a==='pos'){ startPos(k); return; }
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return;
+    try{ const d=await shrinkImg(f,IMG_SPEC[k].max); localStorage.setItem(IMG_KEY(k),d); DECO[k+'Pos']='50% 50%'; savePref(); paintImgs(); toastH('사진을 넣었어요'); }
+    catch(e){ toastH('사진을 넣지 못했어요. 저장 공간이 부족하면 더 작은 사진으로 해 보세요.'); } };
+  inp.click();
+}
+/* 끌어서 보이는 부분 맞추기 */
+function startPos(k){
+  const box=$h(IMG_SPEC[k].box), im=box&&box.querySelector('img.dimg'); if(!im) return;
+  box.classList.add('posing'); toastH('사진을 끌어서 맞춘 뒤 바깥을 누르면 끝나요');
+  let [px,py]=(DECO[k+'Pos']||'50% 50%').split(' ').map(v=>parseFloat(v));
+  let st=null;
+  const down=e=>{ e.preventDefault(); st={x:e.clientX,y:e.clientY,px,py}; box.setPointerCapture(e.pointerId); };
+  const move=e=>{ if(!st) return; const r=box.getBoundingClientRect(), nw=im.naturalWidth, nh=im.naturalHeight, sc=Math.max(r.width/nw,r.height/nh), ox=nw*sc-r.width, oy=nh*sc-r.height;
+    if(ox>1) px=Math.min(100,Math.max(0,st.px-(e.clientX-st.x)/ox*100)); if(oy>1) py=Math.min(100,Math.max(0,st.py-(e.clientY-st.y)/oy*100));
+    im.style.objectPosition=`${px.toFixed(1)}% ${py.toFixed(1)}%`; };
+  const up=()=>{ st=null; };
+  const done=e=>{ if(e&&box.contains(e.target)) return; box.classList.remove('posing'); DECO[k+'Pos']=`${px.toFixed(1)}% ${py.toFixed(1)}%`; savePref();
+    box.removeEventListener('pointerdown',down); box.removeEventListener('pointermove',move); box.removeEventListener('pointerup',up); document.removeEventListener('pointerdown',done,true); };
+  box.addEventListener('pointerdown',down); box.addEventListener('pointermove',move); box.addEventListener('pointerup',up);
+  setTimeout(()=>document.addEventListener('pointerdown',done,true),0);
+}
+
+/* 배너 아래 바로가기 */
+function paintHeroNav(){
+  const nav=$h('heroNav'); if(!nav) return;
+  const vh='vault.html';
+  nav.innerHTML=[['홈','#',1],['캐릭터',vh+'#tab=persona'],['페어',vh+'#tab=pair'],['프롬프트',vh+'#tab=prompt'],['OOC',vh+'#tab=ooc'],['위젯',vh+'#tab=widget'],['로그','logs.html']]
+    .map(([n,h,on])=>`<a href="${h}"${on?' class="on"':' data-link'}>${n}</a>`).join('');
+  applyOpen();
+}
+
+/* 달력 (페어 기념일 표시) */
+let calY, calM; { const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); }
+function calMarks(y,m){
+  const out={}; const last=new Date(y,m+1,0).getDate();
+  ddPairs().forEach(r=>{ const st=new Date(r.dday+'T00:00:00'); if(isNaN(st)) return; const A=sideOf(r.a), B=sideOf(r.b); const nm=r.name||(A.name+' × '+B.name);
+    for(let d=1; d<=last; d++){ const t=new Date(y,m,d); const day=Math.round((t-st)/DAY)+1; if(day<1) continue;
+      let lab=''; if(day===1) lab='시작한 날'; else if(day%100===0) lab=day+'일';
+      else if(t.getMonth()===st.getMonth()&&t.getDate()===st.getDate()&&t.getFullYear()>st.getFullYear()) lab=(t.getFullYear()-st.getFullYear())+'주년';
+      if(lab) (out[d]=out[d]||[]).push(`${nm} ${lab}`); } });
+  return out;
+}
+function paintCal(){
+  const g=$h('cal'); if(!g) return;
+  const first=new Date(calY,calM,1).getDay(), last=new Date(calY,calM+1,0).getDate(), now=new Date();
+  const mk=calMarks(calY,calM);
+  $h('calM').textContent=`${calY}. ${String(calM+1).padStart(2,'0')}`;
+  let h=['일','월','화','수','목','금','토'].map((d,i)=>`<span class="dw${i===0?' su':i===6?' sa':''}">${d}</span>`).join('');
+  for(let i=0;i<first;i++) h+='<span></span>';
+  for(let d=1; d<=last; d++){ const today=now.getFullYear()===calY&&now.getMonth()===calM&&now.getDate()===d; const w=(first+d-1)%7;
+    h+=`<span class="cd${today?' today':''}${mk[d]?' ev':''}${w===0?' su':w===6?' sa':''}"${mk[d]?` title="${esc(mk[d].join(', '))}"`:''}>${d}</span>`; }
+  g.innerHTML=h;
+  const ev=Object.entries(mk).map(([d,l])=>l.map(x=>`<div><b>${calM+1}.${d}</b>${esc(x)}</div>`).join('')).join('');
+  $h('calEv').innerHTML=ev||'<div class="none">이번 달에는 페어 기념일이 없어요</div>';
+}
+$h('calPrev').onclick=()=>{ if(--calM<0){ calM=11; calY--; } paintCal(); };
+$h('calNext').onclick=()=>{ if(++calM>11){ calM=0; calY++; } paintCal(); };
+
+/* 홈에 띄울 블럭 고르기 · 순서 */
+const BLKS={note:'노트',short:'바로가기',cal:'달력',dday:'디데이',links:'링크',memo:'메모장',gal:'갤러리',music:'음악'};
+const BLK_DEF=['note','cal','short','dday','links'];
+const blkList=()=>{ const L=(DECO.blocks||BLK_DEF).filter(k=>BLKS[k]); return L; };
+function paintBlocks(){
+  const box=$h('blocks'); if(!box) return; const L=blkList();
+  box.querySelectorAll(':scope > [data-blk]').forEach(el=>{ const on=L.includes(el.dataset.blk); el.style.display=on?'':'none';
+    let t=el.querySelector(':scope > .blk-tools'); if(decoOn&&on){ if(!t){ t=document.createElement('div'); t.className='blk-tools'; el.appendChild(t); }
+      const i=L.indexOf(el.dataset.blk); t.innerHTML=`<span>${BLKS[el.dataset.blk]}</span><button type="button" data-m="-1" ${i===0?'disabled':''} title="앞으로">◀</button><button type="button" data-m="1" ${i===L.length-1?'disabled':''} title="뒤로">▶</button><button type="button" data-m="x" title="홈에서 숨기기">숨기기</button>`;
+      t.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const l=blkList().slice(), k=el.dataset.blk, j=l.indexOf(k);
+        if(b.dataset.m==='x') l.splice(j,1); else { const n=j+(+b.dataset.m); [l[j],l[n]]=[l[n],l[j]]; }
+        DECO.blocks=l; savePref(); paintBlocks(); }); }
+    else if(t) t.remove(); });
+  L.forEach(k=>{ const el=box.querySelector(`:scope > [data-blk="${k}"]`); if(el) box.appendChild(el); });
+  const ad=$h('blkAdd'), hid=Object.keys(BLKS).filter(k=>!L.includes(k));
+  ad.innerHTML=decoOn?`<span class="lb">홈에 띄울 블럭</span>${hid.length?hid.map(k=>`<button type="button" data-k="${k}">＋ ${BLKS[k]}</button>`).join(''):'<span class="none">모든 블럭을 띄우고 있어요</span>'}`:'';
+  ad.style.display=decoOn?'':'none';
+  ad.querySelectorAll('button').forEach(b=>b.onclick=()=>{ DECO.blocks=[...blkList(),b.dataset.k]; savePref(); paintBlocks(); if(b.dataset.k==='gal') paintGal(); if(b.dataset.k==='music') muInit(); });
+}
+/* 메모장 */
+(()=>{ const m=$h('memo'); if(!m) return; m.value=DECO.memo||''; let t=0; m.addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(()=>{ DECO.memo=m.value; savePref(); },300); }); })();
+/* 갤러리 (보관함 갤러리의 최근 사진) */
+function paintGal(){
+  const g=$h('gal'); if(!g) return; const all=V.gallery||[], L=all.slice(0,5);
+  if(!L.length){ g.className='gal-g'; g.innerHTML=`<div class="empty2">보관함 갤러리에 사진을 올리면 최근 사진이 여기 떠요.<a class="pill" href="vault.html#tab=gallery" data-link>갤러리로 가기</a></div>`; applyOpen(); return; }
+  g.className='gal-g n'+L.length;
+  g.innerHTML=L.map((x,i)=>{ const src=V.img&&V.img[x.img]; const more=i===L.length-1&&all.length>L.length?all.length-L.length:0;
+    return `<a href="vault.html#tab=gallery" data-link class="gt${i===0?' big':''}"><span class="gi" style="${src?`background-image:url('${src}')`:''}"></span>${x.title?`<span class="gc">${esc(x.title)}</span>`:''}${more?`<span class="gm">+${more}</span>`:''}</a>`; }).join('');
+  applyOpen();
+}
+/* ---------- 음악 (유튜브 재생목록) ---------- */
+if(!P.music) P.music={list:[],idx:0,shuffle:false,repeat:'all',vol:60,auto:false};
+const MU=P.music;
+let ytP=null, ytReady=false, ytState=-1, muTick=0, muLoaded=false;
+function ytId(u){ u=String(u||'').trim(); let m=u.match(/(?:youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|[?&]v=)([\w-]{11})/); if(m) return m[1]; if(/^[\w-]{11}$/.test(u)) return u; return ''; }
+const fmtT=s=>{ s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+const muCur=()=>MU.list[MU.idx]||null;
+function muLoadApi(){ if(window.YT&&window.YT.Player){ muMake(); return; } if(muLoaded) return; muLoaded=true;
+  const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{ if(prev) prev(); muMake(); };
+  const sc=document.createElement('script'); sc.src='https://www.youtube.com/iframe_api'; document.head.appendChild(sc); }
+function muMake(){
+  if(ytP||!muCur()) return; const box=$h('muScreen'); if(!box) return;
+  /* 유튜브는 출발 주소가 없으면 재생을 막아서, 이 칸만 출발지(사이트 주소)를 보내요 */
+  const f=document.createElement('iframe'); f.id='home-ytFrame'; f.allow='autoplay; encrypted-media'; f.setAttribute('referrerpolicy','strict-origin-when-cross-origin'); f.title='음악 플레이어';
+  f.src=`https://www.youtube.com/embed/${muCur().vid}?enablejsapi=1&playsinline=1&rel=0&origin=${encodeURIComponent(location.origin)}`;
+  box.innerHTML=''; box.appendChild(f);
+  ytP=new YT.Player(f,{events:{onReady:()=>{ ytReady=true; ytP.setVolume(MU.vol); if(muWant){ muWant=false; ytP.playVideo(); } muPaint(); },
+    onStateChange:e=>{ ytState=e.data; if(e.data===1){ const d=ytP.getVideoData&&ytP.getVideoData(); const c=muCur(); if(c&&d&&d.title&&(!c.title||c.auto)){ c.title=d.title; c.auto=false; if(d.author) c.by=d.author; savePref(); muList(); } }
+      if(e.data===0) muEnd(); muPaint(); },
+    onError:()=>{ toastH('이 곡은 재생할 수 없어서 다음 곡으로 넘어가요'); setTimeout(()=>muStep(1),800); }}});
+}
+let muWant=false;
+function muPlayIdx(i,play){ if(!MU.list.length) return; MU.idx=(i+MU.list.length)%MU.list.length; savePref();
+  if(!ytP){ muWant=!!play; muLoadApi(); muMake(); }
+  else if(ytReady){ play?ytP.loadVideoById(muCur().vid):ytP.cueVideoById(muCur().vid); }
+  muPaint(); muList(); }
+function muStep(d){ if(!MU.list.length) return; if(MU.shuffle&&MU.list.length>1){ let n; do{ n=Math.floor(Math.random()*MU.list.length); }while(n===MU.idx); muPlayIdx(n,true); } else muPlayIdx(MU.idx+d,true); }
+function muEnd(){ if(MU.repeat==='one'){ ytP.seekTo(0); ytP.playVideo(); return; } if(!MU.shuffle&&MU.repeat==='off'&&MU.idx===MU.list.length-1) return; muStep(1); }
+function muToggle(){ if(!MU.list.length){ $h('muUrl').focus(); return; } if(!ytP||!ytReady){ muWant=true; muLoadApi(); muMake(); return; } ytState===1?ytP.pauseVideo():ytP.playVideo(); }
+function muPaint(){
+  const c=muCur(), playing=ytState===1;
+  $h('muTitle').textContent=c?(c.title||'제목을 불러오는 중…'):'재생목록이 비어 있어요';
+  $h('muSub').textContent=c?(c.by||`${MU.idx+1} / ${MU.list.length}`):'아래 칸에 유튜브 링크를 붙여넣어 보세요';
+  $h('muCnt').textContent=MU.list.length?`${MU.list.length}곡`:'';
+  $h('muPlay').innerHTML=playing?'<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg>':'<svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>';
+  $h('muPlay').title=playing?'일시정지':'재생';
+  $h('muShuf').classList.toggle('on',!!MU.shuffle);
+  $h('muRep').classList.toggle('on',MU.repeat!=='off'); $h('muRep1').style.display=MU.repeat==='one'?'':'none';
+  $h('muRep').title={all:'전체 반복',one:'한 곡 반복',off:'반복 안 함'}[MU.repeat];
+  const th=c?`https://i.ytimg.com/vi/${c.vid}/mqdefault.jpg`:'';
+  const cv=$h('muCover'), lb=$h('muLabel');
+  if(cv.dataset.v!==th){ cv.dataset.v=th; cv.innerHTML=th?`<img src="${th}" alt="" referrerpolicy="no-referrer" onerror="this.remove()"><span class="ph">♪</span>`:'<span class="ph">♪</span>'; lb.innerHTML=th?`<img src="${th}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''; }
+  $h('muCd').classList.toggle('has',!!c);
+  home.classList.toggle('mu-playing',playing); muMini();
+}
+function muList(){
+  const ol=$h('muList'); if(!ol) return;
+  ol.innerHTML=MU.list.map((t,i)=>`<li class="${i===MU.idx?'on':''}" data-i="${i}"><span class="md"><img src="https://i.ytimg.com/vi/${t.vid}/mqdefault.jpg" alt="" referrerpolicy="no-referrer" loading="lazy" onerror="this.remove()"></span><span class="t"><b>${esc(t.title||'제목을 불러오는 중…')}</b>${t.by?`<small>${esc(t.by)}</small>`:''}</span><span class="ac"><button type="button" data-a="up" title="위로">▲</button><button type="button" data-a="dn" title="아래로">▼</button><button type="button" data-a="rm" title="빼기">✕</button></span></li>`).join('')||'<li class="none">아직 곡이 없어요</li>';
+  ol.querySelectorAll('li[data-i]').forEach(li=>{ const i=+li.dataset.i;
+    li.onclick=e=>{ const b=e.target.closest('button'); if(!b){ muPlayIdx(i,true); return; }
+      e.stopPropagation(); const a=b.dataset.a, L=MU.list;
+      if(a==='rm'){ const cur=MU.idx; L.splice(i,1); if(i<cur||(i===cur&&cur>=L.length)) MU.idx=Math.max(0,cur-(i<cur?1:0)); if(!L.length){ MU.idx=0; if(ytP){ try{ ytP.stopVideo(); }catch(_){} } } else if(i===cur&&ytP&&ytReady) ytP.cueVideoById(muCur().vid); }
+      else { const j=i+(a==='up'?-1:1); if(j<0||j>=L.length) return; [L[i],L[j]]=[L[j],L[i]]; if(MU.idx===i) MU.idx=j; else if(MU.idx===j) MU.idx=i; }
+      savePref(); muList(); muPaint(); }; });
+}
+async function muAdd(){
+  const inp=$h('muUrl'), raw=inp.value.trim(); if(!raw) return;
+  const ids=[...new Set(raw.split(/\s+/).map(ytId).filter(Boolean))];
+  if(!ids.length){ toastH('유튜브 영상 링크를 넣어 주세요 (재생목록 링크는 곡마다 넣어 주세요)'); return; }
+  ids.forEach(v=>MU.list.push({vid:v,title:'',auto:true}));
+  inp.value=''; savePref(); muList(); muPaint(); toastH(ids.length>1?`${ids.length}곡을 추가했어요`:'곡을 추가했어요');
+  for(const v of ids){ try{ const r=await fetch(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent('https://www.youtube.com/watch?v='+v)}`,{referrerPolicy:'no-referrer'}); if(r.ok){ const j=await r.json(); MU.list.filter(t=>t.vid===v&&t.auto).forEach(t=>{ t.title=j.title||''; t.by=j.author_name||''; t.auto=false; }); savePref(); muList(); muPaint(); } }catch(e){} }
+}
+/* 블럭이 화면 밖일 때 작은 플레이어 */
+function muMini(){
+  let m=document.getElementById('home-muMini'); const blk=home.querySelector('[data-blk="music"]'); const c=muCur();
+  const show=c&&ytState===1&&blk&&!muVis;
+  if(!show){ if(m) m.classList.remove('on'); return; }
+  if(!m){ m=document.createElement('div'); m.id='home-muMini'; m.className='mu-mini'; document.body.appendChild(m); }
+  m.innerHTML=`<span class="eq"><i></i><i></i><i></i></span><b>${esc(c.title||'재생 중')}</b><button type="button" data-a="p" title="일시정지">❚❚</button><button type="button" data-a="n" title="다음 곡">⏭</button>`;
+  m.querySelector('[data-a=p]').onclick=()=>muToggle(); m.querySelector('[data-a=n]').onclick=()=>muStep(1);
+  m.querySelector('b').onclick=()=>blk.scrollIntoView({behavior:'smooth',block:'center'});
+  m.classList.add('on');
+}
+let muVis=true;
+let muInited=false;
+function muInit(){
+  if(muInited) return; muInited=true;
+  $h('muPlay').onclick=muToggle; $h('muNext').onclick=()=>muStep(1); $h('muPrev').onclick=()=>{ if(ytP&&ytReady&&ytP.getCurrentTime()>4){ ytP.seekTo(0); return; } muStep(-1); };
+  $h('muShuf').onclick=()=>{ MU.shuffle=!MU.shuffle; savePref(); muPaint(); };
+  $h('muRep').onclick=()=>{ MU.repeat={all:'one',one:'off',off:'all'}[MU.repeat||'all']; savePref(); muPaint(); };
+  $h('muVol').value=MU.vol; $h('muVol').oninput=()=>{ MU.vol=+$h('muVol').value; if(ytP&&ytReady) ytP.setVolume(MU.vol); clearTimeout(muInit.v); muInit.v=setTimeout(savePref,300); };
+  $h('muSeek').oninput=()=>{ if(ytP&&ytReady){ const d=ytP.getDuration()||0; ytP.seekTo(d*$h('muSeek').value/1000,true); } };
+  $h('muAdd').onclick=muAdd; $h('muUrl').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); muAdd(); } });
+  $h('muUrl').addEventListener('paste',()=>setTimeout(()=>{ if(ytId($h('muUrl').value)) muAdd(); },0));
+  $h('muAuto').checked=!!MU.auto; $h('muAuto').onchange=()=>{ MU.auto=$h('muAuto').checked; savePref(); };
+  $h('muCd').addEventListener('click',()=>{ if($h('muCd').classList.contains('vid')) return; muToggle(); });
+  $h('muVid').onclick=()=>{ const on=!$h('muCd').classList.contains('vid'); $h('muCd').classList.toggle('vid',on); $h('muVid').classList.toggle('on',on); $h('muVid').textContent=on?'CD로':'영상'; };
+  setInterval(()=>{ if(!ytP||!ytReady||ytState!==1) return; const t=ytP.getCurrentTime()||0, d=ytP.getDuration()||0; $h('muCur').textContent=fmtT(t); $h('muDur').textContent=fmtT(d); if(document.activeElement!==$h('muSeek')) $h('muSeek').value=d?Math.round(t/d*1000):0; },500);
+  const blk=home.querySelector('[data-blk="music"]');
+  if(window.IntersectionObserver&&blk) new IntersectionObserver(es=>{ muVis=es[0].isIntersecting; muMini(); }).observe(blk);
+  muList(); muPaint();
+  if(MU.auto&&MU.list.length){ muLoadApi(); const go=e=>{ if(e.target.closest&&e.target.closest('#home-muPlay,#home-muCd,.mu-list,.mu-ctl')) return; document.removeEventListener('pointerdown',go,true); if(ytState!==1) muToggle(); }; document.addEventListener('pointerdown',go,true); }
+}
+if(blkList().includes('music')) muInit();
+function paintDeco(){
+  home.classList.toggle('decor',decoOn);
+  $h('decoBtn').classList.toggle('on',decoOn); $h('decoBtn').textContent=decoOn?'✓ 꾸미기 끝':'✎ 꾸미기';
+  paintTexts(); paintImgs(); paintHeroNav(); paintCal(); paintBlocks(); paintGal();
+  const pd=$h('postDate'); if(pd){ const t=new Date(); pd.textContent=`${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')}`; }
+}
+$h('decoBtn').onclick=()=>{ decoOn=!decoOn; if(!decoOn&&document.activeElement) document.activeElement.blur(); paintDeco(); if(!decoOn) toastH('꾸민 내용을 저장했어요'); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&decoOn&&!$h('settings').classList.contains('on')){ decoOn=false; paintDeco(); } });
+paintDeco();
 
 function paintLast(){ const el=$h('last'); if(!el) return; const t=+get('studio-home-lastBackup');
   el.innerHTML=t?`<b>${ago(t)}</b> 마지막 전체 백업`:'아직 전체 백업을 받은 적이 없어요'; }

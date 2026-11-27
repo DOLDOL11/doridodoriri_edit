@@ -1562,7 +1562,7 @@ function selMode(on){
 function paintSel(){
   const g=$('grid'); if(!g) return;
   const vis=[...g.querySelectorAll(CARD_Q)];
-  vis.forEach(el=>{ const id=cardId(el); el.classList.toggle('v-sel',U.selMode&&SEL.has(id)); el.classList.toggle('v-selable',!!U.selMode);
+  vis.forEach(el=>{ const id=cardId(el); el.classList.toggle('v-sel',!!(U.selMode&&SEL.has(id))); el.classList.toggle('v-selable',!!U.selMode);
     if(U.selMode&&!el.querySelector(':scope > .v-ck')){ const c=document.createElement('span'); c.className='v-ck'; el.appendChild(c); }
     if(!U.selMode){ const c=el.querySelector(':scope > .v-ck'); if(c) c.remove(); } });
   if(!U.selMode){ if(selBar){ selBar.remove(); selBar=null; } return; }
